@@ -9,7 +9,7 @@ IMGModel = imageModel
 
 #default:main
 
-main: main.o $(IMGModel)/Point.o $(IMGModel)/Line.o $(IMGModel)/Edge.o $(IMGModel)/Matrix.o $(IMGModel)/Image.o
+maelab: main.o $(IMGModel)/Point.o $(IMGModel)/Line.o $(IMGModel)/Edge.o $(IMGModel)/Matrix.o $(IMGModel)/Image.o
 	$(CC) $(CFLAGS) -o main main.o $(IMGModel)/Point.o $(IMGModel)/Line.o $(IMGModel)/Edge.o $(IMGModel)/Matrix.o $(IMGModel)/Image.o
 
 main.o: main.cpp $(IMGModel)/Point.h $(IMGModel)/Line.h $(IMGModel)/Edge.h $(IMGModel)/Matrix.h $(IMGModel)/Image.h
@@ -22,6 +22,6 @@ Matrix.o: $(IMGModel)/Matrix.h
 Image.o: $(IMGModel)/Image.h
 
 clean:
-	rm -f main
+	rm -f maelab
 	rm -f *.o
 	rm -f imageModel/*.o
