@@ -4,9 +4,12 @@
  * Test file
  */
 #include <iostream>
+#include <vector>
 #include <math.h>
 #include <stdlib.h>
-#include <vector>
+#include <string.h>
+#include <fstream>
+
 using namespace std;
 
 #include "imageModel/Point.h"
@@ -14,9 +17,7 @@ using namespace std;
 #include "imageModel/Edge.h"
 #include "imageModel/Matrix.h"
 //#include "imageModel/Image.h"
-
-
-
+std::vector<ptr_Point> readTPS(const char* filename);
 
 int main()
 {
@@ -84,9 +85,9 @@ int main()
 	otherMT->printMatrix();
 
 	// matrix of points
-	ptr_PointMatrix points(2,2,new Point(1,1));
+	//ptr_PointMatrix points(2,2,new Point(1,1));
 
-
+	cout<<endl<<"Number: "<<readTPS("/home/linh/Desktop/Temps/mg/Mg 159.TPS").size();
 
     cout << endl;
 

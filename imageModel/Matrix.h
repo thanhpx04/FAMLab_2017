@@ -16,42 +16,17 @@ class Matrix
     std::vector<std::vector<T> > data; // store the data
     int rows;			      // number of rows
     int cols;			      // number of columns
-	void Init()
-	{
-		data.resize(getRows());
-		for (int i = 0; i < getRows(); ++i)
-			data[i].resize(getCols());
-	}
-	void InitWithValue(T value)
-	{
-		data.resize(getRows());
-		for (int i = 0; i < getRows(); ++i)
-			data[i].resize(getCols(),value);
-	}
+	void Init();
+	void InitWithValue(T);
   public:
   	// basic constructor
-    Matrix()
-    {
-		rows = 0;
-		cols = 0;
-    }
+    Matrix();
+
 
 	// constructor with number of rows and column
-    Matrix(int nrows, int ncols)
-    {
-		rows = nrows;
-		cols = ncols;
-		// Initialization the matrix
-		Init();
-    }
-
+    Matrix(int nrows, int ncols);
 	// constructor with number of rows, columns and default value
-	Matrix(int nrows, int ncols, T value)
-	{
-		rows = nrows;
-		cols = ncols;
-		InitWithValue(value);
-	}
+	Matrix(int nrows, int ncols, T value);
 	Matrix(const Matrix<T>& tMatrix);
 	Matrix<T>& operator=(const Matrix<T>& tMatrix);
     virtual ~Matrix() {}
