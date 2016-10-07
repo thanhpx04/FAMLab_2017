@@ -98,10 +98,10 @@ std::vector<ptr_Point> Edge::getPoints(std::vector<ptr_Line> listLines){
 	if(listLines.size() > 0){
 		for (size_t i = 0; i < listLines.size(); ++i) {
 			ptr_Line l= listLines.at(i);
-			if(!checkPointInList(vip,l->getP1()))
-				vip.push_back(l->getP1());
-			if(!checkPointInList(vip,l->getP2()))
-				vip.push_back(l->getP2());
+			if(!checkPointInList(vip,l->getBegin()))
+				vip.push_back(l->getBegin());
+			if(!checkPointInList(vip,l->getEnd()))
+				vip.push_back(l->getEnd());
 		}
 	}
 	return vip;

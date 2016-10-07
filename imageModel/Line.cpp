@@ -16,14 +16,25 @@ using namespace std;
 #include "Line.h"
 
 //=================================================== Constructor ===========================================
+Line::Line()
+{}
+Line::Line(const Line& otherLine)
+{
+	begin = otherLine.begin;
+	end = otherLine.end;
+	dx = otherLine.dx;
+	dy = otherLine.dy;
+	length = otherLine.length;
+	equation = otherLine.equation;
+}
 
 Line::Line(ptr_Point ep1, ptr_Point ep2)
 {
-    p1 = ep1;
-    p2 = ep2;
+    begin = ep1;
+    end = ep2;
 
-    dx = p2->getX() - p1->getX();
-    dy = p2->getY() - p1->getY();
+    dx = end->getX() - begin->getX();
+    dy = end->getY() - begin->getY();
 
     length = lengthOfLine();
 
@@ -35,22 +46,22 @@ Line::~Line()
     // TODO Auto-generated destructor stub
 }
 //=================================================== Get and set ===========================================
-ptr_Point Line::getP1()
+ptr_Point Line::getBegin()
 {
-    return p1;
+    return begin;
 }
-ptr_Point Line::getP2()
+ptr_Point Line::getEnd()
 {
-    return p2;
+    return end;
 }
 
-void Line::setP1(ptr_Point ep1)
+void Line::setBegin(ptr_Point ep1)
 {
-    p1 = ep1;
+    begin = ep1;
 }
-void Line::setP2(ptr_Point ep2)
+void Line::setEnd(ptr_Point ep2)
 {
-    p2 = ep2;
+    end = ep2;
 }
 
 double Line::getLength()
@@ -68,7 +79,7 @@ std::vector<double> Line::getEquation()
  */
 bool Line::isPoint()
 {
-    if (p1->getX() == p2->getX() && p1->getY() == p2->getY())
+    if (begin->getX() == end->getX() && begin->getY() == end->getY())
 		return true;
     return false;
 }
@@ -91,7 +102,7 @@ std::vector<double> Line::equationOfLine()
     { // line y = m
 		equa.push_back(0);
 		equa.push_back(1);
-		equa.push_back(-(p1->getY()));
+		equa.push_back(-(begin->getY()));
 		return equa;
     }
 
@@ -99,7 +110,7 @@ std::vector<double> Line::equationOfLine()
     { //line x = n
 		equa.push_back(1);
 		equa.push_back(0);
-		equa.push_back(-(p1->getX()));
+		equa.push_back(-(begin->getX()));
 		return equa;
     }
 
@@ -109,7 +120,7 @@ std::vector<double> Line::equationOfLine()
 
 		equa.push_back(m);
 		equa.push_back(-1);
-		equa.push_back(p1->getY() - (m * p1->getX()));
+		equa.push_back(begin->getY() - (m * begin->getX()));
 		return equa;
     }
     return equa; // NULL

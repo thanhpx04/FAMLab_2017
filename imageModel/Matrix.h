@@ -8,45 +8,56 @@
 
 #ifndef MATRIX_H_
 #define MATRIX_H_
+#include "../helpers/Defines.hpp"
 
-template <typename T>
-class Matrix
-{
-  private:
-    std::vector<std::vector<T> > data; // store the data
-    int rows;			      // number of rows
-    int cols;			      // number of columns
+template<typename T>
+class Matrix {
+private:
+	std::vector<std::vector<T> > data; // store the data
+	int rows; // number of rows
+	int cols; // number of columns
 	void Init();
 	void InitWithValue(T);
-  public:
-  	// basic constructor
-    Matrix();
-
-
+public:
+	// basic constructor
+	Matrix();
 	// constructor with number of rows and column
-    Matrix(int nrows, int ncols);
+	Matrix(int nrows, int ncols);
 	// constructor with number of rows, columns and default value
 	Matrix(int nrows, int ncols, T value);
 	Matrix(const Matrix<T>& tMatrix);
+
 	Matrix<T>& operator=(const Matrix<T>& tMatrix);
-    virtual ~Matrix() {}
-    int getRows() { return rows; }
-    int getCols() { return cols; }
-    void setRows(int nrows) { rows = nrows; }
-    void setCols(int ncols) { cols = ncols; }
-    std::vector<std::vector<T> > getData()
-	{
+	virtual ~Matrix() {
+	}
+	int getRows() {
+		return rows;
+	}
+	int getCols() {
+		return cols;
+	}
+	void setRows(int nrows) {
+		rows = nrows;
+	}
+	void setCols(int ncols) {
+		cols = ncols;
+	}
+	std::vector<std::vector<T> > getData() {
 		return data;
 	}
-	void setData(std::vector<std::vector<T> > iData)
-	{
+
+	void setData(std::vector<std::vector<T> > iData) {
 		data = iData;
 	}
-    T getAtPosition(int, int);
+
+	T getAtPosition(int, int);
 	void setAtPosition(int, int, T);
 	void printMatrix();
 };
+typedef Matrix<unsigned int>* ptr_IntMatrix;
+//typedef Matrix<ptr_Point> ptr_PointMatrix;
+typedef Matrix<RGB>* ptr_RGBMatrix;
 
-typedef Matrix<int>* ptr_Matrix;
-typedef Matrix<ptr_Point> ptr_PointMatrix;
+//typedef Matrix ptr_Matrix;
+
 #endif /* MATRIX_H_ */

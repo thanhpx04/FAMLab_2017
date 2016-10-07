@@ -31,10 +31,7 @@ Matrix<T>::Matrix(int nrows, int ncols, T value) {
 	InitWithValue(value);
 }
 
-/*Matrix<T>::~Matrix() {
- }
-
-
+/*
  template <typename T>
  Matrix<T>::Matrix(int nrows, int ncols)
  {
@@ -63,25 +60,26 @@ void Matrix<T>::InitWithValue(T value) {
 }
 
 template<typename T>
-T Matrix<T>::getAtPosition(int x, int y) {
-	return data[x][y];
+T Matrix<T>::getAtPosition(int r, int c) {
+	return data[r][c];
 }
 
 template<typename T>
-void Matrix<T>::setAtPosition(int x, int y, T value) {
-	data[x][y] = value;
+void Matrix<T>::setAtPosition(int r, int c, T value) {
+	data[r][c] = value;
 }
 
 template<typename T>
 void Matrix<T>::printMatrix() {
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
-			cout << data[i][j] << "\t";
+			//cout << data[i][j] << "\t";
 		}
 		cout << endl;
 	}
 }
 
-template class Matrix<int> ;
-template class Matrix<ptr_Point> ;
+//template class Matrix<int> ;
+template class Matrix<unsigned int> ;
+template class Matrix<RGB> ;
 
