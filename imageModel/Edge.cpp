@@ -5,10 +5,13 @@
  *      Author: linh
  */
 #include <iostream>
-#include <vector>
 #include <math.h>
 #include <stdlib.h>
-#include <stdlib.h>
+#include <stdio.h>
+#include <vector>
+#include <string.h>
+#include <fstream>
+#include <time.h>
 
 using namespace std;
 

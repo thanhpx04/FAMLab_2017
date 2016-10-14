@@ -36,7 +36,7 @@
 #include <iostream>
 using namespace std;
 
-#include "../helpers/Defines.hpp"
+#include "../utils/Defines.hpp"
 
 #include "LoadJPG.h"
 
@@ -49,7 +49,13 @@ using namespace std;
 #define SOS 	 0xDA	// Start of Scan
 #define EOI 	 0xD9	// End of Image, or End of File
 #define APP0	 0xE0
-
+#define JPG		 0xC8	// JPG Marker
+#define DAC		 0xCC	// Define arithmetic coding conditions marker
+#define DRI		 0xDD
+#define COM		 0xFE	// comment marker
+#define DHP		 0xDE	// define hierachical progression marker
+#define DNL		 0xDC	// define number of lines marker
+#define EXP		 0xDF	// expand reference compnents marker
 #define BYTE_TO_WORD(x) (((x)[0]<<8)|(x)[1])
 
 const int HUFFMAN_TABLES = 4;
@@ -384,7 +390,7 @@ inline void BuildHuffmanTable(const unsigned char *bits,
 
 /***************************************************************************/
 
-inline void PrintSOF(const unsigned char *stream) {
+/*inline void PrintSOF(const unsigned char *stream) {
 	int width;
 	int height;
 	int nr_components;
@@ -399,12 +405,12 @@ inline void PrintSOF(const unsigned char *stream) {
 	nr_components = stream[7];
 
 	cout << endl << "> SOF marker\n";
-	/*cout<<endl<<"Size:%dx%d nr_components:%d (%s)  precision:%d\n",
+	cout<<endl<<"Size:%dx%d nr_components:%d (%s)  precision:%d\n",
 	 width, height,
 	 nr_components,
 	 nr_components_to_string[nr_components],
-	 precision;*/
-}
+	 precision;
+}*/
 
 /***************************************************************************/
 
@@ -424,7 +430,8 @@ inline int ParseSOF(stJpegData *jdata, const unsigned char *stream) {
 	 Tqi		8		0-3			Quantization Table Selector.
 	 */
 
-	PrintSOF(stream);
+	//PrintSOF(stream);
+	cout << endl << "> SOF marker\n";
 
 	int height = BYTE_TO_WORD(stream+3);
 	int width = BYTE_TO_WORD(stream+5);
@@ -683,14 +690,18 @@ inline int ParseJFIF(stJpegData *jdata, const unsigned char *stream) {
 			// certain jpg compressions, like swf, it splits the encoding 
 			// and image data with SOI & EOI extra tags, so we need to skip
 			// over them here and decode the whole image
-		case SOI:
-		case EOI: {
+		case SOI: {
+			cout << endl << "SOI - start of image\n";
 			chuck_len = 0;
+		}
 			break;
+		case EOI: {
+			cout << endl << "EOI - End of image\n";
+			chuck_len = 0;
 		}
 			break;
 
-		case 0xDD: //DRI: Restart_markers=1;
+		case DRI: //DRI: Restart_markers=1;
 		{
 			jdata->m_restart_interval = BYTE_TO_WORD(stream);
 			cout << endl << "DRI - Restart_marker\n";
@@ -701,9 +712,33 @@ inline int ParseJFIF(stJpegData *jdata, const unsigned char *stream) {
 			cout << endl << "APP0 Chunk ('txt' information) skipping\n";
 		}
 			break;
-
+		case JPG: {
+			cout << endl << "JPG marker \n";
+		}
+			break;
+		case DAC: {
+			cout << endl << "DAC marker\n";
+		}
+			break;
+		case DNL: {
+			cout << endl << "DNL marker\n";
+		}
+			break;
+		case DHP: {
+			cout << endl << "DHP marker\n";
+		}
+			break;
+		case EXP: {
+			cout << endl << "EXP marker\n";
+		}
+			break;
+		case COM: {
+			cout << endl << "COM marker\n";
+		}
+			break;
 		default: {
 			cout << endl << "ERROR> Unknown marker %2.2x\n";
+			cout << endl << hex << marker;
 		}
 			break;
 		}
@@ -1045,11 +1080,11 @@ void ProcessHuffmanDataUnit(stJpegData *jdata, int indx) {
 		}
 	}
 
-/*
-#ifndef JPG_SPEEDUP
-	DumpDCTValues(DCT_tcoeff);
-#endif
-*/
+	/*
+	 #ifndef JPG_SPEEDUP
+	 DumpDCTValues(DCT_tcoeff);
+	 #endif
+	 */
 
 	// We've decoded a block of data, so copy it across to our buffer
 	for (int j = 0; j < 64; j++) {
@@ -1198,9 +1233,9 @@ inline int JpegDecode(stJpegData *jdata) {
 	int ystride_by_mcu = 8 * vFactor;
 
 	// Don't forget to that block can be either 8 or 16 lines
-	unsigned int bytes_per_blocklines = jdata->m_width * 3 * ystride_by_mcu;
+	//unsigned int bytes_per_blocklines = jdata->m_width * 3 * ystride_by_mcu;
 
-	unsigned int bytes_per_mcu = 3 * xstride_by_mcu;
+	//unsigned int bytes_per_mcu = 3 * xstride_by_mcu;
 
 	// Just the decode the image by 'macroblock' (size is 8x8, 8x16, or 16x16)
 	for (int y = 0; y < (int) jdata->m_height; y += ystride_by_mcu) {
@@ -1296,26 +1331,28 @@ unsigned char* readFile(char* jpgFileName, unsigned int &lengthOfFile) {
 	fclose(fp);
 	return buf;
 }
+
+// convert jpg file to bmp
 int ConvertJpgFile(char* szJpgFileInName, char * szBmpFileOutName) {
 	//FILE *fp;
 	unsigned int lengthOfFile;
-	unsigned char *buf = readFile(szJpgFileInName,lengthOfFile);
+	unsigned char *buf = readFile(szJpgFileInName, lengthOfFile);
 
 	/*// Load the Jpeg into memory
-	fp = fopen(szJpgFileInName, "rb");
-	if (fp == NULL) {
-		cout << endl << "Cannot open jpg file:";
-		return 0;
-	}
+	 fp = fopen(szJpgFileInName, "rb");
+	 if (fp == NULL) {
+	 cout << endl << "Cannot open jpg file:";
+	 return 0;
+	 }
 
-	lengthOfFile = FileSize(fp);
-	buf = new unsigned char[lengthOfFile + 4]; // +4 is safety padding
-	if (buf == NULL) {
-		cout << endl << ("Not enough memory for loading file\n");
-		return 0;
-	}
-	fread(buf, lengthOfFile, 1, fp);
-	fclose(fp)*/;
+	 lengthOfFile = FileSize(fp);
+	 buf = new unsigned char[lengthOfFile + 4]; // +4 is safety padding
+	 if (buf == NULL) {
+	 cout << endl << ("Not enough memory for loading file\n");
+	 return 0;
+	 }
+	 fread(buf, lengthOfFile, 1, fp);
+	 fclose(fp)*/;
 
 	unsigned char* rgbpix = NULL;
 	unsigned int width = 0;
@@ -1341,51 +1378,51 @@ int ConvertJpgFile(char* szJpgFileInName, char * szBmpFileOutName) {
 }
 
 /***************************************************************************/
-int** redChannel(unsigned char* rgbpix, int width, int height) {
-	int** redMatrix = 0;
-	redMatrix = new int*[height];
-	for (int h = 0; h < height; h++) {
-		redMatrix[h] = new int[width];
-		for (int w = 0; w < width; w++) {
-			int i = (w + width * h) * 3;
-			redMatrix[h][w] = rgbpix[i];
-		}
-	}
-	return redMatrix;
-}
-int** greenChannel(unsigned char* rgbpix, int width, int height) {
-	int** greenMatrix = 0;
-	greenMatrix = new int*[height];
-	for (int h = 0; h < height; h++) {
-		greenMatrix[h] = new int[width];
-		for (int w = 0; w < width; w++) {
-			int i = (w + width * h) * 3;
-			greenMatrix[h][w] = rgbpix[i + 1];
-		}
-	}
-	return greenMatrix;
-}
-int** blueChannel(unsigned char* rgbpix, int width, int height) {
-	int** blueMatrix = 0;
-	blueMatrix = new int*[height];
-	for (int h = 0; h < height; h++) {
-		blueMatrix[h] = new int[width];
-		for (int w = 0; w < width; w++) {
-			int i = (w + width * h) * 3;
-			blueMatrix[h][w] = rgbpix[i + 2];
-		}
-	}
-	return blueMatrix;
-}
-unsigned int** grayChannel(unsigned char* rgbpix, int width, int height) {
-	unsigned int** grayMatrix = 0;
-	grayMatrix = new unsigned int*[height];
-	for (int h = 0; h < height; h++) {
-		grayMatrix[h] = new unsigned int[width];
-		for (int w = 0; w < width; w++) {
-			int i = (w + width * h) * 3;
-			grayMatrix[h][w] = (rgbpix[i] + rgbpix[i + 1] + rgbpix[i + 2]) / 3;
-		}
-	}
-	return grayMatrix;
-}
+/*int** redChannel(unsigned char* rgbpix, int width, int height) {
+ int** redMatrix = 0;
+ redMatrix = new int*[height];
+ for (int h = 0; h < height; h++) {
+ redMatrix[h] = new int[width];
+ for (int w = 0; w < width; w++) {
+ int i = (w + width * h) * 3;
+ redMatrix[h][w] = rgbpix[i];
+ }
+ }
+ return redMatrix;
+ }
+ int** greenChannel(unsigned char* rgbpix, int width, int height) {
+ int** greenMatrix = 0;
+ greenMatrix = new int*[height];
+ for (int h = 0; h < height; h++) {
+ greenMatrix[h] = new int[width];
+ for (int w = 0; w < width; w++) {
+ int i = (w + width * h) * 3;
+ greenMatrix[h][w] = rgbpix[i + 1];
+ }
+ }
+ return greenMatrix;
+ }
+ int** blueChannel(unsigned char* rgbpix, int width, int height) {
+ int** blueMatrix = 0;
+ blueMatrix = new int*[height];
+ for (int h = 0; h < height; h++) {
+ blueMatrix[h] = new int[width];
+ for (int w = 0; w < width; w++) {
+ int i = (w + width * h) * 3;
+ blueMatrix[h][w] = rgbpix[i + 2];
+ }
+ }
+ return blueMatrix;
+ }
+ unsigned int** grayChannel(unsigned char* rgbpix, int width, int height) {
+ unsigned int** grayMatrix = 0;
+ grayMatrix = new unsigned int*[height];
+ for (int h = 0; h < height; h++) {
+ grayMatrix[h] = new unsigned int[width];
+ for (int w = 0; w < width; w++) {
+ int i = (w + width * h) * 3;
+ grayMatrix[h][w] = (rgbpix[i] + rgbpix[i + 1] + rgbpix[i + 2]) / 3;
+ }
+ }
+ return grayMatrix;
+ }*/

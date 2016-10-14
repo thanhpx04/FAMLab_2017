@@ -43,9 +43,9 @@ ptr_RGBMatrix readJPGToRGB(const char* filename) {
 	rgbMatrix = new Matrix<RGB>(height, width);
 	cout << "width: " << rgbMatrix->getCols() << "\t height: "
 			<< rgbMatrix->getRows();
-	for (int h = 0; h < height; h++) { // rows
-		for (int w = 0; w < width; w++) { // cols
-			int i = (w + width * h) * 3;
+	for (unsigned int h = 0; h < height; h++) { // rows
+		for (unsigned  int w = 0; w < width; w++) { // cols
+			unsigned int i = (w + width * h) * 3;
 			RGB rgb;
 			rgb.R = (unsigned short int) rgbpix[i];
 			rgb.G = (unsigned short int) rgbpix[i + 1];
@@ -53,6 +53,7 @@ ptr_RGBMatrix readJPGToRGB(const char* filename) {
 			rgbMatrix->setAtPosition(h, w, rgb);
 		}
 	}
+
 	//cout<<"\nTest value: "<<(unsigned short int)rgbpix[0]<<"\t"<<(unsigned short int)rgbpix[1]<<"\t"<<(unsigned short int)rgbpix[2];
 	//cout<<"\nTest value matrix: "<<rgbMatrix->getAtPosition(0,0).R<<"\t"<<rgbMatrix->getAtPosition(0,0).G<<"\t"<<rgbMatrix->getAtPosition(0,0).B;
 	delete[] rgbpix;
@@ -71,8 +72,8 @@ ptr_IntMatrix readJPGToGray(const char* filename) {
 	}
 
 	grayMatrix = new Matrix<unsigned int>(height, width);
-	for (int h = 0; h < height; h++) {
-		for (int w = 0; w < width; w++) {
+	for (unsigned int h = 0; h < height; h++) {
+		for (unsigned int w = 0; w < width; w++) {
 			int i = (w + width * h) * 3;
 			grayMatrix->setAtPosition(h, w,
 					((rgbpix[i] + rgbpix[i + 1] + rgbpix[i + 2]) / 3));
@@ -83,24 +84,7 @@ ptr_IntMatrix readJPGToGray(const char* filename) {
 	return grayMatrix;
 }
 
-ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix) {
-	ptr_IntMatrix grayMatrix;
-	unsigned int width = rgbMatrix->getCols();
-	unsigned int height = rgbMatrix->getRows();
 
-	grayMatrix = new Matrix<unsigned int>(height, width);
-	for (int h = 0; h < height; h++) {
-		for (int w = 0; w < width; w++) {
-
-			grayMatrix->setAtPosition(h, w,
-					((rgbMatrix->getAtPosition(h, w).R
-							+ rgbMatrix->getAtPosition(h, w).G
-							+ rgbMatrix->getAtPosition(h, w).B) / 3));
-		}
-	}
-
-	return grayMatrix;
-}
 void saveRGBJPG(ptr_RGBMatrix matrix, int width, int height,
 		char* outputFilename) {
 	unsigned char *rgbBuff = new unsigned char[width * height * 3];
@@ -117,7 +101,7 @@ void saveRGBJPG(ptr_RGBMatrix matrix, int width, int height,
 
 	}
 	WriteBMP24("output/abc.bmp", width, height, rgbBuff);
-	SaveJpgFile("output/abc.bmp", outputFilename);
+	SaveJpgFile((char*)"output/abc.bmp", outputFilename);
 	remove("output/abc.bmp");
 }
 void saveGrayJPG(ptr_IntMatrix grayMatrix, int width, int height,
@@ -136,7 +120,7 @@ void saveGrayJPG(ptr_IntMatrix grayMatrix, int width, int height,
 	}
 	WriteBMP24("output/temp.bmp", width, height, rgbBuff);
 	delete[] rgbBuff;
-	SaveJpgFile("output/temp.bmp", outputFileName);
+	SaveJpgFile((char*)"output/temp.bmp", outputFileName);
 	remove("output/temp.bmp");
 }
 // ============================================================== TPS File =====================================================

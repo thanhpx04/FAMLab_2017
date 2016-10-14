@@ -8,8 +8,7 @@
 
 #ifndef MATRIX_H_
 #define MATRIX_H_
-#include "../helpers/Defines.hpp"
-
+#include "../utils/Defines.hpp"
 template<typename T>
 class Matrix {
 private:

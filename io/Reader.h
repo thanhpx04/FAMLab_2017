@@ -10,7 +10,7 @@
 
 ptr_RGBMatrix readJPGToRGB(const char* filename);
 ptr_IntMatrix readJPGToGray(const char* filename);
-ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix);
+//ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix);
 vector<ptr_Point> readTPSFile(const char* filename);
 void saveRGBJPG(ptr_RGBMatrix matrix, int width, int height,
 		char* outputFilename);

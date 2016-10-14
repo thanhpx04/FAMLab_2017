@@ -6,10 +6,18 @@
  */
 
 #include <iostream>
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <vector>
+#include <string.h>
+#include <fstream>
+#include <time.h>
+
 using namespace std;
 
 #include "Point.h"
+
 #include "Matrix.h"
 
 template<typename T>

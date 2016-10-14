@@ -4,13 +4,15 @@
  *  Created on: Sep 16, 2016
  *      Author: linh
  */
+
 #include <iostream>
-#include <vector>
 #include <math.h>
 #include <stdlib.h>
-#include <stdlib.h>
-#include <time.h>
+#include <stdio.h>
+#include <vector>
 #include <string.h>
+#include <fstream>
+#include <time.h>
 
 using namespace std;
 
@@ -22,6 +24,32 @@ using namespace std;
 
 #include "Image.h"
 
+const int BIN_SIZE = 256;
+const int MEAN_GRAY = 120;
+const int DECREASE_25 = 25;
+const int DECREASE_5 = 5;
+
+//================================================= Utils methods =================================================
+ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix) {
+	ptr_IntMatrix grayMatrix;
+	unsigned int width = rgbMatrix->getCols();
+	unsigned int height = rgbMatrix->getRows();
+
+	grayMatrix = new Matrix<unsigned int>(height, width);
+	for (int h = 0; h < height; h++) {
+		for (int w = 0; w < width; w++) {
+
+			grayMatrix->setAtPosition(h, w,
+					((rgbMatrix->getAtPosition(h, w).R
+							+ rgbMatrix->getAtPosition(h, w).G
+							+ rgbMatrix->getAtPosition(h, w).B) / 3));
+		}
+	}
+
+	return grayMatrix;
+}
+// ================================================== End utils methods =============================================
+//===================================================== Constructor =================================================
 Image::Image() {
 	// TODO Auto-generated constructor stub
 
@@ -35,8 +63,12 @@ Image::Image(std::string filePath) {
 	imgMatrix = readJPGToRGB(filePath.c_str());
 	grayMatrix = convertRGBToGray(imgMatrix);
 	calcGrayHistogram();
-
+	calThresholdValue();
 }
+
+//===================================================== End constructor ================================================
+
+//================================================ Public methods ======================================================
 void Image::setFileName(std::string filePath) {
 	fileName = filePath;
 }
@@ -53,26 +85,50 @@ void Image::setMLandmarks(string tpsFile) {
 	listOfMLandmarks = readTPSFile(tpsFile.c_str());
 
 }
+ptr_IntMatrix Image::getGrayMatrix() {
+	return grayMatrix;
+}
+ptr_RGBMatrix Image::getRGBMatrix() {
+	return imgMatrix;
+}
+float Image::getMedianHistogram() {
+	if (medianHistogram == 0)
+		calcGrayHistogram();
+	return medianHistogram;
 
+}
+float Image::getMeanHistogram() {
+	if (meanHistogram == 0)
+		calcGrayHistogram();
+	return meanHistogram;
+}
+float Image::getThresholdValue() {
+	if (thresholdValue == 0)
+		calThresholdValue();
+	return thresholdValue;
+}
+//================================================ End public methods ==================================================
+
+//================================================ Private methods =====================================================
 void Image::calcGrayHistogram() {
 
-
 	if (grayMatrix->getCols() != 0) {
-		grayHistogram = new Matrix<unsigned int>(grayMatrix->getCols() * grayMatrix->getRows(),256,0);
+
 		float total = 0;
 		float pi = 0;
-		int array[256] = {0};
+		int array[BIN_SIZE] = { 0 };
 
 		for (int c = 0; c < grayMatrix->getRows(); c++) {
 			for (int r = 0; r < grayMatrix->getCols(); r++) {
 				int k = grayMatrix->getAtPosition(c, r);
 				array[k]++;
-
 			}
 		}
 
-		for (int k = 0; k < 256; k++) {
-			grayHistogram->setAtPosition(array[k],k,1);
+		grayHistogram = new Matrix<unsigned int>(1, BIN_SIZE, 0);
+
+		for (int k = 0; k < BIN_SIZE; k++) {
+			grayHistogram->setAtPosition(0, k, 255);
 			total += array[k];
 			pi += (k * array[k]);
 		}
@@ -83,7 +139,7 @@ void Image::calcGrayHistogram() {
 		// calculate the median of histogram
 		float avm = total / 2;
 		float temp = 0;
-		for (int m = 0; m < 256; m++) {
+		for (int m = 0; m < BIN_SIZE; m++) {
 			temp += array[m];
 			if (temp >= avm) {
 				medianHistogram = m;
@@ -93,4 +149,42 @@ void Image::calcGrayHistogram() {
 	}
 
 }
+
+void Image::calThresholdValue() {
+	if (medianHistogram == 0 || meanHistogram == 0)
+		calcGrayHistogram();
+	int limit1 =
+			meanHistogram > medianHistogram ? medianHistogram : meanHistogram;
+	limit1 = (limit1 >= 120) ? (limit1 - DECREASE_25) : (limit1 - DECREASE_5);
+	int imax1 = -1, max1 = -1;
+	for (int index = 0; index < limit1; index++) {
+		int temp = grayHistogram->getAtPosition(0, index);
+		if (temp > max1) {
+			max1 = temp;
+			imax1 = index;
+		}
+	}
+	int limit2 =
+			meanHistogram > medianHistogram ? meanHistogram : medianHistogram;
+	int imin = -1, min = max1;
+	for (int k = imax1; k < limit2; k++) {
+		int temp = grayHistogram->getAtPosition(0, k);
+		if (temp < min) {
+			min = temp;
+			imin = k;
+		}
+	}
+	int max2 = -1, imax2 = -1;
+	for (int k = limit2; k < BIN_SIZE; k++) {
+		int temp = grayHistogram->getAtPosition(0, k);
+		if (temp > max2) {
+			max2 = temp;
+			imax2 = k;
+		}
+	}
+	float mid1 = (imin + imax1)/2;
+	float mid2 = (imin + imax2)/2;
+	thresholdValue = (mid1 + mid2)/2;
+}
+//================================================ End private methods =====================================================
 

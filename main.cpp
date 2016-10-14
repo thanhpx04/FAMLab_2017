@@ -4,11 +4,13 @@
  * Test file
  */
 #include <iostream>
-#include <vector>
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <vector>
 #include <string.h>
 #include <fstream>
+#include <time.h>
 
 using namespace std;
 
@@ -24,6 +26,7 @@ using namespace std;
 #include "io/Reader.h"
 
 #include "imageModel/Image.h"
+#include "utils/Canny.h"
 
 int main() {
 	cout << "MAELab test" << endl << endl;
@@ -90,14 +93,19 @@ int main() {
 	cout << endl << "Number: "
 			<< readTPSFile("/home/linh/Desktop/Temps/mg/Mg 159.TPS").size();
 
-	cout << endl;
+	cout << endl;*/
 
-	ptr_RGBMatrix rgbMatrix = readJPGToRGB("/home/linh/Desktop/Temps/md/images/Md 009.JPG");
+	//ptr_RGBMatrix rgbMatrix = readJPGToRGB("/home/linh/Desktop/Temps/md/images/Md 009.JPG");
+	//ptr_RGBMatrix rgbMatrix = readJPGToRGB("data/bd2.jpg");
+	//saveRGBJPG(rgbMatrix, rgbMatrix->getCols(), rgbMatrix->getRows(),
+	//		"output/flower.jpg");
+	//Image image("/home/linh/Desktop/Temps/md/images/Md 009.JPG");
+	Image image("data/smile.jpg");
+	saveRGBJPG(image.getRGBMatrix(), image.getRGBMatrix()->getCols(), image.getRGBMatrix()->getRows(),
+				"output/md_output.jpg");
+	saveGrayJPG(image.getGrayMatrix(),image.getGrayMatrix()->getCols(),image.getGrayMatrix()->getRows(),"output/out.jpg");
 
-	saveRGBJPG(rgbMatrix, rgbMatrix->getCols(), rgbMatrix->getRows(),
-			"output/md009.jpg");*/
-	///home/linh/Desktop/Temps/md/images/Md 009.JPG
-	Image image("/home/linh/Desktop/Temps/md/images/Md 009.JPG");
+	canny(image.getGrayMatrix(),image.getGrayMatrix(),image.getThresholdValue(),3 * image.getThresholdValue());
 
 	cout << endl << "finish\n";
 	return 0;

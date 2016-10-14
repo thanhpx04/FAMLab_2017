@@ -18,9 +18,10 @@ private:
 	ptr_IntMatrix grayHistogram;
 	float medianHistogram = 0;
 	float meanHistogram = 0;
+	float thresholdValue = 0;
 
 	void calcGrayHistogram();
-
+	void calThresholdValue();
 
 public:
 	Image();
@@ -29,6 +30,11 @@ public:
 	void setFileName(std::string);
 	std::string getFileName();
 	void setMLandmarks(string);
+	ptr_IntMatrix getGrayMatrix();
+	ptr_RGBMatrix getRGBMatrix();
+	float getMedianHistogram();
+	float getMeanHistogram();
+	float getThresholdValue();
 	//void setEdges(std::vector<Edge>);
 	//std::vector<Edge> getEdge();
 };
