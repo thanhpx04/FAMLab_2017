@@ -32,28 +32,19 @@ Edge::~Edge() {
 	// TODO Auto-generated destructor stub
 }
 
-Edge::Edge(std::vector<ptr_Line> lines){
-	listOfLines = lines;
-	listOfPoints = getPoints(lines);
-}
-
 Edge::Edge(std::vector<ptr_Point> points){
 	listOfPoints = points;
-	listOfLines = getLines(points);
 }
 //=================================================== Get and set methods ===========================================
-std::vector<ptr_Line> Edge::getLines(){
-	return listOfLines;
-}
+
 std::vector<ptr_Point> Edge::getPoints(){
 	return listOfPoints;
 }
-void Edge::setLines(std::vector<ptr_Line> lines){
-	listOfLines = lines;
-}
+
 void Edge::setPoints(std::vector<ptr_Point> points){
 	listOfPoints = points;
 }
+
 //=================================================== Private methods ===========================================
 
 /*
@@ -69,13 +60,6 @@ bool Edge::checkPointInList(std::vector<ptr_Point> listPoints, ptr_Point point){
 			return true;
 	}
 	return false;
-}
-
-/*
- * Add a line into list of Lines
- */
-void Edge::addLine(ptr_Line line){
-	listOfLines.push_back(line);
 }
 
 
@@ -94,20 +78,6 @@ std::vector<ptr_Line> Edge::getLines(std::vector<ptr_Point> listPoints){
 	    }
 	}
 	return listLines;
-}
-
-std::vector<ptr_Point> Edge::getPoints(std::vector<ptr_Line> listLines){
-	std::vector<ptr_Point> vip;
-	if(listLines.size() > 0){
-		for (size_t i = 0; i < listLines.size(); ++i) {
-			ptr_Line l= listLines.at(i);
-			if(!checkPointInList(vip,l->getBegin()))
-				vip.push_back(l->getBegin());
-			if(!checkPointInList(vip,l->getEnd()))
-				vip.push_back(l->getEnd());
-		}
-	}
-	return vip;
 }
 
 static std::vector<ptr_Point> vvp; // used to keep the break points after recursive time
@@ -158,11 +128,13 @@ void Edge::breakEdge(int minDistance){ // in old program, minDistance is constan
 
 
 //=================================================== Public methods ===========================================
-std::vector<ptr_Point> Edge::segment(int minDistance){
+std::vector<ptr_Line> Edge::segment(int minDistance){
 	listOfBreakPoints.clear();
 	breakEdge(minDistance);
 	listOfBreakPoints = vvp;
-	return listOfBreakPoints;
+
+	vector<ptr_Line> lines = getLines(listOfBreakPoints);
+	return lines;
 }
 
 

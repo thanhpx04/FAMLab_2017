@@ -14,7 +14,7 @@
  * 		  - upper threshold value
  * Output: - matrix (in binary) contains the edges of image.
  */
-void canny(ptr_IntMatrix inputImg, ptr_IntMatrix outputImg, int lowerThreshold,
+vector<vector<ptr_Point> > canny(ptr_IntMatrix inputImg, int lowerThreshold,
 		int upperThreshold);
 
 #endif /* CANNY_H_ */

@@ -11,8 +11,8 @@
 class Image {
 private:
 	std::string fileName;
-	//std::vector<Edge> listOfEdges;
-	std::vector<ptr_Point> listOfMLandmarks;
+	vector<ptr_Edge> listOfEdges;
+	vector<ptr_Point> listOfMLandmarks;
 	ptr_IntMatrix grayMatrix;
 	ptr_RGBMatrix imgMatrix;
 	ptr_IntMatrix grayHistogram;
@@ -22,6 +22,8 @@ private:
 
 	void calcGrayHistogram();
 	void calThresholdValue();
+	vector<ptr_Edge> cannyAlgorithm();
+
 
 public:
 	Image();
@@ -35,8 +37,7 @@ public:
 	float getMedianHistogram();
 	float getMeanHistogram();
 	float getThresholdValue();
-	//void setEdges(std::vector<Edge>);
-	//std::vector<Edge> getEdge();
+	vector<ptr_Line> getApproximateLines(int minDistance);
 };
 
 #endif /* IMAGE_H_ */

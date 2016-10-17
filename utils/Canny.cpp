@@ -5,8 +5,6 @@
  *      Author: linh
  */
 
-
-
 #include <iostream>
 #include <math.h>
 #include <stdlib.h>
@@ -22,24 +20,15 @@ using namespace std;
 #include "../io/Reader.h"
 #include "Canny.h"
 
-const int gaussianMask[5][5] = {
-		{ 2, 4, 5, 4, 2 },
-		{ 4, 9, 12, 9, 4 },
-		{ 5, 12, 15, 12, 5 },
-		{ 4, 9, 12, 9, 4 },
-		{ 2, 4, 5, 4, 2 }
-};
+// gaussian mask
+const int gaussianMask[5][5] = { { 2, 4, 5, 4, 2 }, { 4, 9, 12, 9, 4 }, { 5, 12,
+		15, 12, 5 }, { 4, 9, 12, 9, 4 }, { 2, 4, 5, 4, 2 } };
+// sum of values in gaussian mask
 const int GMASKTOTAL = 159;
-const int gxMask[3][3] = {
-		{ -1, 0, 1 },
-		{ -2, 0, 2 },
-		{ -1, 0, 1 }
-};
-const int gyMask[3][3] = {
-		{ 1, 2, 1 },
-		{ 0, 0, 0 },
-		{ -1, -2, -1 }
-};
+
+// Sobel masks
+const int gxMask[3][3] = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+const int gyMask[3][3] = { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
 const float PI = 3.14159;
 
 const float ANGLE_0 = 0.0;
@@ -56,8 +45,11 @@ const float LIMIT_ANGLE_4 = 157.5;
 const unsigned int WHITE = 255;
 const unsigned int BLACK = 0;
 
-
-
+/*
+ * Apply a Gaussian blur
+ * Input: - input image matrix (gray)
+ * Output: - matrix after bluring with Gaussian mask
+ */
 ptr_IntMatrix gaussianBlur(ptr_IntMatrix img) {
 	ptr_IntMatrix returnImg = new Matrix<unsigned int>(img->getRows(),
 			img->getCols(), 0);
@@ -68,7 +60,8 @@ ptr_IntMatrix gaussianBlur(ptr_IntMatrix img) {
 			newPixel = 0;
 			for (int rg = -2; rg <= 2; rg++) {
 				for (int cg = -2; cg <= 2; cg++) {
-					newPixel += img->getAtPosition(r+rg,c+cg) * gaussianMask[2 + rg][2+cg];
+					newPixel += img->getAtPosition(r + rg, c + cg)
+							* gaussianMask[2 + rg][2 + cg];
 				}
 
 			}
@@ -81,14 +74,21 @@ ptr_IntMatrix gaussianBlur(ptr_IntMatrix img) {
 	return returnImg;
 
 }
+
+/*
+ * Detect the direction of edge  with four possible values.
+ * Input: - image matrix (gray) after applying Gaussian
+ * 		  - gradient matrix (same size with matrix image), it uses to save the gradient strength of each pixel
+ * Output:- edge direction matrix (same size with image matrix), it stores the edge direction of each pixel
+ */
 ptr_IntMatrix edgeDirection(ptr_IntMatrix img, ptr_IntMatrix &gradient) {
 	ptr_IntMatrix edgeDir = new Matrix<unsigned int>(img->getRows(),
 			img->getCols(), 0);
 	float thisAngle, newAngle;
 
 	int gx, gy, rowTotal, colTotal;
-	for (int r = 1; r < img->getRows()-1; r++) {
-		for (int c = 1; c < img->getCols()-1; c++) {
+	for (int r = 1; r < img->getRows() - 1; r++) {
+		for (int c = 1; c < img->getCols() - 1; c++) {
 			gx = 0;
 			gy = 0;
 			for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
@@ -106,16 +106,20 @@ ptr_IntMatrix edgeDirection(ptr_IntMatrix img, ptr_IntMatrix &gradient) {
 			thisAngle = (atan2(gx, gy) / PI) * ANGLE_180;
 
 			if (((thisAngle < LIMIT_ANGLE_1) && (thisAngle > -LIMIT_ANGLE_1))
-					|| (thisAngle > LIMIT_ANGLE_4) || (thisAngle < -LIMIT_ANGLE_4))
+					|| (thisAngle > LIMIT_ANGLE_4)
+					|| (thisAngle < -LIMIT_ANGLE_4))
 				newAngle = ANGLE_0;
 			if (((thisAngle > LIMIT_ANGLE_1) && (thisAngle < LIMIT_ANGLE_2))
-					|| ((thisAngle < -LIMIT_ANGLE_3) && (thisAngle > -LIMIT_ANGLE_4)))
+					|| ((thisAngle < -LIMIT_ANGLE_3)
+							&& (thisAngle > -LIMIT_ANGLE_4)))
 				newAngle = ANGLE_45;
 			if (((thisAngle > LIMIT_ANGLE_2) && (thisAngle < LIMIT_ANGLE_3))
-					|| ((thisAngle < -LIMIT_ANGLE_2) && (thisAngle > -LIMIT_ANGLE_3)))
+					|| ((thisAngle < -LIMIT_ANGLE_2)
+							&& (thisAngle > -LIMIT_ANGLE_3)))
 				newAngle = ANGLE_90;
 			if (((thisAngle > LIMIT_ANGLE_3) && (thisAngle < LIMIT_ANGLE_4))
-					|| ((thisAngle < -LIMIT_ANGLE_1) && (thisAngle > -LIMIT_ANGLE_2)))
+					|| ((thisAngle < -LIMIT_ANGLE_1)
+							&& (thisAngle > -LIMIT_ANGLE_2)))
 				newAngle = ANGLE_135;
 
 			edgeDir->setAtPosition(r, c, newAngle);
@@ -125,70 +129,93 @@ ptr_IntMatrix edgeDirection(ptr_IntMatrix img, ptr_IntMatrix &gradient) {
 	return edgeDir;
 }
 
-void findEdge(ptr_IntMatrix &img, ptr_IntMatrix edgeDir, ptr_IntMatrix gradient,
-		int rowShift, int colShift, int row, int col, float dir,
-		int lowerThreshold) {
-
-	int newRow = 0, newCol = 0;
-	bool edgeEnd = false;
+/*
+ * Indicate the next pixel in edge
+ * Input:	- column index (currently column)
+ * 			- row index
+ * 			- number of columns shift
+ * 			- number of rows shift
+ * 			- number of columns of matrix
+ * 			- number of rows of matrix
+ * 			- new column index
+ * 			- new row index
+ * Output:  - the end of edge or not
+ */
+bool shiftPosition(int col, int row, int colShift, int rowShift, int cols,
+		int rows, int &newCol, int &newRow) {
+	bool end = false;
 	if (colShift < 0) {
 		if (col > 0)
 			newCol = col + colShift;
 		else
-			edgeEnd = true;
+			end = true;
 	} else {
-		if (col < img->getCols() - 1)
+		if (col < cols - 1)
 			newCol = col + colShift;
 		else
-			edgeEnd = true;
+			end = true;
 	}
 	if (rowShift < 0) {
 		if (row > 0)
 			newRow = row + rowShift;
 		else
-			edgeEnd = true;
+			end = true;
 	} else {
-		if (row < img->getRows() - 1)
+		if (row < rows - 1)
 			newRow = row + rowShift;
 		else
-			edgeEnd = true;
+			end = true;
 	}
+	return end;
+}
+
+/*
+ * Find the edge in image matrix
+ * Input:  - input image matrix
+ * 		   - edge direction matrix
+ * 		   - gradient strength matrix
+ * 		   - number of row shift
+ * 		   - number of column shift
+ * 		   - row index
+ * 		   - column index
+ * 		   - angle direction value
+ * 		   - lower threshold value
+ * Output: - update the value of input pixels followed edge detected.
+ */
+void findEdge(ptr_IntMatrix &img, ptr_IntMatrix edgeDir, ptr_IntMatrix gradient,
+		int rowShift, int colShift, int row, int col, float dir,
+		int lowerThreshold) {
+
+	int newRow = 0, newCol = 0;
+	bool edgeEnd = shiftPosition(col, row, colShift, rowShift, img->getCols(),
+			img->getRows(), newCol, newRow);
+
 	while (edgeDir->getAtPosition(newRow, newCol) == dir && !edgeEnd
 			&& gradient->getAtPosition(newRow, newCol) > lowerThreshold) {
 
 		img->setAtPosition(newRow, newCol, WHITE);
-		if (colShift < 0) {
-			if (newCol > 0)
-				newCol = newCol + colShift;
-			else
-				edgeEnd = true;
-		} else {
-			if (newCol < img->getCols() - 1)
-				newCol = newCol + colShift;
-			else
-				edgeEnd = true;
-		}
 
-		if (rowShift < 0) {
-			if (newRow > 0)
-				newRow = newRow + rowShift;
-			else
-				edgeEnd = true;
-		} else {
-			if (newRow < img->getRows() - 1)
-				newRow = newRow + rowShift;
-			else
-				edgeEnd = true;
-		}
+		edgeEnd = shiftPosition(newCol, newRow, colShift, rowShift,
+				img->getCols(), img->getRows(), newCol, newRow);
+
 	}
 }
 
+/*
+ * Trace all edge in image matrix
+ * Input:  - image matrix
+ * 		   - gradient strength matrix
+ * 		   - edge direction matrix
+ * 		   - upper threshold value
+ * 		   - lower threshold value
+ * Output: - trace all the edges in the input image matrix
+ */
 void traceEdge(ptr_IntMatrix &img, ptr_IntMatrix gradient,
 		ptr_IntMatrix edgeDir, int upperThreshold, int lowerThreshold) {
-	//bool edgeEnd = false;
+
 	for (int r = 1; r < img->getRows() - 1; r++) {
 		for (int c = 1; c < img->getCols() - 1; c++) {
-			//edgeEnd = false;
+
 			if (gradient->getAtPosition(r, c) > upperThreshold) {
 				switch (edgeDir->getAtPosition(r, c)) {
 				case 0:
@@ -225,9 +252,21 @@ void traceEdge(ptr_IntMatrix &img, ptr_IntMatrix gradient,
 
 }
 
-void suppressNonMax(ptr_IntMatrix &img, ptr_IntMatrix edgeDir,
+/*
+ * Suppress the weak edge( or parallel edge)
+ * Input:  - input image matrix
+ * 		   - edge direction matrix
+ * 		   - gradient strength matrix
+ * 		   - number of rows shift
+ * 		   - number of columns shift
+ * 		   - row index
+ * 		   - column index
+ * 		   - angle direction value
+ * Output: - suppress the weak edge in input image matrix
+ */
+void suppressNonMax(ptr_IntMatrix &img, ptr_IntMatrix &edgeDir,
 		ptr_IntMatrix gradient, int rowShift, int colShift, int row, int col,
-		int dir, int lowerThreshold) {
+		int dir) {
 	bool edgeEnd = false;
 	float nonMax[img->getRows()][3]; // temporarily stores gradient and position of pixels in parallel edges
 	int pixelCount = 0; // store the number of pixels in parallel edges
@@ -235,154 +274,59 @@ void suppressNonMax(ptr_IntMatrix &img, ptr_IntMatrix edgeDir,
 	//int max[3] = { 0 }; // maximum point in a wide edge
 	int newRow, newCol;
 
-	if (colShift < 0) {
-		if (col > 0)
-			newCol = col + colShift;
-		else
-			edgeEnd = true;
-	} else {
-		if (col < img->getCols() - 1)
-			newCol = col + colShift;
-		else
-			edgeEnd = true;
-	}
-	if (rowShift < 0) {
-		if (row > 0)
-			newRow = row + rowShift;
-		else
-			edgeEnd = true;
-	} else {
-		if (row < img->getRows() - 1)
-			newRow = row + rowShift;
-		else
-			edgeEnd = true;
-	}
-	while ((int)edgeDir->getAtPosition(newRow, newCol) == dir && !edgeEnd
+	edgeEnd = shiftPosition(col, row, colShift, rowShift, img->getCols(),
+			img->getRows(), newCol, newRow);
+	while ((int) edgeDir->getAtPosition(newRow, newCol) == dir && !edgeEnd
 			&& img->getAtPosition(newRow, newCol) == WHITE) {
-		if (colShift < 0) {
-			if (newCol > 0)
-				newCol = newCol + colShift;
-			else
-				edgeEnd = true;
-		} else {
-			if (newCol < img->getCols() - 1)
-				newCol = newCol + colShift;
-			else
-				edgeEnd = true;
-		}
 
-		if (rowShift < 0) {
-			if (newRow > 0)
-				newRow = newRow + rowShift;
-			else
-				edgeEnd = true;
-		} else {
-			if (newRow < img->getRows() - 1)
-				newRow = newRow + rowShift;
-			else
-				edgeEnd = true;
-		}
+		edgeEnd = shiftPosition(newCol, newRow, colShift, rowShift,
+				img->getCols(), img->getRows(), newCol, newRow);
+
 		// save the position and gradient of pixels in parallel edges
 		nonMax[pixelCount][0] = newRow; // row index
 		nonMax[pixelCount][1] = newCol; // column index
 		nonMax[pixelCount][2] = gradient->getAtPosition(newRow, newCol); // gradient
+
 		pixelCount++;
 
 	}
-/*
-	edgeEnd = false;
-	colShift *= -1;
-	rowShift *= -1;
-	if (colShift < 0) {
-		if (col > 0)
-			newCol = col + colShift;
-		else
-			edgeEnd = true;
-	} else {
-		if (col < img->getCols() - 1)
-			newCol = col + colShift;
-		else
-			edgeEnd = true;
-	}
-	if (rowShift < 0) {
-		if (row > 0)
-			newRow = row + rowShift;
-		else
-			edgeEnd = true;
-	} else {
-		if (row < img->getRows() - 1)
-			newRow = row + rowShift;
-		else
-			edgeEnd = true;
-	}
 
-	while ((int)edgeDir->getAtPosition(newRow, newCol) == dir && !edgeEnd
-			&& img->getAtPosition(newRow, newCol) == WHITE) {
-		if (colShift < 0) {
-			if (newCol > 0)
-				newCol = newCol + colShift;
-			else
-				edgeEnd = true;
-		} else {
-			if (newCol < img->getCols() - 1)
-				newCol = newCol + colShift;
-			else
-				edgeEnd = true;
-		}
-
-		if (rowShift < 0) {
-			if (newRow > 0)
-				newRow = newRow + rowShift;
-			else
-				edgeEnd = true;
-		} else {
-			if (newRow < img->getRows() - 1)
-				newRow = newRow + rowShift;
-			else
-				edgeEnd = true;
-		}
-		// save the position and gradient of pixels in parallel edges
-		nonMax[pixelCount][0] = newRow;
-		nonMax[pixelCount][1] = newCol;
-		nonMax[pixelCount][2] = gradient->getAtPosition(newRow, newCol);
-		pixelCount++;
-
-	}*/
-
-	//Suppress non-maximum edges
-	/*for (count = 0; count < pixelCount; count++) {
-		if (nonMax[count][2] > max[2]) {
-			max[0] = nonMax[count][0];
-			max[1] = nonMax[count][1];
-			max[2] = nonMax[count][2];
-		}
-	}*/
 	for (int count = 0; count < pixelCount; count++) {
 		img->setAtPosition(nonMax[count][0], nonMax[count][1], BLACK);
+		edgeDir->setAtPosition(nonMax[count][0], nonMax[count][1], ANGLE_180);
+		//gradient->setAtPosition(nonMax[count][0], nonMax[count][1], 0);
 	}
 
 }
-void suppress(ptr_IntMatrix img, ptr_IntMatrix edgeDir, ptr_IntMatrix gradient,
-		int lowerThreshold) {
+
+/*
+ * Suppress all of weak edges in input image matrix
+ * Input:  - input image matrix
+ * 		   - edge direction matrix
+ * 		   - gradient strength matrix
+ * Outuput:- supress the weak edges in input image matrix
+ */
+
+void suppress(ptr_IntMatrix &img, ptr_IntMatrix &edgeDir,
+		ptr_IntMatrix gradient) {
 	for (int r = 1; r < img->getRows() - 1; r++) {
 		for (int c = 1; c < img->getCols() - 1; c++) {
 			if (img->getAtPosition(r, c) == WHITE) {
 				switch (edgeDir->getAtPosition(r, c)) {
 				case 0:
-					suppressNonMax(img, edgeDir, gradient, 1, 0, r, c, ANGLE_0,
-							lowerThreshold);
+					suppressNonMax(img, edgeDir, gradient, 1, 0, r, c, ANGLE_0);
 					break;
 				case 45:
-					suppressNonMax(img, edgeDir, gradient, 1, -1, r, c, ANGLE_45,
-							lowerThreshold);
+					suppressNonMax(img, edgeDir, gradient, 1, -1, r, c,
+							ANGLE_45);
 					break;
 				case 90:
-					suppressNonMax(img, edgeDir, gradient, 0, 1, r, c, ANGLE_90,
-							lowerThreshold);
+					suppressNonMax(img, edgeDir, gradient, 0, 1, r, c,
+							ANGLE_90);
 					break;
 				case 135:
-					suppressNonMax(img, edgeDir, gradient, 1, 1, r, c,ANGLE_135,
-							lowerThreshold);
+					suppressNonMax(img, edgeDir, gradient, 1, 1, r, c,
+							ANGLE_135);
 					break;
 				default:
 					break;
@@ -391,24 +335,118 @@ void suppress(ptr_IntMatrix img, ptr_IntMatrix edgeDir, ptr_IntMatrix gradient,
 		}
 	}
 }
-void canny(ptr_IntMatrix inputImg, ptr_IntMatrix outputImg, int lowerThreshold,
+
+/*
+ *  Get an edge in after finished all operations
+ *  Input:  - input image matrix
+ *  		- edge direction matrix
+ *  		- number of rows shift
+ *  		- number of columns shift
+ *  		- row index
+ *  		- column index
+ *  		- angle direction value
+ *  Output: - the list of point presented for an edge
+ */
+vector<ptr_Point> getEdge(ptr_IntMatrix img, ptr_IntMatrix edgeDir,
+		int rowShift, int colShift, int row, int col, int dir) {
+
+	vector<ptr_Point> edge;
+	edge.push_back(new Point(col, row));
+	bool edgeEnd = false;
+
+	int newRow, newCol;
+
+	edgeEnd = shiftPosition(col, row, colShift, rowShift, img->getCols(),
+			img->getRows(), newCol, newRow);
+	while (!edgeEnd && img->getAtPosition(newRow, newCol) == WHITE) {
+		edgeEnd = shiftPosition(newCol, newRow, colShift, rowShift,
+				img->getCols(), img->getRows(), newCol, newRow);
+		edge.push_back(new Point(newCol, newRow));
+
+	}
+	return edge;
+}
+
+/*
+ * Get all edge of image
+ * Input:   - input image matrix
+ * 			- edge direction matrix
+ * Output: - list of edges in image. Each each is presented by a list of points
+ */
+vector<vector<ptr_Point> > getEdges(ptr_IntMatrix img, ptr_IntMatrix edgeDir) {
+
+	vector<vector<ptr_Point> > edges;
+	vector<ptr_Point> edge;
+	for (int r = 0; r < img->getRows(); r++) {
+		for (int c = 0; c < img->getCols(); c++) {
+			if (img->getAtPosition(r, c) == WHITE) {
+				switch (edgeDir->getAtPosition(r, c)) {
+				case 0:
+					edge = getEdge(img, edgeDir, 0, 1, r, c, ANGLE_0);
+					break;
+				case 45:
+					edge = getEdge(img, edgeDir, 1, 1, r, c, ANGLE_45);
+					break;
+				case 90:
+					edge = getEdge(img, edgeDir, 1, 0, r, c, ANGLE_90);
+					break;
+				case 135:
+					edge = getEdge(img, edgeDir, 1, -1, r, c, ANGLE_135);
+					break;
+				default:
+					break;
+				}
+				edges.push_back(edge);
+			}
+		}
+	}
+	return edges;
+}
+
+/*
+ * Apply Canny algorithm and return list of edges
+ * Input: - image matrix (gray)
+ * 		  - lower threshold value
+ * 		  - upper threshold value
+ * Output:- list of edges which extracted from Canny
+ */
+vector<vector<ptr_Point> > canny(ptr_IntMatrix inputImg, int lowerThreshold,
 		int upperThreshold) {
-	// co the detect duoc list of edge hay khong ??????
+
 	ptr_IntMatrix gaussianMatrix = gaussianBlur(inputImg);
 	ptr_IntMatrix edgeDir, gradient;
-	gradient = new Matrix<unsigned int>(inputImg->getRows(),inputImg->getCols(),0);
-	edgeDir = edgeDirection(gaussianMatrix,gradient);
-	traceEdge(gaussianMatrix,gradient,edgeDir,upperThreshold,lowerThreshold);
-	suppress(gaussianMatrix,edgeDir,gradient,lowerThreshold);
+	gradient = new Matrix<unsigned int>(inputImg->getRows(),
+			inputImg->getCols(), 0);
+	edgeDir = edgeDirection(gaussianMatrix, gradient);
+	traceEdge(gaussianMatrix, gradient, edgeDir, upperThreshold,
+			lowerThreshold);
+
+	suppress(gaussianMatrix, edgeDir, gradient);
 
 	//suppress some border lines
 	for (int r = 0; r < gaussianMatrix->getRows(); r++) {
 		for (int c = 0; c < gaussianMatrix->getCols(); c++) {
-			if(r < 5 || r > gaussianMatrix->getRows() - 5
-				|| c < 5 || c > gaussianMatrix->getCols() - 5)
-				gaussianMatrix->setAtPosition(r,c,0);
+			if (r < 5 || r > gaussianMatrix->getRows() - 5 || c < 5
+					|| c > gaussianMatrix->getCols() - 5)
+				gaussianMatrix->setAtPosition(r, c, 0);
 		}
 	}
 
-	saveGrayJPG(gaussianMatrix,gaussianMatrix->getCols(),gaussianMatrix->getRows(),"output/test.jpg");
+	/*saveGrayJPG(gaussianMatrix, gaussianMatrix->getCols(),
+	 gaussianMatrix->getRows(), "output/test2.jpg");*/
+
+	vector<vector<ptr_Point> > edges = getEdges(gaussianMatrix, edgeDir);
+
+	/*ptr_IntMatrix test = new Matrix<unsigned int>(inputImg->getRows(),
+	 inputImg->getCols(), 0);
+	 cout << endl << "Number of edges: " << dec << edges.size();
+	 for (size_t i = 0; i < edges.size(); i++) {
+	 vector<ptr_Point> edge = edges.at(i);
+	 for (size_t j = 0; j < edge.size(); j++) {
+	 ptr_Point p = edge.at(j);
+	 test->setAtPosition(p->getY(), p->getX(), WHITE);
+	 }
+	 }
+	 saveGrayJPG(test, test->getCols(), test->getRows(), "output/test3.jpg");*/
+	return edges;
 }

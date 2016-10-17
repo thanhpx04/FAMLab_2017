@@ -41,7 +41,7 @@ ptr_RGBMatrix readJPGToRGB(const char* filename) {
 	}
 
 	rgbMatrix = new Matrix<RGB>(height, width);
-	cout << "width: " << rgbMatrix->getCols() << "\t height: "
+	cout <<dec<< "width: " << rgbMatrix->getCols() << "\t height: "
 			<< rgbMatrix->getRows();
 	for (unsigned int h = 0; h < height; h++) { // rows
 		for (unsigned  int w = 0; w < width; w++) { // cols

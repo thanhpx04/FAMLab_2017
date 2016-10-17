@@ -23,6 +23,7 @@ using namespace std;
 #include "../io/Reader.h"
 
 #include "Image.h"
+#include "../utils/Canny.h"
 
 const int BIN_SIZE = 256;
 const int MEAN_GRAY = 120;
@@ -107,6 +108,17 @@ float Image::getThresholdValue() {
 		calThresholdValue();
 	return thresholdValue;
 }
+
+vector<ptr_Line> Image::getApproximateLines(int minDistance){
+	vector<ptr_Line> lines;
+	for (size_t t = 0; t < listOfEdges.size(); ++t) {
+		ptr_Edge edgei = listOfEdges.at(t);
+		vector<ptr_Line> templines = edgei->segment(minDistance);
+		lines.insert(lines.end(),templines.begin(),templines.end());
+
+	}
+	return lines;
+}
 //================================================ End public methods ==================================================
 
 //================================================ Private methods =====================================================
@@ -182,9 +194,22 @@ void Image::calThresholdValue() {
 			imax2 = k;
 		}
 	}
-	float mid1 = (imin + imax1)/2;
-	float mid2 = (imin + imax2)/2;
-	thresholdValue = (mid1 + mid2)/2;
+	float mid1 = (imin + imax1) / 2;
+	float mid2 = (imin + imax2) / 2;
+	thresholdValue = (mid1 + mid2) / 2;
+}
+
+vector<ptr_Edge> Image::cannyAlgorithm() {
+	if (thresholdValue == 0)
+		calThresholdValue();
+	vector<vector<ptr_Point> > edges = canny(grayMatrix, thresholdValue,
+			3 * thresholdValue);
+	for (size_t t = 0; t < edges.size(); ++t) {
+		ptr_Edge edge = new Edge(edges.at(t));
+		listOfEdges.push_back(edge);
+	}
+	return listOfEdges;
+
 }
 //================================================ End private methods =====================================================
 
