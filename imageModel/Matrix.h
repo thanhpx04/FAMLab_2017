@@ -54,7 +54,7 @@ public:
 	void printMatrix();
 };
 typedef Matrix<unsigned int>* ptr_IntMatrix;
-//typedef Matrix<ptr_Point> ptr_PointMatrix;
+typedef Matrix<double>* ptr_DoubleMatrix;
 typedef Matrix<RGB>* ptr_RGBMatrix;
 
 //typedef Matrix ptr_Matrix;

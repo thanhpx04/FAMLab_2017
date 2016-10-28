@@ -33,12 +33,32 @@ Next:
 	- Compute Geometric Histogram
 Problems detected :
 	- Load JPG wrong when the input is not JFIF or JFXX (the XMP segment (APP1))
+
 17 Oct 2016
 Finished:
-	- Apply Canny algorithm into Image class (after verified)
+	- Apply Canny algorithm into Image class
 	- Get the edge of image into list of edges
 	- Break the edges into approximate lines.
 
 Next:
 	- Construct the shape histogram for image
 	- Compare the shape histogram using Bhattacharyya distance
+
+28 Oct 2016
+Works:
+	- (1) Write the methods to construct the ShapeHistogram of images
+	- (2) Write the method to compute Bhattacharyya distance
+	- (3) Verify the Canny result with the result from OpenCV. Noted: The Gaussian filter in OpenCV is combined into Sobel method (http://docs.opencv.org/trunk/d4/d86/group__imgproc__filter.html#gacea54f142e81b6758cb6f375ce782c8d)
+	- (4) Extract the contours after apply the Canny algorithm
+Finished: (1), (2)
+Problems:
+	- The edge after applying the Canny algorithm are thinner than the edge from OpenCV.
+	  The reason: the conditions when considering the weak edge in double threshold stage.
+
+
+
+
+
+
+
+

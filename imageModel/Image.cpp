@@ -30,6 +30,15 @@ const int MEAN_GRAY = 120;
 const int DECREASE_25 = 25;
 const int DECREASE_5 = 5;
 
+const double RED_COEFFICIENT = 0.299;
+const double GREEN_COEFFICIENT = 0.587;
+const double BLUE_COEFFICIENT = 0.114;
+
+const int MAX_GRAY_VALUE = 255;
+/*
+ * The equations to convert from RGB or BGR to Grayscale: Gvalue = 0.299*R + 0.587*G + 0.114*B
+ *
+ */
 //================================================= Utils methods =================================================
 ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix) {
 	ptr_IntMatrix grayMatrix;
@@ -41,13 +50,34 @@ ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix) {
 		for (int w = 0; w < width; w++) {
 
 			grayMatrix->setAtPosition(h, w,
-					((rgbMatrix->getAtPosition(h, w).R
-							+ rgbMatrix->getAtPosition(h, w).G
-							+ rgbMatrix->getAtPosition(h, w).B) / 3));
+					round(
+							((double) rgbMatrix->getAtPosition(h, w).R
+									* RED_COEFFICIENT)
+									+ ((double) rgbMatrix->getAtPosition(h, w).G
+											* GREEN_COEFFICIENT)
+									+ ((double) rgbMatrix->getAtPosition(h, w).B
+											* BLUE_COEFFICIENT)));
 		}
 	}
 
 	return grayMatrix;
+}
+
+ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue,
+		int maxValue) {
+	int rows = inputMatrix->getRows();
+	int cols = inputMatrix->getCols();
+
+	ptr_IntMatrix result = new Matrix<unsigned int>(rows, cols);
+	for (int r = 0; r < rows; r++) {
+		for (int c = 0; c < cols; c++) {
+			if (inputMatrix->getAtPosition(r, c) > tValue)
+				result->setAtPosition(r, c, maxValue);
+			else
+				result->setAtPosition(r, c, 0);
+		}
+	}
+	return result;
 }
 // ================================================== End utils methods =============================================
 //===================================================== Constructor =================================================
@@ -65,6 +95,25 @@ Image::Image(std::string filePath) {
 	grayMatrix = convertRGBToGray(imgMatrix);
 	calcGrayHistogram();
 	calThresholdValue();
+
+	ofstream of("output/grayValues.txt");
+	for (int r = 0; r < grayMatrix->getRows(); ++r) {
+		for (int c = 0; c < grayMatrix->getCols(); ++c) {
+			of << (int) grayMatrix->getAtPosition(r,c) << "\n";
+
+		}
+	}
+	of.close();
+
+	cout << endl << "Test value in gray scale matrix: "
+			<< grayMatrix->getAtPosition(36, 100);
+	cout << endl << "Threshold value: " << thresholdValue;
+	/*cout << endl << "Test value in histogram matrix: "
+	 << (int) grayHistogram->getAtPosition(0, 200);
+	 cout << endl << "The histogram values: " << endl;
+	 for (int i = 0; i < 256; i++) {
+	 cout << "\t" << grayHistogram->getAtPosition(0, i);
+	 }*/
 }
 
 //===================================================== End constructor ================================================
@@ -109,12 +158,12 @@ float Image::getThresholdValue() {
 	return thresholdValue;
 }
 
-vector<ptr_Line> Image::getApproximateLines(int minDistance){
+vector<ptr_Line> Image::getApproximateLines(int minDistance) {
 	vector<ptr_Line> lines;
 	for (size_t t = 0; t < listOfEdges.size(); ++t) {
 		ptr_Edge edgei = listOfEdges.at(t);
 		vector<ptr_Line> templines = edgei->segment(minDistance);
-		lines.insert(lines.end(),templines.begin(),templines.end());
+		lines.insert(lines.end(), templines.begin(), templines.end());
 
 	}
 	return lines;
@@ -136,11 +185,15 @@ void Image::calcGrayHistogram() {
 				array[k]++;
 			}
 		}
+		/*cout<<endl<<"value of histogram:"<<endl;
+		 for (int i = 0; i < 256; i++) {
+		 cout << "\t" << array[i];
+		 }*/
 
 		grayHistogram = new Matrix<unsigned int>(1, BIN_SIZE, 0);
 
 		for (int k = 0; k < BIN_SIZE; k++) {
-			grayHistogram->setAtPosition(0, k, 255);
+			grayHistogram->setAtPosition(0, k, array[k]);
 			total += array[k];
 			pi += (k * array[k]);
 		}
@@ -202,12 +255,21 @@ void Image::calThresholdValue() {
 vector<ptr_Edge> Image::cannyAlgorithm() {
 	if (thresholdValue == 0)
 		calThresholdValue();
-	vector<vector<ptr_Point> > edges = canny(grayMatrix, thresholdValue,
+
+	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, thresholdValue,
+			MAX_GRAY_VALUE);
+
+	/*saveGrayJPG(binMatrix, binMatrix->getCols(), binMatrix->getRows(),
+			"output/new_threshold.jpg");*/
+
+	cannyProcess(binMatrix,thresholdValue,3 * thresholdValue);
+
+	/*vector<vector<ptr_Point> > edges = canny(binMatrix, thresholdValue,
 			3 * thresholdValue);
 	for (size_t t = 0; t < edges.size(); ++t) {
 		ptr_Edge edge = new Edge(edges.at(t));
 		listOfEdges.push_back(edge);
-	}
+	}*/
 	return listOfEdges;
 
 }

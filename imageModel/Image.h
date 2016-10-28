@@ -22,7 +22,6 @@ private:
 
 	void calcGrayHistogram();
 	void calThresholdValue();
-	vector<ptr_Edge> cannyAlgorithm();
 
 
 public:
@@ -37,6 +36,8 @@ public:
 	float getMedianHistogram();
 	float getMeanHistogram();
 	float getThresholdValue();
+
+	vector<ptr_Edge> cannyAlgorithm();
 	vector<ptr_Line> getApproximateLines(int minDistance);
 };
 

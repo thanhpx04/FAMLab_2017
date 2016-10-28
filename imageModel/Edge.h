@@ -28,6 +28,7 @@ public:
 	std::vector<ptr_Point> getPoints();
 	void setPoints(std::vector<ptr_Point>);
 	std::vector<ptr_Line> segment(int);
+	bool isWeakEdge();
 
 };
 typedef Edge* ptr_Edge;

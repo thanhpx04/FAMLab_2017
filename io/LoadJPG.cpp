@@ -1096,17 +1096,20 @@ void ProcessHuffmanDataUnit(stJpegData *jdata, int indx) {
 /***************************************************************************/
 
 inline void ConvertYCrCbtoRGB(int y, int cb, int cr, int* r, int* g, int* b)
-
 {
-	float red, green, blue;
+	double red, green, blue;
 
-	red = y + 1.402f * (cb - 128);
-	green = y - 0.34414f * (cr - 128) - 0.71414f * (cb - 128);
-	blue = y + 1.772f * (cr - 128);
+	double Y = (double) y;
+	double Cb = (double) cb;
+	double Cr = (double) cr;
 
-	*r = (int) Clamp((int) red);
-	*g = (int) Clamp((int) green);
-	*b = (int) Clamp((int) blue);
+	red = Y + 1.402f * (Cb - 128);
+	green = Y - 0.344136f * (Cr - 128) - 0.714136f * (Cb - 128);
+	blue = Y + 1.772f * (Cr - 128);
+
+	*r = (int) Clamp(round(red));
+	*g = (int) Clamp(round(green));
+	*b = (int) Clamp(round(blue));
 }
 
 /***************************************************************************/

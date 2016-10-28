@@ -136,7 +136,11 @@ std::vector<ptr_Line> Edge::segment(int minDistance){
 	vector<ptr_Line> lines = getLines(listOfBreakPoints);
 	return lines;
 }
-
+bool Edge::isWeakEdge(){
+	if(listOfPoints.size() < 3)
+		return true;
+	return false;
+}
 
 
 
