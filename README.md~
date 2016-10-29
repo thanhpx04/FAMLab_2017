@@ -52,10 +52,13 @@ Works:
 	- (4) Extract the contours after apply the Canny algorithm
 Finished: (1), (2)
 Problems:
-	- The edge after applying the Canny algorithm are thinner than the edge from OpenCV.
-	  The reason: the conditions when considering the weak edge in double threshold stage.
+	- (1) The edge after applying the Canny algorithm are thinner than the edge from OpenCV.
+	  The reason: wrong indicating the gradient of edge at some points.
 
-
+29 Oct 2016
+Continue with the works on 28 Oct and finished:
+	- The problem (1)(date: 28 Oct) has fixed.
+	- (3)
 
 
 

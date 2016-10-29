@@ -128,7 +128,7 @@ ptr_IntMatrix sobelOperation(ptr_IntMatrix gaussianImage) {
 			gaussianImage->getRows(), gaussianImage->getCols(),0);
 
 	angles = new Matrix<double>(gaussianImage->getRows(),
-			gaussianImage->getCols(),90);
+			gaussianImage->getCols());
 	for (int i = 0; i < gaussianImage->getRows() - size; i++) {
 		for (int j = 0; j < gaussianImage->getCols() - size; j++) {
 			double sumx = 0, sumy = 0;
@@ -146,11 +146,11 @@ ptr_IntMatrix sobelOperation(ptr_IntMatrix gaussianImage) {
 			double sumysq = sumy * sumy;
 
 			double sq2 = sqrt(sumxsq + sumysq);
-			if (sq2 > 255)
-				sq2 = 255;
+			/*if (sq2 > 255)
+				sq2 = 255;*/
 			filteredImg->setAtPosition(i + ksize, j + ksize, sq2);
 			if (sumx == 0)
-				angles->setAtPosition(i + ksize, j + ksize, 90);
+				angles->setAtPosition(i + ksize, j + ksize, 0);
 			else
 				angles->setAtPosition(i + ksize, j + ksize, atan(sumy / sumx));
 		}
@@ -328,5 +328,5 @@ void cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold, int highThreshold
 	cout<<endl<<"Total point: "<< count;
 	of.close();
 	saveGrayJPG(thresh, thresh->getCols(), thresh->getRows(),
-			"output/new_cannyyyyyy.jpg");
+			"output/new_cannyy.jpg");
 }
