@@ -19,9 +19,9 @@ HISTModel	= histograms
 #OBJECTS		= $(SOURCES:.cpp=.o)
 #default:main
 
-main: main.o $(HELPModel)/Canny.o  $(IMGModel)/Point.o $(IMGModel)/Line.o $(IMGModel)/Edge.o $(IMGModel)/Matrix.o $(IMGModel)/Image.o $(IOModel)/TPSReader.o $(IOModel)/SaveJPG.o $(IOModel)/LoadJPG.o $(IOModel)/Reader.o $(HISTModel)/ShapeHistogram.o
+maelab: main.o $(HELPModel)/Canny.o  $(IMGModel)/Point.o $(IMGModel)/Line.o $(IMGModel)/Edge.o $(IMGModel)/Matrix.o $(IMGModel)/Image.o $(IOModel)/TPSReader.o $(IOModel)/SaveJPG.o $(IOModel)/LoadJPG.o $(IOModel)/Reader.o $(HISTModel)/ShapeHistogram.o
 			 
-	$(CC) $(CFLAGS) -std=c++11 -o main main.o $(HELPModel)/Canny.o $(IMGModel)/Point.o $(IMGModel)/Line.o $(IMGModel)/Edge.o $(IMGModel)/Matrix.o $(IMGModel)/Image.o $(IOModel)/TPSReader.o $(IOModel)/SaveJPG.o $(IOModel)/LoadJPG.o $(IOModel)/Reader.o $(HISTModel)/ShapeHistogram.o
+	$(CC) $(CFLAGS) -std=c++11 -o maelab main.o $(HELPModel)/Canny.o $(IMGModel)/Point.o $(IMGModel)/Line.o $(IMGModel)/Edge.o $(IMGModel)/Matrix.o $(IMGModel)/Image.o $(IOModel)/TPSReader.o $(IOModel)/SaveJPG.o $(IOModel)/LoadJPG.o $(IOModel)/Reader.o $(HISTModel)/ShapeHistogram.o
 
 main.o: main.cpp $(IMGModel)/Point.h $(IMGModel)/Line.h $(IMGModel)/Edge.h $(IMGModel)/Matrix.h $(IMGModel)/Image.h $(IOModel)/TPSReader.h $(IOModel)/SaveJPG.h $(IOModel)/LoadJPG.h $(IOModel)/Reader.h $(HELPModel)/Canny.h $(HISTModel)/ShapeHistogram.h
 	$(CC) $(CFLAGS) -c main.cpp $(IMGModel)/Point.cpp $(IMGModel)/Line.cpp $(IMGModel)/Edge.cpp $(IMGModel)/Matrix.cpp $(IMGModel)/Image.cpp $(IOModel)/TPSReader.cpp $(IOModel)/SaveJPG.cpp $(IOModel)/LoadJPG.cpp $(IOModel)/Reader.cpp $(HELPModel)/Canny.cpp $(HISTModel)/ShapeHistogram.cpp
@@ -42,7 +42,7 @@ main.o: main.cpp $(IMGModel)/Point.h $(IMGModel)/Line.h $(IMGModel)/Edge.h $(IMG
 
 
 clean:
-	rm -f main
+	rm -f maelab
 	rm -f *.o
 	rm -f imageModel/*.o
 	rm -f io/*.o
