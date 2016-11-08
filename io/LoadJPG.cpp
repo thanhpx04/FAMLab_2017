@@ -1103,13 +1103,13 @@ inline void ConvertYCrCbtoRGB(int y, int cb, int cr, int* r, int* g, int* b)
 	double Cb = (double) cb;
 	double Cr = (double) cr;
 
-	red = Y + 1.402f * (Cb - 128);
-	green = Y - 0.344136f * (Cr - 128) - 0.714136f * (Cb - 128);
-	blue = Y + 1.772f * (Cr - 128);
-
-	*r = (int) Clamp(round(red));
-	*g = (int) Clamp(round(green));
-	*b = (int) Clamp(round(blue));
+	red = Y + 1.403f * (Cr - 128);
+	green = Y - 0.344f * (Cb - 128) - 0.714f * (Cr - 128);
+	blue = Y + 1.773f * (Cb - 128);
+	//cout<<"\n\t"<<red<<"\t"<<green<<"\t"<<blue;
+	*r = (int) Clamp(ceil(red));
+	*g = (int) Clamp(ceil(green));
+	*b = (int) Clamp(ceil(blue));
 }
 
 /***************************************************************************/
@@ -1156,7 +1156,7 @@ inline void YCrCB_to_RGB24_Block8x8(stJpegData *jdata, int w, int h, int imgx,
 			int cb = Cb[coff];
 			int cr = Cr[coff];
 
-			ConvertYCrCbtoRGB(yc, cr, cb, &r, &g, &b);
+			ConvertYCrCbtoRGB(yc, cb, cr, &r, &g, &b);
 
 			pix[0] = Clamp(r);
 			pix[1] = Clamp(g);

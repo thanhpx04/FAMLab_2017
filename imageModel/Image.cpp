@@ -21,18 +21,19 @@ using namespace std;
 #include "Edge.h"
 #include "Matrix.h"
 #include "../io/Reader.h"
+#include "../utils/Canny.h"
+#include "../utils/Suzuki.h"
 
 #include "Image.h"
-#include "../utils/Canny.h"
 
 const int BIN_SIZE = 256;
 const int MEAN_GRAY = 120;
 const int DECREASE_25 = 25;
 const int DECREASE_5 = 5;
 
-const double RED_COEFFICIENT = 0.299;
-const double GREEN_COEFFICIENT = 0.587;
-const double BLUE_COEFFICIENT = 0.114;
+const double RED_COEFFICIENT = 0.299f;
+const double GREEN_COEFFICIENT = 0.587f;
+const double BLUE_COEFFICIENT = 0.114f;
 
 const int MAX_GRAY_VALUE = 255;
 /*
@@ -95,18 +96,18 @@ Image::Image(std::string filePath) {
 	grayMatrix = convertRGBToGray(imgMatrix);
 	calcGrayHistogram();
 	calThresholdValue();
+	/*ofstream of("output/image Value.txt");
+	 for (int r = 0; r < imgMatrix->getRows(); ++r) {
+	 for (int c = 0; c < imgMatrix->getCols(); ++c) {
+	 of << (int) imgMatrix->getAtPosition(r, c).B << "\t"
+	 << (int) imgMatrix->getAtPosition(r, c).G << "\t"
+	 << (int) imgMatrix->getAtPosition(r, c).R<<"\t"
+	 << (int) grayMatrix->getAtPosition(r,c)<<"\n";
 
-	ofstream of("output/grayValues.txt");
-	for (int r = 0; r < grayMatrix->getRows(); ++r) {
-		for (int c = 0; c < grayMatrix->getCols(); ++c) {
-			of << (int) grayMatrix->getAtPosition(r,c) << "\n";
+	 }
+	 }
+	 of.close();*/
 
-		}
-	}
-	of.close();
-
-	cout << endl << "Test value in gray scale matrix: "
-			<< grayMatrix->getAtPosition(36, 100);
 	cout << endl << "Threshold value: " << thresholdValue;
 	/*cout << endl << "Test value in histogram matrix: "
 	 << (int) grayHistogram->getAtPosition(0, 200);
@@ -132,7 +133,7 @@ std::string Image::getFileName() {
  return listOfEdges;
  }*/
 void Image::setMLandmarks(string tpsFile) {
-	listOfMLandmarks = readTPSFile(tpsFile.c_str());
+	//listOfMLandmarks = readTPSFile(tpsFile.c_str());
 
 }
 ptr_IntMatrix Image::getGrayMatrix() {
@@ -158,14 +159,21 @@ float Image::getThresholdValue() {
 	return thresholdValue;
 }
 
-vector<ptr_Line> Image::getApproximateLines(int minDistance) {
+vector<ptr_Line> Image::getApproximateLines(int minDistance = 3) { // min distance to seperate the edge to list of approximate lines
+	vector<ptr_Edge> listOfEdges = cannyAlgorithm();
+	cout << "\n Number of edges: " << listOfEdges.size();
 	vector<ptr_Line> lines;
-	for (size_t t = 0; t < listOfEdges.size(); ++t) {
+	for (size_t t = 0; t < listOfEdges.size(); t++) {
 		ptr_Edge edgei = listOfEdges.at(t);
 		vector<ptr_Line> templines = edgei->segment(minDistance);
-		lines.insert(lines.end(), templines.begin(), templines.end());
+
+		if (templines.size() > 0)
+			lines.insert(lines.end(), templines.begin(), templines.end());
 
 	}
+	cout << "\n Finish segment to lines, total lines in images are "
+			<< lines.size();
+	listOfLines = lines;
 	return lines;
 }
 //================================================ End public methods ==================================================
@@ -259,17 +267,19 @@ vector<ptr_Edge> Image::cannyAlgorithm() {
 	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, thresholdValue,
 			MAX_GRAY_VALUE);
 
-	/*saveGrayJPG(binMatrix, binMatrix->getCols(), binMatrix->getRows(),
-			"output/new_threshold.jpg");*/
+	vector<ptr_Edge> listOfEdges = cannyProcess(binMatrix, (int) thresholdValue,
+			3 * (int) thresholdValue);
 
-	cannyProcess(binMatrix,thresholdValue,3 * thresholdValue);
+	//suzuki(binMatrix);
 
-	/*vector<vector<ptr_Point> > edges = canny(binMatrix, thresholdValue,
-			3 * thresholdValue);
-	for (size_t t = 0; t < edges.size(); ++t) {
-		ptr_Edge edge = new Edge(edges.at(t));
-		listOfEdges.push_back(edge);
-	}*/
+	/*int count = 0;
+	 for (int i = 0; i < listOfEdges.size(); i++) {
+	 if (listOfEdges.at(i)->getPoints().size() > 3)
+	 count++;
+	 }
+
+	 cout << "\n Number of edges: " << listOfEdges.size();
+	 cout << "\n Number of edges > 30: " << count;*/
 	return listOfEdges;
 
 }

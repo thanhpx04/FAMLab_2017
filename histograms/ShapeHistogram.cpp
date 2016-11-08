@@ -12,27 +12,10 @@ using namespace std;
 #include "../imageModel/Matrix.h"
 #include "../imageModel/Point.h"
 #include "../imageModel/Line.h"
+#include "../imageModel/Image.h"
 
-struct GFeature {
-	double angle;
-	double dmin;
-	double dmax;
-};
 
-struct LocalHistogram {
-	vector<GFeature> features;
-	double maxDistance;
-};
 
-enum AngleAccuracy {
-	HaftDegree = 0,
-	Degree = 1,
-	TwoTimeDegree = 2,
-	FourTimeDegree = 4,
-	SixTimeDegree = 6,
-	TwelveTimeDegree = 12,
-	SixtyTimeDegree = 60
-};
 
 // the minutes per bin corresponds with angle accuracy
 const int m_bin_30 = 120;
@@ -91,7 +74,7 @@ vector<LocalHistogram> constructPGH(vector<ptr_Line> listOfLines,
 		if (lh.maxDistance > maxDistance)
 			maxDistance = lh.maxDistance;
 	}
-
+	cout<<"\n Finish construct the local geometric histogram";
 	return result;
 }
 int heightOfAngleAxis(AngleAccuracy angleAcc) {
@@ -176,6 +159,7 @@ ptr_IntMatrix constructPGHMatrix(vector<LocalHistogram> localHists,
 			}
 		}
 	}
+	cout<<"\n Finish construct the geometric histogram";
 	return result;
 }
 
@@ -201,4 +185,22 @@ double bhattacharyyaMetric(ptr_IntMatrix refHist, ptr_IntMatrix sceneHist) {
 		}
 	}
 	return distance;
+}
+//================================================================= Public method ===================================
+// construct the geometric histogram of image
+ptr_IntMatrix shapeHistogram(Image grayImage, AngleAccuracy angleAcc, int cols){
+	ptr_IntMatrix histogramResult;
+	vector<ptr_Line> inputImage = grayImage.getApproximateLines(3);
+	double maxDistance;
+	vector<LocalHistogram> localHistogram =constructPGH(inputImage,maxDistance);
+	histogramResult = constructPGHMatrix(localHistogram,angleAcc,cols);
+	cout<<"\nShape histogram is constructed.";
+	return histogramResult;
+}
+
+// compute the Bhattacharrya distance between two images
+double bhattacharyyaDistance(Image refImage, Image sceneImage,AngleAccuracy angleAcc, int cols){
+	ptr_IntMatrix refHistogram = shapeHistogram(refImage,angleAcc,cols);
+	//ptr_IntMatrix sceneHistogram = shapeHistogram(sceneImage,angleAcc,cols);
+	return bhattacharyyaMetric(refHistogram,refHistogram);
 }

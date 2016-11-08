@@ -32,16 +32,16 @@ Edge::~Edge() {
 	// TODO Auto-generated destructor stub
 }
 
-Edge::Edge(std::vector<ptr_Point> points){
+Edge::Edge(std::vector<ptr_Point> points) {
 	listOfPoints = points;
 }
 //=================================================== Get and set methods ===========================================
 
-std::vector<ptr_Point> Edge::getPoints(){
+std::vector<ptr_Point> Edge::getPoints() {
 	return listOfPoints;
 }
 
-void Edge::setPoints(std::vector<ptr_Point> points){
+void Edge::setPoints(std::vector<ptr_Point> points) {
 	listOfPoints = points;
 }
 
@@ -52,83 +52,81 @@ void Edge::setPoints(std::vector<ptr_Point> points){
  * Check a point is exist in list of Break Point or not.
  *
  */
-bool Edge::checkPointInList(std::vector<ptr_Point> listPoints, ptr_Point point){
+bool Edge::checkPointInList(std::vector<ptr_Point> listPoints,
+		ptr_Point point) {
 	for (size_t i = 0; i < listPoints.size(); i++) {
 		ptr_Point p = listPoints.at(i);
-		if( point->getX() == p->getX()
-				&& point->getY() == p->getY())
+		if (point->getX() == p->getX() && point->getY() == p->getY())
 			return true;
 	}
 	return false;
 }
 
-
-std::vector<ptr_Line> Edge::getLines(std::vector<ptr_Point> listPoints){
+std::vector<ptr_Line> Edge::getLines(std::vector<ptr_Point> listPoints) {
 	std::vector<ptr_Line> listLines;
 	ptr_Point p0;
 	ptr_Point p1;
 
 	if (listPoints.size() > 0) {
 		p0 = listPoints.at(0);
-	    for (size_t i = 1; i < listPoints.size(); i++) {
-	    	p1 = listPoints.at(i);
-	        Line l(p0, p1);
-	        listLines.push_back(new Line(p0,p1));
-	        p0 = p1;
-	    }
+		for (size_t i = 1; i < listPoints.size(); i++) {
+			p1 = listPoints.at(i);
+			Line l(p0, p1);
+			listLines.push_back(new Line(p0, p1));
+			p0 = p1;
+		}
 	}
 	return listLines;
 }
 
 static std::vector<ptr_Point> vvp; // used to keep the break points after recursive time
-void Edge::breakEdge(int minDistance){ // in old program, minDistance is constant with value is 3
-	if(listOfPoints.size() <= 1)
+void Edge::breakEdge(int minDistance) { // in old program, minDistance is constant with value is 3
+	if (listOfPoints.size() <= 1)
 		return;
 	ptr_Point p0;
 	ptr_Point pend;
 	int size = listOfPoints.size();
 
-	if(size  < 2)
+	if (isWeakEdge())
 		return;
 
 	p0 = listOfPoints.at(0);
 	pend = listOfPoints.at(size - 1);
 
-	if(size > 2){
-		ptr_Line line = new Line(p0,pend);
-		double distance =0, maxDistance = 0;
+	if (size > 2) {
+		ptr_Line line = new Line(p0, pend);
+		double distance = 0, maxDistance = 0;
 		size_t imax = 0;
 
-		for (int i = 1; i < size-1; i++) {
+		for (int i = 1; i < size - 1; i++) {
 			ptr_Point pi = listOfPoints.at(i);
 			distance = line->perpendicularDistance(pi);
-			if(distance > maxDistance){
+			if (distance > maxDistance) {
 				maxDistance = distance;
 				imax = i;
 			}
 		}
-		if(maxDistance > minDistance){// continue break the edge
-			std::vector<ptr_Point> part1(listOfPoints.begin(), listOfPoints.begin()+imax + 1);
-			std::vector<ptr_Point> part2(listOfPoints.begin()+imax, listOfPoints.end());
+		if (maxDistance > minDistance) { // continue break the edge
+			std::vector<ptr_Point> part1(listOfPoints.begin(),
+					listOfPoints.begin() + imax + 1);
+			std::vector<ptr_Point> part2(listOfPoints.begin() + imax,
+					listOfPoints.end());
 			ptr_Edge edge1 = new Edge(part1);
 			ptr_Edge edge2 = new Edge(part2);
 			edge1->breakEdge(minDistance);
 			edge2->breakEdge(minDistance);
 		}
 	}
-	else{
-		if(!checkPointInList(vvp,p0))
-			vvp.push_back(p0);
-		if(!checkPointInList(vvp,pend))
-			vvp.push_back(pend);
-	}
+
+	if (!checkPointInList(vvp, p0))
+		vvp.push_back(p0);
+	if (!checkPointInList(vvp, pend))
+		vvp.push_back(pend);
 
 }
 
-
-
 //=================================================== Public methods ===========================================
-std::vector<ptr_Line> Edge::segment(int minDistance){
+std::vector<ptr_Line> Edge::segment(int minDistance) {
 	listOfBreakPoints.clear();
 	breakEdge(minDistance);
 	listOfBreakPoints = vvp;
@@ -136,23 +134,9 @@ std::vector<ptr_Line> Edge::segment(int minDistance){
 	vector<ptr_Line> lines = getLines(listOfBreakPoints);
 	return lines;
 }
-bool Edge::isWeakEdge(){
-	if(listOfPoints.size() < 3)
+bool Edge::isWeakEdge() {
+	if (listOfPoints.size() < 3)
 		return true;
 	return false;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
