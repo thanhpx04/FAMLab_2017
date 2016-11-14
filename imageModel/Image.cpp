@@ -13,7 +13,7 @@
 #include <string.h>
 #include <fstream>
 #include <time.h>
-
+#include <string>
 using namespace std;
 
 #include "Point.h"
@@ -46,7 +46,7 @@ ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix) {
 	unsigned int width = rgbMatrix->getCols();
 	unsigned int height = rgbMatrix->getRows();
 
-	grayMatrix = new Matrix<unsigned int>(height, width);
+	grayMatrix = new Matrix<int>(height, width);
 	for (int h = 0; h < height; h++) {
 		for (int w = 0; w < width; w++) {
 
@@ -69,7 +69,7 @@ ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue,
 	int rows = inputMatrix->getRows();
 	int cols = inputMatrix->getCols();
 
-	ptr_IntMatrix result = new Matrix<unsigned int>(rows, cols);
+	ptr_IntMatrix result = new Matrix<int>(rows, cols);
 	for (int r = 0; r < rows; r++) {
 		for (int c = 0; c < cols; c++) {
 			if (inputMatrix->getAtPosition(r, c) > tValue)
@@ -96,17 +96,18 @@ Image::Image(std::string filePath) {
 	grayMatrix = convertRGBToGray(imgMatrix);
 	calcGrayHistogram();
 	calThresholdValue();
-	/*ofstream of("output/image Value.txt");
-	 for (int r = 0; r < imgMatrix->getRows(); ++r) {
-	 for (int c = 0; c < imgMatrix->getCols(); ++c) {
-	 of << (int) imgMatrix->getAtPosition(r, c).B << "\t"
-	 << (int) imgMatrix->getAtPosition(r, c).G << "\t"
-	 << (int) imgMatrix->getAtPosition(r, c).R<<"\t"
-	 << (int) grayMatrix->getAtPosition(r,c)<<"\n";
 
-	 }
-	 }
-	 of.close();*/
+	/*ofstream of("output/imageValues.txt");
+	for (int r = 0; r < imgMatrix->getRows(); ++r) {
+		for (int c = 0; c < imgMatrix->getCols(); ++c) {
+			of <<r<<"\t"<<c<<"\t"<< (int) imgMatrix->getAtPosition(r, c).B << "\t"
+					<< (int) imgMatrix->getAtPosition(r, c).G << "\t"
+					<< (int) imgMatrix->getAtPosition(r, c).R << "\t"
+					<< (int) grayMatrix->getAtPosition(r, c) << "\n";
+
+		}
+	}
+	of.close();*/
 
 	cout << endl << "Threshold value: " << thresholdValue;
 	/*cout << endl << "Test value in histogram matrix: "
@@ -193,12 +194,8 @@ void Image::calcGrayHistogram() {
 				array[k]++;
 			}
 		}
-		/*cout<<endl<<"value of histogram:"<<endl;
-		 for (int i = 0; i < 256; i++) {
-		 cout << "\t" << array[i];
-		 }*/
 
-		grayHistogram = new Matrix<unsigned int>(1, BIN_SIZE, 0);
+		grayHistogram = new Matrix<int>(1, BIN_SIZE, 0);
 
 		for (int k = 0; k < BIN_SIZE; k++) {
 			grayHistogram->setAtPosition(0, k, array[k]);
@@ -264,8 +261,21 @@ vector<ptr_Edge> Image::cannyAlgorithm() {
 	if (thresholdValue == 0)
 		calThresholdValue();
 
-	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, thresholdValue,
+	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, (int) thresholdValue,
 			MAX_GRAY_VALUE);
+	/*ofstream of("output/binaryPixels.txt");
+	int count = 0;
+	for (int r = 0; r < binMatrix->getRows(); r++) {
+		for (int c = 0; c < binMatrix->getCols(); c++) {
+			if (binMatrix->getAtPosition(r, c) == 0) {
+				count++;
+			}
+			of << r << "\t" << c << "\t"<<binMatrix->getAtPosition(r,c)<<"\n";
+		}
+
+	}
+	cout << endl << "Total points binary: " << count;
+	of.close();*/
 
 	vector<ptr_Edge> listOfEdges = cannyProcess(binMatrix, (int) thresholdValue,
 			3 * (int) thresholdValue);

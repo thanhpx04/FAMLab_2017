@@ -71,8 +71,7 @@ ptr_RGBMatrix decompressJPEG(const char* filename) {
 	std::cout << "\nFinished de-compress JPEG.\n";
 	return rgbMatrix;
 }
-
-void compressJPEG(const char* filename, ptr_RGBMatrix rgbMatrix) {
+void saveJPEG(const char* filename, unsigned char *buffer, int width, int height,int components, J_COLOR_SPACE colorspace) {
 	std::cout << "\n Begin compress JPEG image.\n";
 
 	struct jpeg_compress_struct cinfo;
@@ -88,16 +87,29 @@ void compressJPEG(const char* filename, ptr_RGBMatrix rgbMatrix) {
 		exit(1);
 	}
 	jpeg_stdio_dest(&cinfo, outfile);
-	cinfo.image_width = rgbMatrix->getCols();
-	cinfo.image_height = rgbMatrix->getRows();
-	cinfo.input_components = 3;
-	cinfo.in_color_space = JCS_RGB;
+	cinfo.image_width = width;
+	cinfo.image_height = height;
+	cinfo.input_components = components;
+	cinfo.in_color_space = colorspace;
 
 	jpeg_set_defaults(&cinfo);
 	jpeg_start_compress(&cinfo, TRUE);
 
 	JSAMPROW row_pointer[1];
-	int row_stride = rgbMatrix->getCols() * 3;
+	int row_stride = width * 3;
+
+	while (cinfo.next_scanline < cinfo.image_height) {
+		row_pointer[0] = &buffer[cinfo.next_scanline * row_stride];
+		jpeg_write_scanlines(&cinfo, row_pointer, 1);
+
+	}
+
+	jpeg_finish_compress(&cinfo);
+	jpeg_destroy_compress(&cinfo);
+	fclose(outfile);
+	std::cout << "\nFinished compress JPEG.\n";
+}
+void RGB2JPEG(const char* filename, ptr_RGBMatrix rgbMatrix) {
 
 	unsigned char *buffer = new unsigned char[rgbMatrix->getRows()
 			* rgbMatrix->getCols() * 3];
@@ -112,15 +124,22 @@ void compressJPEG(const char* filename, ptr_RGBMatrix rgbMatrix) {
 		}
 	}
 
-	while (cinfo.next_scanline < cinfo.image_height) {
-		row_pointer[0] = &buffer[cinfo.next_scanline * row_stride];
-		jpeg_write_scanlines(&cinfo, row_pointer, 1);
+	saveJPEG(filename,buffer,rgbMatrix->getCols(),rgbMatrix->getRows(),3,JCS_RGB);
+}
+void Gray2JPEG(const char* filename, ptr_IntMatrix grayMatrix) {
 
+	unsigned char *buffer = new unsigned char[grayMatrix->getRows()
+			* grayMatrix->getCols() * 3];
+
+	for (int r = 0; r < grayMatrix->getRows(); r++) {
+		for (int c = 0; c < grayMatrix->getCols(); c++) {
+			int value = grayMatrix->getAtPosition(r, c);
+			int i = (c + grayMatrix->getCols() * r) * 3;
+			buffer[i] = value;
+			buffer[i + 1] = value;
+			buffer[i + 2] = value;
+		}
 	}
 
-	jpeg_finish_compress(&cinfo);
-	jpeg_destroy_compress(&cinfo);
-	fclose(outfile);
-	std::cout << "\nFinished compress JPEG.\n";
+	saveJPEG(filename,buffer,grayMatrix->getCols(),grayMatrix->getRows(),3,JCS_RGB);
 }
-

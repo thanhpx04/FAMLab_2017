@@ -139,7 +139,7 @@ ptr_IntMatrix constructPGHMatrix(vector<LocalHistogram> localHists,
 		AngleAccuracy angleAcc, int cols) {
 	int rows = heightOfAngleAxis(angleAcc);
 	double entries = 0;
-	ptr_IntMatrix result = new Matrix<unsigned int>(rows, cols, 0);
+	ptr_IntMatrix result = new Matrix<int>(rows, cols, 0);
 	for (size_t t = 0; t < localHists.size(); t++) {
 		LocalHistogram lh = localHists.at(t);
 		vector<GFeature> lsFeatures = lh.features;

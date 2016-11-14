@@ -22,7 +22,10 @@ ptr_RGBMatrix readJPGToRGB(const char* filename) {
 	return decompressJPEG(filename);
 }
 void saveRGB(const char* filename, ptr_RGBMatrix rgbMatrix){
-	compressJPEG(filename,rgbMatrix);
+	RGB2JPEG(filename,rgbMatrix);
+}
+void saveGrayScale(const char* filename, ptr_IntMatrix grayMatrix){
+	Gray2JPEG(filename,grayMatrix);
 }
 // ============================================================== TPS File =====================================================
 vector<ptr_Point> readTPSFile(const char* filename) {

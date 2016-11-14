@@ -584,7 +584,7 @@ void suzuki(ptr_IntMatrix inputImage) {
 
 	}
 
-	ptr_IntMatrix output = new Matrix<unsigned int>(inputImage->getRows(),
+	ptr_IntMatrix output = new Matrix<int>(inputImage->getRows(),
 			inputImage->getCols(), 0);
 	cout << "\n Size of edges: " << edges.size();
 	ofstream of("output/edgeValues.txt");

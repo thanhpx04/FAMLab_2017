@@ -35,80 +35,46 @@ const float ANGLE_180 = 180.0;
 
 #include "Canny.h"
 
-vector<vector<double> > createGaussianFilter(int ksize, double sigmaIn) {
-
-	vector<vector<double> > gFilter;
-
-	if (ksize > 3) {
-		cout
-				<< "Fail to create the gaussian filter. The size of filter too large. It should be 1(3x3), 2(5x5), or 3(7x7)";
-		return gFilter;
-	}
-	int row = 2 * ksize + 1;
-	int column = 2 * ksize + 1;
-
-	for (int i = 0; i < row; i++) {
-		vector<double> col;
-		for (int j = 0; j < column; j++) {
-			col.push_back(-1);
+double getBorderValue(ptr_IntMatrix inputMatrix, int x, int y) {
+	int rows = inputMatrix->getRows();
+	int cols = inputMatrix->getCols();
+	if (x < 0) {
+		if (y < 0) {
+			return inputMatrix->getAtPosition(0, 0);
+		} else {
+			if (y < cols) {
+				return inputMatrix->getAtPosition(0, y);
+			} else {
+				return inputMatrix->getAtPosition(0, cols - 1);
+			}
 		}
-		gFilter.push_back(col);
-	}
-
-	float coorSum = 0;
-	float constant = 2.0 * sigmaIn * sigmaIn;
-
-	float sum = 0.0;
-
-	for (int x = 1; x <= row; x++) {
-		for (int y = 1; y <= column; y++) {
-			float xSum = (x - (ksize + 1)) * (x - (ksize + 1));
-			float ySum = (y - (ksize + 1)) * (y - (ksize + 1));
-			coorSum = xSum + ySum;
-			gFilter[x - 1][y - 1] = (exp(-(coorSum) / constant))
-					/ (M_PI * constant);
-			sum += gFilter[x - 1][y - 1];
-		}
-	}
-	for (int i = 0; i < row; i++) {
-		for (int j = 0; j < column; j++) {
-			gFilter[i][j] /= sum;
-		}
-	}
-	return gFilter;
-}
-
-ptr_IntMatrix applyGaussianFilter(ptr_IntMatrix binaryImage,
-		vector<vector<double> > gaussianFilter) {
-
-	int size = (int) gaussianFilter.size();
-
-	int ksize = size / 2;
-
-	ptr_IntMatrix filteredImg = new Matrix<unsigned int>();
-	filteredImg = binaryImage;
-
-	for (int i = 0; i < binaryImage->getRows() - size; i++) {
-		for (int j = 0; j < binaryImage->getCols() - size; j++) {
-			double sum = 0;
-			for (int x = 0; x < size; x++) {
-				for (int y = 0; y < size; y++) {
-					sum +=
-							gaussianFilter[x][y]
-									* (double) (binaryImage->getAtPosition(
-											i + x, j + y));
+	} else {
+		if (x < rows) {
+			if (y < 0) {
+				return inputMatrix->getAtPosition(x, 0);
+			} else {
+				if (y < cols) {
+					return inputMatrix->getAtPosition(x, y);
+				} else {
+					return inputMatrix->getAtPosition(x, cols - 1);
 				}
 			}
-			filteredImg->setAtPosition(i + ksize, j + ksize, sum);
+		} else {
+			if (y < 0) {
+				return inputMatrix->getAtPosition(rows - 1, 0);
+			} else {
+				if (y < cols) {
+					return inputMatrix->getAtPosition(rows - 1, y);
+				} else {
+					return inputMatrix->getAtPosition(rows - 1, cols - 1);
+				}
+			}
 		}
 	}
-
-	return filteredImg;
-
 }
+ptr_IntMatrix gxSobelConvolution(ptr_IntMatrix inputMatrix) {
 
-ptr_IntMatrix sobelOperation(ptr_IntMatrix gaussianImage) {
-
+	// create kernel
 	double x1[] = { -1.0, 0, 1.0 };
 	double x2[] = { -2.0, 0, 2.0 };
 	double x3[] = { -1.0, 0, 1.0 };
@@ -116,173 +82,230 @@ ptr_IntMatrix sobelOperation(ptr_IntMatrix gaussianImage) {
 	xfilter[0].assign(x1, x1 + 3);
 	xfilter[1].assign(x2, x2 + 3);
 	xfilter[2].assign(x3, x3 + 3);
+	int size = (int) xfilter.size();
+	int ksize = size / 2;
 
-	double y1[] = { 1.0, 2.0, 1.0 };
+	int rows = inputMatrix->getRows();
+	int cols = inputMatrix->getCols();
+	ptr_IntMatrix gxConvol = new Matrix<int>(rows, cols, 0);
+	for (int i = -ksize; i < rows - ksize; i++) {
+		for (int j = -ksize; j < cols - ksize; j++) {
+			double sumx = 0;
+
+			for (int x = 0; x < size; x++) {
+
+				for (int y = 0; y < size; y++) {
+					double gValue =
+							(i + x < 0 || j + y < 0 || i + x >= rows
+									|| j + y >= cols) ?
+									getBorderValue(inputMatrix, i + x, j + y) :
+									(double) inputMatrix->getAtPosition(i + x,
+											j + y);
+					sumx += xfilter[x][y] * gValue;
+
+				}
+
+			}
+			//set value
+			gxConvol->setAtPosition(i + ksize, j + ksize, sumx);
+		}
+	}
+	return gxConvol;
+}
+
+ptr_IntMatrix gySobelConvolution(ptr_IntMatrix inputMatrix) {
+
+	// create kernel
+	double y1[] = { -1.0, -2.0, -1.0 };
 	double y2[] = { 0, 0, 0 };
-	double y3[] = { -1.0, -2.0, -1.0 };
+	double y3[] = { 1.0, 2.0, 1.0 };
 	vector<vector<double> > yfilter(3);
 	yfilter[0].assign(y1, y1 + 3);
 	yfilter[1].assign(y2, y2 + 3);
 	yfilter[2].assign(y3, y3 + 3);
-
-	int size = (int) xfilter.size();
+	int size = (int) yfilter.size();
 	int ksize = size / 2;
 
-	ptr_IntMatrix filteredImg = new Matrix<unsigned int>(
-			gaussianImage->getRows(), gaussianImage->getCols(), 0);
+	int rows = inputMatrix->getRows();
+	int cols = inputMatrix->getCols();
 
-	angles = new Matrix<double>(gaussianImage->getRows(),
-			gaussianImage->getCols());
-	for (int i = 0; i < gaussianImage->getRows() - size; i++) {
-		for (int j = 0; j < gaussianImage->getCols() - size; j++) {
-			double sumx = 0, sumy = 0;
+	ptr_IntMatrix gyConvol = new Matrix<int>(rows, cols, 255);
+	for (int i = -ksize; i < rows - ksize; i++) {
+		for (int j = -ksize; j < cols - ksize; j++) {
+			double sumy = 0;
 			for (int x = 0; x < size; x++) {
 				for (int y = 0; y < size; y++) {
-					sumx += xfilter[x][y]
-							* (double) (gaussianImage->getAtPosition(i + x,
-									j + y));
-					sumy += yfilter[x][y]
-							* (double) (gaussianImage->getAtPosition(i + x,
-									j + y));
+					double gValue =
+							(i + x < 0 || j + y < 0 || i + x >= rows
+									|| j + y >= cols) ?
+									getBorderValue(inputMatrix, i + x, j + y) :
+									(double) inputMatrix->getAtPosition(i + x,
+											j + y);
+					sumy += yfilter[x][y] * gValue;
 				}
 			}
-			double sumxsq = sumx * sumx;
-			double sumysq = sumy * sumy;
-
-			double sq2 = abs(sumx) + abs(sumy);//sqrt(sumxsq + sumysq);
-
-			/*if (sq2 > 255){
-			 sq2 = 255;
-			 }*/
-			filteredImg->setAtPosition(i + ksize, j + ksize, sq2);
-			/*if (sumx == 0)
-				angles->setAtPosition(i + ksize, j + ksize, 90);
-			else*/
-				angles->setAtPosition(i + ksize, j + ksize, atan2(sumy, sumx));
+			//set value
+			gyConvol->setAtPosition(i + ksize, j + ksize, sumy);
 		}
 	}
+	return gyConvol;
+}
+
+ptr_IntMatrix sobelOperation(ptr_IntMatrix gaussianImage) {
+
+	int rows = gaussianImage->getRows();
+	int cols = gaussianImage->getCols();
+
+	ptr_IntMatrix filteredImg = new Matrix<int>(rows, cols, 255);
+
+	angles = new Matrix<double>(rows, cols);
+
+	ptr_IntMatrix dxMatrix = gxSobelConvolution(gaussianImage);
+	ptr_IntMatrix dyMatrix = gySobelConvolution(gaussianImage);
+	ofstream sof("output/n_SobelValues.txt");
+
+	for (int r = 0; r < dxMatrix->getRows(); r++) {
+		for (int c = 0; c < dxMatrix->getCols(); c++) {
+			double dx = dxMatrix->getAtPosition(r, c);
+			double dy = dyMatrix->getAtPosition(r, c);
+
+			double value = abs(dx) + abs(dy);
+
+			filteredImg->setAtPosition(r, c, value);
+
+			angles->setAtPosition(r, c, (atan2(dy, dx) * 180 / M_PI));
+			if (dx != 0 || dy != 0) {
+				sof << r << "\t" << c << "\t" << dx << "\t" << dy << "\t"
+						<< value << "\t" << angles->getAtPosition(r, c) << "\n";
+			}
+		}
+	}
+	sof.close();
+
 	return filteredImg;
 
 }
 
 ptr_IntMatrix nonMaxSuppression(ptr_IntMatrix sobelImage) {
 
-	ptr_IntMatrix nonMaxSupped = new Matrix<unsigned int>(sobelImage->getRows(),
+	ptr_IntMatrix nonMaxSupped = new Matrix<int>(sobelImage->getRows(),
 			sobelImage->getCols(), 0);
 
-	for (int i = 1; i < sobelImage->getRows() - 1; i++) {
-		for (int j = 1; j < sobelImage->getCols() - 1; j++) {
-
+	int rows = sobelImage->getRows();
+	int cols = sobelImage->getCols();
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
 			double tangent = angles->getAtPosition(i, j);
-			nonMaxSupped->setAtPosition(i, j, sobelImage->getAtPosition(i, j));
 
 			//Horizontal Edge
 			if (((-LIMIT_ANGLE_1 < tangent) && (tangent <= LIMIT_ANGLE_1))
-					|| (LIMIT_ANGLE_4 < tangent) || (tangent <= -LIMIT_ANGLE_4)) {
-				if ((sobelImage->getAtPosition(i, j)
-						< sobelImage->getAtPosition(i, j + 1))
-						|| (sobelImage->getAtPosition(i, j)
-								< sobelImage->getAtPosition(i, j - 1)))
-					nonMaxSupped->setAtPosition(i, j, 0);
+					|| (LIMIT_ANGLE_4 < tangent)
+					|| (tangent <= -LIMIT_ANGLE_4)) {
+				int x = (j + 1 >= cols) ?
+						0 : sobelImage->getAtPosition(i, j + 1);
+				int y = (j - 1 < 0) ? 0 : sobelImage->getAtPosition(i, j - 1);
+				if ((sobelImage->getAtPosition(i, j) > y)
+						&& (sobelImage->getAtPosition(i, j) >= x))
+					nonMaxSupped->setAtPosition(i, j,
+							sobelImage->getAtPosition(i, j));
 
+			} else {
+				//Vertical Edge
+				if (((-LIMIT_ANGLE_3 < tangent) && (tangent <= -LIMIT_ANGLE_2))
+						|| ((LIMIT_ANGLE_2 < tangent)
+								&& (tangent <= LIMIT_ANGLE_3))) {
+
+					int x = (i + 1 >= rows) ?
+							0 : sobelImage->getAtPosition(i + 1, j);
+					int y = (i - 1 < 0) ?
+							0 : sobelImage->getAtPosition(i - 1, j);
+
+					if ((sobelImage->getAtPosition(i, j) > y)
+							&& (sobelImage->getAtPosition(i, j) >= x))
+						nonMaxSupped->setAtPosition(i, j,
+								sobelImage->getAtPosition(i, j));
+
+				} else {
+					//-45 Degree Edge
+					if (((-LIMIT_ANGLE_2 < tangent)
+							&& (tangent <= -LIMIT_ANGLE_1))
+							|| ((LIMIT_ANGLE_3 < tangent)
+									&& (tangent <= LIMIT_ANGLE_4))) {
+
+						int x = (i - 1 < 0 || j + 1 >= cols) ?
+								0 : sobelImage->getAtPosition(i - 1, j + 1);
+						int y = (i + 1 >= rows || j - 1 < 0) ?
+								0 : sobelImage->getAtPosition(i + 1, j - 1);
+						if ((sobelImage->getAtPosition(i, j) > x)
+								&& (sobelImage->getAtPosition(i, j) > y))
+							nonMaxSupped->setAtPosition(i, j,
+									sobelImage->getAtPosition(i, j));
+
+					} else {
+
+						//45 Degree Edge
+						if (((-LIMIT_ANGLE_4 < tangent)
+								&& (tangent <= -LIMIT_ANGLE_3))
+								|| ((LIMIT_ANGLE_1 < tangent)
+										&& (tangent <= LIMIT_ANGLE_2))) {
+
+							int x = (i + 1 >= rows || j + 1 >= cols) ?
+									0 : sobelImage->getAtPosition(i + 1, j + 1);
+							int y = (i - 1 < 0 || j - 1 < 0) ?
+									0 : sobelImage->getAtPosition(i - 1, j - 1);
+							if ((sobelImage->getAtPosition(i, j) > x)
+									&& (sobelImage->getAtPosition(i, j) > y))
+								nonMaxSupped->setAtPosition(i, j,
+										sobelImage->getAtPosition(i, j));
+						}
+					}
+				}
 			}
-			//Vertical Edge
-			if (((-LIMIT_ANGLE_3 < tangent) && (tangent <= -LIMIT_ANGLE_2))
-					|| ((LIMIT_ANGLE_2 < tangent) && (tangent <= LIMIT_ANGLE_3))) {
-				if ((sobelImage->getAtPosition(i, j)
-						< sobelImage->getAtPosition(i + 1, j))
-						|| (sobelImage->getAtPosition(i, j)
-								< sobelImage->getAtPosition(i - 1, j)))
-					nonMaxSupped->setAtPosition(i, j, 0);
-
-			}
-
-			//-45 Degree Edge
-			if (((-LIMIT_ANGLE_2 < tangent) && (tangent <= -LIMIT_ANGLE_1))
-					|| ((LIMIT_ANGLE_3 < tangent) && (tangent <= LIMIT_ANGLE_4))) {
-				if ((sobelImage->getAtPosition(i, j)
-						< sobelImage->getAtPosition(i - 1, j + 1))
-						|| (sobelImage->getAtPosition(i, j)
-								< sobelImage->getAtPosition(i + 1, j - 1)))
-					nonMaxSupped->setAtPosition(i, j, 0);
-
-			}
-
-			//45 Degree Edge
-			if (((-LIMIT_ANGLE_4 < tangent) && (tangent <= -LIMIT_ANGLE_3))
-					|| ((LIMIT_ANGLE_1 < tangent) && (tangent <= LIMIT_ANGLE_2))) {
-				if ((sobelImage->getAtPosition(i, j)
-						< sobelImage->getAtPosition(i + 1, j + 1))
-						|| (sobelImage->getAtPosition(i, j)
-								< sobelImage->getAtPosition(i - 1, j - 1)))
-					nonMaxSupped->setAtPosition(i, j, 0);
-
-			}
-
 		}
 	}
+
 	return nonMaxSupped;
 }
-ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage, int low, int high) {
-	if (low > 255)
-		low = 255;
-	if (high > 255)
-		high = 255;
+ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage,
+		ptr_IntMatrix sobelMatrix, int low, int high) {
+	/*if (low > 255)
+	 low = 255;
+	 if (high > 255)
+	 high = 255;*/
 
-	ptr_IntMatrix edgeMatrix = new Matrix<unsigned int>(nonMaxImage->getRows(),
+	ptr_IntMatrix edgeMatrix = new Matrix<int>(nonMaxImage->getRows(),
 			nonMaxImage->getCols());
 	for (int i = 0; i < nonMaxImage->getRows(); i++) {
 		for (int j = 0; j < nonMaxImage->getCols(); j++) {
 			edgeMatrix->setAtPosition(i, j, nonMaxImage->getAtPosition(i, j));
-			if (edgeMatrix->getAtPosition(i, j) >= high)
+
+			if (nonMaxImage->getAtPosition(i, j) >= high)
 				edgeMatrix->setAtPosition(i, j, 255);
 			else {
-				if (edgeMatrix->getAtPosition(i, j) < low)
+				if (nonMaxImage->getAtPosition(i, j) < low)
 					edgeMatrix->setAtPosition(i, j, 0);
 				else {
-					//edgeMatrix->setAtPosition(i, j, 255);
+					//edgeMatrix->setAtPosition(i, j, 0);
 					bool anyHigh = false;
 					bool anyBetween = false;
 					for (int x = i - 1; x < i + 2; x++) {
 						for (int y = j - 1; y < j + 2; y++) {
-							if (x <= 0 || y <= 0 || x > edgeMatrix->getRows()
-									|| y > edgeMatrix->getCols())
+							if (x < 0 || y < 0 || x >= edgeMatrix->getRows()
+									|| y >= edgeMatrix->getCols())
 								continue;
 							else {
-								if (edgeMatrix->getAtPosition(x, y) >= high) {
+								if (nonMaxImage->getAtPosition(x, y) >= high) {
 									edgeMatrix->setAtPosition(i, j, 255);
+									nonMaxImage->setAtPosition(i, j, high + 1);
+									i = 0;
+									j = 0;
 									anyHigh = true;
 									break;
-								} else {
-									if (edgeMatrix->getAtPosition(x, y) < high
-											&& edgeMatrix->getAtPosition(x, y)
-													>= low)
-										anyBetween = true;
 								}
 							}
 						}
 						if (anyHigh)
 							break;
-					}
-					if (!anyHigh && anyBetween) {
-						for (int x = i - 2; x < i + 3; x++) {
-							for (int y = j - 1; y < j + 3; y++) {
-								if (x < 0 || y < 0 || x >= edgeMatrix->getRows()
-										|| y >= edgeMatrix->getCols())
-									continue;
-								else {
-									if (edgeMatrix->getAtPosition(x, y)
-											>= high) {
-										edgeMatrix->setAtPosition(i, j, 255);
-										anyHigh = true;
-										break;
-									}
-								}
-							}
-							if (anyHigh)
-								break;
-						}
-
 					}
 					if (!anyHigh)
 						edgeMatrix->setAtPosition(i, j, 0);
@@ -294,38 +317,17 @@ ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage, int low, int high) {
 }
 
 // ========================== Process to find the edges in image =============================================
-
-int countPixels(ptr_IntMatrix matrix, int thresh) {
-	int count = 0;
-	for (int r = 0; r < matrix->getRows(); r++) {
-		for (int c = 0; c < matrix->getCols(); c++) {
-			if(matrix->getAtPosition(r,c) != 0 && matrix->getAtPosition(r,c) >= thresh)
-				count++;
-		}
-	}
-	return count;
-}
-
 vector<ptr_Edge> cannyProcess(ptr_IntMatrix &binaryImage, int lowThreshold,
 		int highThreshold) {
 
-	vector<vector<double> > filter = createGaussianFilter(1, 1);
-	cout << "\nFinished create the gaussian filter.\n";
-
-	ptr_IntMatrix gaussianFilter = applyGaussianFilter(binaryImage, filter);
-	//cout<<"\n Total pixels after applying Gaussian: "<<countPixels(gaussianFilter);
-	cout << "\nFinished apply the gaussian filter.\n";
-
-	ptr_IntMatrix sobelFilter = sobelOperation(gaussianFilter);
-	//cout<<"\n Total pixels after applying Sobel: "<<countPixels(sobelFilter);
+	ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
 	cout << "\nFinished apply sobel filter.\n";
 
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
 	cout << "\nFinished non maximum suppression.\n";
 
-	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
-			highThreshold);
-	//cout<<"\n Total pixels after applying threshold: "<<countPixels(thresholdImage);
+	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, sobelFilter,
+			lowThreshold, highThreshold);
 	cout << "\nFinished double threshold.\n";
 
 	int i = 0, count = 0;
@@ -344,17 +346,16 @@ vector<ptr_Edge> cannyProcess(ptr_IntMatrix &binaryImage, int lowThreshold,
 	cout << endl << "Total points: " << count;
 	of.close();
 
+	saveGrayScale("output/new_canny.jpg", thresholdImage);
 
 	binaryImage = thresholdImage;
 
-	delete gaussianFilter;
 	delete sobelFilter;
 	delete nonMaxSuppress;
 
 	vector<ptr_Edge> listOfEdges; // = getEdges(thresholdImage);
 
 	cout << "\nFinished trace the edges.\n";
-
 
 	return listOfEdges;
 }

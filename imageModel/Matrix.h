@@ -53,7 +53,7 @@ public:
 	void setAtPosition(int, int, T);
 	void printMatrix();
 };
-typedef Matrix<unsigned int>* ptr_IntMatrix;
+typedef Matrix<int>* ptr_IntMatrix;
 typedef Matrix<double>* ptr_DoubleMatrix;
 typedef Matrix<RGB>* ptr_RGBMatrix;
 
