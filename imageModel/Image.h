@@ -16,9 +16,9 @@ private:
 	ptr_IntMatrix grayMatrix;
 	ptr_RGBMatrix imgMatrix;
 	ptr_IntMatrix grayHistogram;
-	float medianHistogram = 0;
-	float meanHistogram = 0;
-	float thresholdValue = 0;
+	float medianHistogram;
+	float meanHistogram;
+	float thresholdValue;
 
 	void calcGrayHistogram();
 	void calThresholdValue();

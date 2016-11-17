@@ -162,7 +162,6 @@ ptr_IntMatrix sobelOperation(ptr_IntMatrix gaussianImage) {
 
 	ptr_IntMatrix dxMatrix = gxSobelConvolution(gaussianImage);
 	ptr_IntMatrix dyMatrix = gySobelConvolution(gaussianImage);
-	ofstream sof("output/n_SobelValues.txt");
 
 	for (int r = 0; r < dxMatrix->getRows(); r++) {
 		for (int c = 0; c < dxMatrix->getCols(); c++) {
@@ -174,13 +173,9 @@ ptr_IntMatrix sobelOperation(ptr_IntMatrix gaussianImage) {
 			filteredImg->setAtPosition(r, c, value);
 
 			angles->setAtPosition(r, c, (atan2(dy, dx) * 180 / M_PI));
-			if (dx != 0 || dy != 0) {
-				sof << r << "\t" << c << "\t" << dx << "\t" << dy << "\t"
-						<< value << "\t" << angles->getAtPosition(r, c) << "\n";
-			}
+
 		}
 	}
-	sof.close();
 
 	return filteredImg;
 
@@ -268,10 +263,6 @@ ptr_IntMatrix nonMaxSuppression(ptr_IntMatrix sobelImage) {
 }
 ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage,
 		ptr_IntMatrix sobelMatrix, int low, int high) {
-	/*if (low > 255)
-	 low = 255;
-	 if (high > 255)
-	 high = 255;*/
 
 	ptr_IntMatrix edgeMatrix = new Matrix<int>(nonMaxImage->getRows(),
 			nonMaxImage->getCols());
@@ -317,18 +308,18 @@ ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage,
 }
 
 // ========================== Process to find the edges in image =============================================
-vector<ptr_Edge> cannyProcess(ptr_IntMatrix &binaryImage, int lowThreshold,
+ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 		int highThreshold) {
 
 	ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
-	cout << "\nFinished apply sobel filter.\n";
+	//cout << "\nFinished apply sobel filter.\n";
 
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
-	cout << "\nFinished non maximum suppression.\n";
+	//cout << "\nFinished non maximum suppression.\n";
 
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, sobelFilter,
 			lowThreshold, highThreshold);
-	cout << "\nFinished double threshold.\n";
+	//cout << "\nFinished double threshold.\n";
 
 	int i = 0, count = 0;
 	ofstream of("output/edgeValues.txt");
@@ -345,17 +336,10 @@ vector<ptr_Edge> cannyProcess(ptr_IntMatrix &binaryImage, int lowThreshold,
 	}
 	cout << endl << "Total points: " << count;
 	of.close();
-
 	saveGrayScale("output/new_canny.jpg", thresholdImage);
-
-	binaryImage = thresholdImage;
 
 	delete sobelFilter;
 	delete nonMaxSuppress;
 
-	vector<ptr_Edge> listOfEdges; // = getEdges(thresholdImage);
-
-	cout << "\nFinished trace the edges.\n";
-
-	return listOfEdges;
+	return thresholdImage;
 }

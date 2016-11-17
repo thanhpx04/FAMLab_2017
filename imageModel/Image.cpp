@@ -84,13 +84,19 @@ ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue,
 //===================================================== Constructor =================================================
 Image::Image() {
 	// TODO Auto-generated constructor stub
-
+	medianHistogram = 0;
+	meanHistogram = 0;
+	thresholdValue = 0;
 }
 
 Image::~Image() {
 	// TODO Auto-generated destructor stub
 }
 Image::Image(std::string filePath) {
+	medianHistogram = 0;
+	meanHistogram = 0;
+	thresholdValue = 0;
+
 	fileName = filePath;
 	imgMatrix = readJPGToRGB(filePath.c_str());
 	grayMatrix = convertRGBToGray(imgMatrix);
@@ -98,16 +104,16 @@ Image::Image(std::string filePath) {
 	calThresholdValue();
 
 	/*ofstream of("output/imageValues.txt");
-	for (int r = 0; r < imgMatrix->getRows(); ++r) {
-		for (int c = 0; c < imgMatrix->getCols(); ++c) {
-			of <<r<<"\t"<<c<<"\t"<< (int) imgMatrix->getAtPosition(r, c).B << "\t"
-					<< (int) imgMatrix->getAtPosition(r, c).G << "\t"
-					<< (int) imgMatrix->getAtPosition(r, c).R << "\t"
-					<< (int) grayMatrix->getAtPosition(r, c) << "\n";
+	 for (int r = 0; r < imgMatrix->getRows(); ++r) {
+	 for (int c = 0; c < imgMatrix->getCols(); ++c) {
+	 of <<r<<"\t"<<c<<"\t"<< (int) imgMatrix->getAtPosition(r, c).B << "\t"
+	 << (int) imgMatrix->getAtPosition(r, c).G << "\t"
+	 << (int) imgMatrix->getAtPosition(r, c).R << "\t"
+	 << (int) grayMatrix->getAtPosition(r, c) << "\n";
 
-		}
-	}
-	of.close();*/
+	 }
+	 }
+	 of.close();*/
 
 	cout << endl << "Threshold value: " << thresholdValue;
 	/*cout << endl << "Test value in histogram matrix: "
@@ -161,8 +167,9 @@ float Image::getThresholdValue() {
 }
 
 vector<ptr_Line> Image::getApproximateLines(int minDistance = 3) { // min distance to seperate the edge to list of approximate lines
+
 	vector<ptr_Edge> listOfEdges = cannyAlgorithm();
-	cout << "\n Number of edges: " << listOfEdges.size();
+
 	vector<ptr_Line> lines;
 	for (size_t t = 0; t < listOfEdges.size(); t++) {
 		ptr_Edge edgei = listOfEdges.at(t);
@@ -172,9 +179,19 @@ vector<ptr_Line> Image::getApproximateLines(int minDistance = 3) { // min distan
 			lines.insert(lines.end(), templines.begin(), templines.end());
 
 	}
-	cout << "\n Finish segment to lines, total lines in images are "
-			<< lines.size();
+	cout << "\n Total approximated lines: " << lines.size();
 	listOfLines = lines;
+
+	ofstream of("output/Lines.txt");
+
+	for (size_t i = 0; i < lines.size(); i++) {
+		ptr_Line line = lines.at(i);
+		of << line->getBegin()->getX() << "\t" << line->getEnd()->getY() << "\t"
+				<< line->getEnd()->getX() << "\t" << line->getEnd()->getY()
+				<< "\n";
+	}
+	of.close();
+
 	return lines;
 }
 //================================================ End public methods ==================================================
@@ -263,33 +280,12 @@ vector<ptr_Edge> Image::cannyAlgorithm() {
 
 	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, (int) thresholdValue,
 			MAX_GRAY_VALUE);
-	/*ofstream of("output/binaryPixels.txt");
-	int count = 0;
-	for (int r = 0; r < binMatrix->getRows(); r++) {
-		for (int c = 0; c < binMatrix->getCols(); c++) {
-			if (binMatrix->getAtPosition(r, c) == 0) {
-				count++;
-			}
-			of << r << "\t" << c << "\t"<<binMatrix->getAtPosition(r,c)<<"\n";
-		}
 
-	}
-	cout << endl << "Total points binary: " << count;
-	of.close();*/
-
-	vector<ptr_Edge> listOfEdges = cannyProcess(binMatrix, (int) thresholdValue,
+	ptr_IntMatrix cannyMatrix = cannyProcess(binMatrix, (int) thresholdValue,
 			3 * (int) thresholdValue);
 
-	//suzuki(binMatrix);
-
-	/*int count = 0;
-	 for (int i = 0; i < listOfEdges.size(); i++) {
-	 if (listOfEdges.at(i)->getPoints().size() > 3)
-	 count++;
-	 }
-
-	 cout << "\n Number of edges: " << listOfEdges.size();
-	 cout << "\n Number of edges > 30: " << count;*/
+	vector<ptr_Edge> listOfEdges;
+	listOfEdges = suzuki(cannyMatrix);
 	return listOfEdges;
 
 }

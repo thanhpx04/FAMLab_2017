@@ -22,7 +22,7 @@ using namespace std;
 #include "JPEGReader.h"
 
 ptr_RGBMatrix decompressJPEG(const char* filename) {
-	std::cout << "\n Begin decompress JPEG image.\n";
+	std::cout << "\nBegin decompress JPEG image.\n";
 
 	ptr_RGBMatrix rgbMatrix;
 
@@ -72,7 +72,7 @@ ptr_RGBMatrix decompressJPEG(const char* filename) {
 	return rgbMatrix;
 }
 void saveJPEG(const char* filename, unsigned char *buffer, int width, int height,int components, J_COLOR_SPACE colorspace) {
-	std::cout << "\n Begin compress JPEG image.\n";
+	std::cout << "\nBegin compress JPEG image.\n";
 
 	struct jpeg_compress_struct cinfo;
 	struct jpeg_error_mgr jerr;

@@ -8,6 +8,6 @@
 #ifndef CANNY_H_
 #define CANNY_H_
 
-vector<ptr_Edge> cannyProcess(ptr_IntMatrix &binaryImage, int low, int high);
+ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int low, int high);
 
 #endif /* CANNY2_H_ */

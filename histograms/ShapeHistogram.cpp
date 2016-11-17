@@ -37,7 +37,7 @@ const int m_bin_3600 = 1;
  }*/
 
 GFeature pairwiseHistogram(ptr_Line refLine, ptr_Line objLine) {
-	GFeature pgh = GFeature();
+	GFeature pgh;// = GFeature();
 	pgh.angle = refLine->angleLines(*objLine);
 
 	double distance1 = refLine->perpendicularDistance(objLine->getBegin());
@@ -190,9 +190,10 @@ double bhattacharyyaMetric(ptr_IntMatrix refHist, ptr_IntMatrix sceneHist) {
 // construct the geometric histogram of image
 ptr_IntMatrix shapeHistogram(Image grayImage, AngleAccuracy angleAcc, int cols){
 	ptr_IntMatrix histogramResult;
-	vector<ptr_Line> inputImage = grayImage.getApproximateLines(3);
+	vector<ptr_Line> lines = grayImage.getApproximateLines(3);
+	cout<<"\n Total lines: "<<lines.size();
 	double maxDistance;
-	vector<LocalHistogram> localHistogram =constructPGH(inputImage,maxDistance);
+	vector<LocalHistogram> localHistogram =constructPGH(lines,maxDistance);
 	histogramResult = constructPGHMatrix(localHistogram,angleAcc,cols);
 	cout<<"\nShape histogram is constructed.";
 	return histogramResult;

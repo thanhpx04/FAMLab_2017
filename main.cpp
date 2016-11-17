@@ -28,9 +28,9 @@ using namespace std;
 #include "io/JPEGReader.h"
 #include "imageModel/Image.h"
 #include "utils/Canny.h"
-#include "utils/Suzuki.h"
+#include "utils/Suzuki.h"*/
 #include "histograms/ShapeHistogram.h"
-*/
+
 
 int main() {
 	cout << "MAELab test" << endl << endl;
@@ -38,13 +38,14 @@ int main() {
 
 	//Image image("/home/linh/Desktop/Temps/md/images/Md 009.JPG");
 	Image image("data/Mg_019.JPG");
-	image.cannyAlgorithm();
+	//image.cannyAlgorithm();
 	//vector<ptr_Line> lines = image.getApproximateLines(3);
 	//shapeHistogram(image,Degree,500);
 
 	//Image simage("data/Mg_019.JPG");
 
-	//bhattacharyyaDistance(image,image,Degree,500);
+	double bhatMeasure = bhattacharyyaDistance(image,image,Degree,500);
+	cout<<"\nBhattacharyya metric: "<< bhatMeasure;
 
 	cout << endl << "finish\n";
 	return 0;
