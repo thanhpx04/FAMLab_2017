@@ -596,7 +596,7 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage) {
 						}
 					}
 					if ((i4 == -1 && j4 == -1)
-							|| (i4 == i && j4 == i && i3 == i1 && j3 == j1))
+							|| (i4 == i && j4 == j && i3 == i1 && j3 == j1))
 						goto step4;
 					else {
 
