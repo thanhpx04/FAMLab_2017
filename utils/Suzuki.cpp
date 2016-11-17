@@ -332,8 +332,8 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 	}
 	if (pos == SOUTHEAST) {
 		if (j + 1 < cols && inputImage->getAtPosition(i, j + 1) == 255) {
-			iOut = i + 1;
-			jOut = j;
+			iOut = i;
+			jOut = j + 1;
 			return;
 		}
 		for (int k = j + 1; k >= j - 1; k--) {
