@@ -37,15 +37,15 @@ int main() {
 
 
 	//Image image("/home/linh/Desktop/Temps/md/images/Md 009.JPG");
-	Image image("data/Mg_019.JPG");
-	//image.cannyAlgorithm();
+	Image image("data/Md 036.JPG");
+	image.cannyAlgorithm();
 	//vector<ptr_Line> lines = image.getApproximateLines(3);
 	//shapeHistogram(image,Degree,500);
 
 	//Image simage("data/Mg_019.JPG");
 
-	double bhatMeasure = bhattacharyyaDistance(image,image,Degree,500);
-	cout<<"\nBhattacharyya metric: "<< bhatMeasure;
+	//double bhatMeasure = bhattacharyyaDistance(image,image,Degree,500);
+	//cout<<"\nBhattacharyya metric: "<< bhatMeasure;
 
 	cout << endl << "finish\n";
 	return 0;

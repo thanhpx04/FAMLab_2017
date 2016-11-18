@@ -1,9 +1,3 @@
-/*
- * Suzuki.cpp
- *
- *  Created on: Nov 1, 2016
- *      Author: linh
- */
 #include <iostream>
 #include <math.h>
 #include <stdlib.h>
@@ -40,6 +34,7 @@ enum Direction {
  * of a pixel (i,j)
  */
 Direction getPosition(int i, int j, int ni, int nj) {
+
 	if (i == ni && j < nj)
 		return EAST;
 	if (i > ni && j < nj)
@@ -73,21 +68,22 @@ void clockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci, int cj,
 
 		if (pos == EAST) {
 			for (int k = j + 1; k >= j - 1; k--) {
-				if (k >= 0 && k < cols && i + 1 < rows
-						&& inputImage->getAtPosition(i + 1, k) == 255) {
+				if (k >= 0 && k < cols && i + 1 < rows && i + 1 >= 0
+						&& inputImage->getAtPosition(i + 1, k) != 0) {
 					iOut = i + 1;
 					jOut = k;
 					return;
 				}
 			}
-			if (j - 1 >= 0 && inputImage->getAtPosition(i, j - 1) == 255) {
+			if (j - 1 >= 0 && j - 1 < cols
+					&& inputImage->getAtPosition(i, j - 1) != 0) {
 				iOut = i;
 				jOut = j - 1;
 				return;
 			}
 			for (int k = j - 1; k <= j + 1; k++) {
-				if (k >= 0 && k < cols && i - 1 >= 0
-						&& inputImage->getAtPosition(i - 1, k) == 255) {
+				if (k >= 0 && k < cols && i - 1 >= 0 && i - 1 < rows
+						&& inputImage->getAtPosition(i - 1, k) != 0) {
 					iOut = i - 1;
 					jOut = k;
 					return;
@@ -96,27 +92,28 @@ void clockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci, int cj,
 
 		}
 		if (pos == SOUTHEAST) {
-			if (i + 1 < rows && inputImage->getAtPosition(i + 1, j) == 255) {
+			if (i + 1 < rows && i + 1 >= 0
+					&& inputImage->getAtPosition(i + 1, j) != 0) {
 				iOut = i + 1;
 				jOut = j;
 				return;
 			}
 			for (int r = i + 1; r >= i - 1; r--) {
-				if (r >= 0 && r < rows && j - 1 >= 0
-						&& inputImage->getAtPosition(r, j - 1) == 255) {
+				if (r >= 0 && r < rows && j - 1 >= 0 && j - 1 < cols
+						&& inputImage->getAtPosition(r, j - 1) != 0) {
 					iOut = r;
 					jOut = j - 1;
 					return;
 				}
 			}
-			if (i - 1 >= 0 && inputImage->getAtPosition(i - 1, j) == 255) {
+			if (i - 1 >= 0 && inputImage->getAtPosition(i - 1, j) != 0) {
 				iOut = i - 1;
 				jOut = j;
 				return;
 			}
 			for (int r = i - 1; r < i + 1; r++) {
-				if (r >= 0 && r < rows && j + 1 < cols
-						&& inputImage->getAtPosition(r, j + 1) == 255) {
+				if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0
+						&& inputImage->getAtPosition(r, j + 1) != 0) {
 					iOut = r;
 					jOut = j + 1;
 					return;
@@ -126,21 +123,21 @@ void clockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci, int cj,
 
 		if (pos == SOUTH) {
 			for (int r = i + 1; r >= i - 1; r--) {
-				if (r >= 0 && r < rows && j - 1 >= 0
-						&& inputImage->getAtPosition(r, j - 1) == 255) {
+				if (r >= 0 && r < rows && j - 1 >= 0 && j - 1 < cols
+						&& inputImage->getAtPosition(r, j - 1) != 0) {
 					iOut = r;
 					jOut = j - 1;
 					return;
 				}
 			}
-			if (i - 1 >= 0 && inputImage->getAtPosition(i - 1, j) == 255) {
+			if (i - 1 >= 0 && inputImage->getAtPosition(i - 1, j) != 0) {
 				iOut = i - 1;
 				jOut = j;
 				return;
 			}
 			for (int r = i - 1; r <= i + 1; r++) {
-				if (r >= 0 && r < rows && j + 1 < cols
-						&& inputImage->getAtPosition(r, j + 1) == 255) {
+				if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0
+						&& inputImage->getAtPosition(r, j + 1) != 0) {
 					iOut = r;
 					jOut = j + 1;
 					return;
@@ -149,27 +146,28 @@ void clockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci, int cj,
 		}
 
 		if (pos == SOUTHWEST) {
-			if (j - 1 >= 0 && inputImage->getAtPosition(i, j - 1) == 255) {
+			if (j - 1 >= 0 && inputImage->getAtPosition(i, j - 1) != 0) {
 				iOut = i;
 				jOut = j - 1;
 				return;
 			}
 			for (int k = j - 1; k <= j + 1; k++) {
-				if (k >= 0 && k < cols && i - 1 >= 0
-						&& inputImage->getAtPosition(i - 1, k) == 255) {
+				if (k >= 0 && k < cols && i - 1 >= 0 && i - 1 < rows
+						&& inputImage->getAtPosition(i - 1, k) != 0) {
 					iOut = i - 1;
 					jOut = k;
 					return;
 				}
 			}
-			if (j + 1 < cols && inputImage->getAtPosition(i, j + 1) == 255) {
+			if (j + 1 < cols && j + 1 >= 0
+					&& inputImage->getAtPosition(i, j + 1) != 0) {
 				iOut = i;
 				jOut = j + 1;
 				return;
 			}
 			for (int k = j + 1; k > j - 1; k--) {
-				if (k >= 0 && k < cols && i + 1 < rows
-						&& inputImage->getAtPosition(i + 1, k) == 255) {
+				if (k >= 0 && k < cols && i + 1 < rows && i + 1 >= 0
+						&& inputImage->getAtPosition(i + 1, k) != 0) {
 					iOut = i + 1;
 					jOut = k;
 					return;
@@ -179,21 +177,22 @@ void clockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci, int cj,
 
 		if (pos == WEST) {
 			for (int k = j - 1; k <= j + 1; k++) {
-				if (k >= 0 && k < cols && i - 1 >= 0
-						&& inputImage->getAtPosition(i - 1, k) == 255) {
+				if (k >= 0 && k < cols && i - 1 >= 0 && i - 1 < rows
+						&& inputImage->getAtPosition(i - 1, k) != 0) {
 					iOut = i - 1;
 					jOut = k;
 					return;
 				}
 			}
-			if (j + 1 < cols && inputImage->getAtPosition(i, j + 1) == 255) {
+			if (j + 1 < cols && j + 1 >= 0
+					&& inputImage->getAtPosition(i, j + 1) != 0) {
 				iOut = i;
 				jOut = j + 1;
 				return;
 			}
 			for (int k = j + 1; k >= j - 1; k--) {
-				if (k >= 0 && k < cols && i + 1 < rows
-						&& inputImage->getAtPosition(i + 1, k) == 255) {
+				if (k >= 0 && k < cols && i + 1 < rows && i + 1 >= 0
+						&& inputImage->getAtPosition(i + 1, k) != 0) {
 					iOut = i + 1;
 					jOut = k;
 					return;
@@ -202,29 +201,31 @@ void clockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci, int cj,
 		}
 
 		if (pos == NORTHWEST) {
-			if (i - 1 >= 0 && inputImage->getAtPosition(i - 1, j) == 255) {
+			if (i - 1 >= 0 && i - 1 < rows
+					&& inputImage->getAtPosition(i - 1, j) != 0) {
 				iOut = i - 1;
 				jOut = j;
 				return;
 			}
 
 			for (int r = i - 1; r <= i + 1; r++) {
-				if (r >= 0 && r < rows && j + 1 < cols
-						&& inputImage->getAtPosition(r, j + 1) == 255) {
+				if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0
+						&& inputImage->getAtPosition(r, j + 1) != 0) {
 					iOut = r;
 					jOut = j + 1;
 					return;
 				}
 			}
 
-			if (i + 1 < rows && inputImage->getAtPosition(i + 1, j) == 255) {
+			if (i + 1 < rows && i + 1 >= 0
+					&& inputImage->getAtPosition(i + 1, j) != 0) {
 				iOut = i + 1;
 				jOut = j;
 				return;
 			}
 			for (int r = i + 1; r > i - 1; r--) {
-				if (r >= 0 && r < rows && j - 1 >= 0
-						&& inputImage->getAtPosition(r, j - 1) == 255) {
+				if (r >= 0 && r < rows && j - 1 >= 0 && j - 1 < cols
+						&& inputImage->getAtPosition(r, j - 1) != 0) {
 					iOut = r;
 					jOut = j - 1;
 					return;
@@ -235,21 +236,22 @@ void clockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci, int cj,
 
 		if (pos == NORTH) {
 			for (int r = i - 1; r <= i + 1; r++) {
-				if (r >= 0 && r < rows && j + 1 < cols
-						&& inputImage->getAtPosition(r, j + 1) == 255) {
+				if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0
+						&& inputImage->getAtPosition(r, j + 1) != 0) {
 					iOut = r;
 					jOut = j + 1;
 					return;
 				}
 			}
-			if (i + 1 < rows && inputImage->getAtPosition(i + 1, j) == 255) {
+			if (i + 1 < rows && i + 1 >= 0
+					&& inputImage->getAtPosition(i + 1, j) != 0) {
 				iOut = i + 1;
 				jOut = j;
 				return;
 			}
 			for (int r = i + 1; r >= i - 1; r--) {
-				if (r >= 0 && r < rows && j - 1 >= 0
-						&& inputImage->getAtPosition(r, j - 1) == 255) {
+				if (r >= 0 && r < rows && j - 1 >= 0 && j - 1 < cols
+						&& inputImage->getAtPosition(r, j - 1) != 0) {
 					iOut = r;
 					jOut = j - 1;
 					return;
@@ -259,27 +261,29 @@ void clockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci, int cj,
 		}
 
 		if (pos == NORTHEAST) {
-			if (j + 1 < cols && inputImage->getAtPosition(i, j + 1) == 255) {
+			if (j + 1 < cols && j + 1 >= 0
+					&& inputImage->getAtPosition(i, j + 1) != 0) {
 				iOut = i;
 				jOut = j + 1;
 				return;
 			}
 			for (int k = j + 1; k >= j - 1; k--) {
-				if (k >= 0 && k < cols && i + 1 < rows
-						&& inputImage->getAtPosition(i + 1, k) == 255) {
+				if (k >= 0 && k < cols && i + 1 < rows && i + 1 >= 0
+						&& inputImage->getAtPosition(i + 1, k) != 0) {
 					iOut = i + 1;
 					jOut = k;
 					return;
 				}
 			}
-			if (j - 1 >= 0 && inputImage->getAtPosition(i, j - 1) == 255) {
+			if (j - 1 >= 0 && j - 1 < cols
+					&& inputImage->getAtPosition(i, j - 1) != 0) {
 				iOut = i;
 				jOut = j - 1;
 				return;
 			}
 			for (int k = j - 1; k < j + 1; k++) {
-				if (k >= 0 && k < cols && i - 1 >= 0
-						&& inputImage->getAtPosition(i - 1, k) == 255) {
+				if (k >= 0 && k < cols && i - 1 >= 0 && i - 1 < rows
+						&& inputImage->getAtPosition(i - 1, k) != 0) {
 					iOut = i - 1;
 					jOut = k;
 					return;
@@ -304,57 +308,75 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 
 	if (pos == EAST) {
 		for (int k = j + 1; k >= j - 1; k--) {
-			if (k >= 0 && k < cols && i - 1 >= 0
-					&& inputImage->getAtPosition(i - 1, k) == 255) {
-				iOut = i - 1;
-				jOut = k;
-				return;
+			if (k >= 0 && k < cols && i - 1 >= 0 && i - 1 < rows) {
+				if (inputImage->getAtPosition(i - 1, k) != 0) {
+					iOut = i - 1;
+					jOut = k;
+
+					return;
+				}
 			}
 		}
-		if (j - 1 >= 0 && inputImage->getAtPosition(i, j - 1) == 255) {
-			iOut = i;
-			jOut = j - 1;
-			return;
+		if (j - 1 >= 0 && j - 1 < cols && i < rows) {
+			if (inputImage->getAtPosition(i, j - 1) != 0) {
+				iOut = i;
+				jOut = j - 1;
+
+				return;
+			}
 		}
 		for (int k = j - 1; k <= j + 1; k++) {
-			if (k >= 0 && k < cols && i + 1 < rows
-					&& inputImage->getAtPosition(i + 1, k) == 255) {
-				iOut = i + 1;
-				jOut = k;
-				return;
+			if (k >= 0 && k < cols && i + 1 < rows && i + 1 >= 0) {
+				if (inputImage->getAtPosition(i + 1, k) != 0) {
+					iOut = i + 1;
+					jOut = k;
+
+					return;
+				}
 			}
 		}
-		if (j + 1 < cols && inputImage->getAtPosition(i, j + 1) == 255) {
-			iOut = i;
-			jOut = j + 1;
-			return;
+		if (j + 1 < cols && j + 1 >= 0 && i < rows) {
+			if (inputImage->getAtPosition(i, j + 1) != 0) {
+				iOut = i;
+				jOut = j + 1;
+
+				return;
+			}
 		}
 	}
 	if (pos == SOUTHEAST) {
-		if (j + 1 < cols && inputImage->getAtPosition(i, j + 1) == 255) {
-			iOut = i;
-			jOut = j + 1;
-			return;
+		if (j + 1 < cols && j + 1 >= 0 && i < rows) {
+			if (inputImage->getAtPosition(i, j + 1) != 0) {
+				iOut = i;
+				jOut = j + 1;
+
+				return;
+			}
+
 		}
 		for (int k = j + 1; k >= j - 1; k--) {
-			if (k >= 0 && k < cols && i - 1 >= 0
-					&& inputImage->getAtPosition(i - 1, k) == 255) {
-				iOut = i - 1;
-				jOut = k;
+			if (k >= 0 && k < cols && i - 1 >= 0 && i - 1 < rows) {
+				if (inputImage->getAtPosition(i - 1, k) != 0) {
+					iOut = i - 1;
+					jOut = k;
+					return;
+				}
+			}
+		}
+		if (j - 1 >= 0 && j - 1 < cols && i < rows) {
+			if (inputImage->getAtPosition(i, j - 1) != 0) {
+				iOut = i;
+				jOut = j - 1;
 				return;
 			}
 		}
-		if (j - 1 >= 0 && inputImage->getAtPosition(i, j - 1) == 255) {
-			iOut = i;
-			jOut = j - 1;
-			return;
-		}
 		for (int k = j - 1; k <= j + 1; k++) {
-			if (k >= 0 && k < cols && i + 1 < rows
-					&& inputImage->getAtPosition(i + 1, k) == 255) {
-				iOut = i + 1;
-				jOut = k;
-				return;
+			if (k >= 0 && k < cols && i + 1 < rows && i + 1 >= 0) {
+				if (inputImage->getAtPosition(i + 1, k) != 0) {
+					iOut = i + 1;
+					jOut = k;
+					return;
+				}
 			}
 		}
 
@@ -362,117 +384,143 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 
 	if (pos == SOUTH) {
 		for (int r = i + 1; r >= i - 1; r--) {
-			if (r >= 0 && r < rows && j + 1 < cols
-					&& inputImage->getAtPosition(r, j + 1) == 255) {
-				iOut = r;
-				jOut = j + 1;
-				return;
+			if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0) {
+				if (inputImage->getAtPosition(r, j + 1) != 0) {
+					iOut = r;
+					jOut = j + 1;
+
+					return;
+				}
 			}
 		}
-		if (i - 1 >= 0 && inputImage->getAtPosition(i - 1, j) == 255) {
-			iOut = i - 1;
-			jOut = j;
-			return;
+		if (i - 1 >= 0 && i - 1 < rows && j < cols) {
+			if (inputImage->getAtPosition(i - 1, j) != 0) {
+				iOut = i - 1;
+				jOut = j;
+				return;
+			}
 		}
 		for (int r = i - 1; r <= i + 1; r++) {
-			if (r >= 0 && r < rows && j - 1 >= 0
-					&& inputImage->getAtPosition(r, j - 1) == 255) {
-				iOut = r;
-				jOut = j - 1;
-				return;
+			if (r >= 0 && r < rows && j - 1 >= 0 && j - 1 < cols) {
+				if (inputImage->getAtPosition(r, j - 1) != 0) {
+					iOut = r;
+					jOut = j - 1;
+					return;
+				}
 			}
 		}
-		if (i + 1 < rows && inputImage->getAtPosition(i + 1, j) == 255) {
-			iOut = i + 1;
-			jOut = j;
-			return;
+		if (i + 1 < rows && i + 1 >= 0 && j < cols) {
+			if (inputImage->getAtPosition(i + 1, j) != 0) {
+				iOut = i + 1;
+				jOut = j;
+				return;
+			}
 		}
 	}
 
 	if (pos == SOUTHWEST) {
-		if (i + 1 < rows && inputImage->getAtPosition(i + 1, j) == 255) {
-			iOut = i + 1;
-			jOut = j;
-			return;
-		}
-		for (int r = i + 1; r >= i - 1; r--) {
-			if (r >= 0 && r < rows && j + 1 < cols
-					&& inputImage->getAtPosition(r, j + 1) == 255) {
-				iOut = r;
-				jOut = j + 1;
+		if (i + 1 < rows && i + 1 >= 0 && j < cols) {
+			if (inputImage->getAtPosition(i + 1, j) != 0) {
+				iOut = i + 1;
+				jOut = j;
 				return;
 			}
 		}
-		if (i - 1 >= 0 && inputImage->getAtPosition(i - 1, j) == 255) {
-			iOut = i - 1;
-			jOut = j;
-			return;
+		for (int r = i + 1; r >= i - 1; r--) {
+			if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0) {
+				if (inputImage->getAtPosition(r, j + 1) != 0) {
+					iOut = r;
+					jOut = j + 1;
+
+					return;
+				}
+			}
+		}
+		if (i - 1 >= 0 && i - 1 < rows && j < cols) {
+			if (inputImage->getAtPosition(i - 1, j) != 0) {
+				iOut = i - 1;
+				jOut = j;
+				return;
+			}
 		}
 		for (int r = i - 1; r <= i + 1; r++) {
-			if (r >= 0 && r < rows && j - 1 >= 0
-					&& inputImage->getAtPosition(r, j - 1) == 255) {
-				iOut = r;
-				jOut = j - 1;
-				return;
+			if (r >= 0 && r < rows && j - 1 >= 0 && j - 1 < cols) {
+				if (inputImage->getAtPosition(r, j - 1) != 0) {
+					iOut = r;
+					jOut = j - 1;
+					return;
+				}
 			}
 		}
 	}
 
 	if (pos == WEST) {
 		for (int k = j - 1; k <= j + 1; k++) {
-			if (k >= 0 && k < cols && i + 1 < rows
-					&& inputImage->getAtPosition(i + 1, k) == 255) {
-				iOut = i + 1;
-				jOut = k;
-				return;
+			if (k >= 0 && k < cols && i + 1 < rows && i + 1 >= 0) {
+				if (inputImage->getAtPosition(i + 1, k) != 0) {
+					iOut = i + 1;
+					jOut = k;
+					return;
+				}
 			}
 		}
-		if (j + 1 < cols && inputImage->getAtPosition(i, j + 1) == 255) {
-			iOut = i;
-			jOut = j + 1;
-			return;
+		if (j + 1 < cols && j + 1 >= 0 && i < rows) {
+			if (inputImage->getAtPosition(i, j + 1) != 0) {
+				iOut = i;
+				jOut = j + 1;
+				return;
+			}
 		}
 		for (int k = j + 1; k >= j - 1; k--) {
-			if (k >= 0 && k < cols && i - 1 >= 0
-					&& inputImage->getAtPosition(i - 1, k) == 255) {
-				iOut = i - 1;
-				jOut = k;
-				return;
+			if (k >= 0 && k < cols && i - 1 >= 0 && i - 1 < rows) {
+				if (inputImage->getAtPosition(i - 1, k) != 0) {
+					iOut = i - 1;
+					jOut = k;
+					return;
+				}
 			}
 		}
-		if (j - 1 >= 0 && inputImage->getAtPosition(i, j - 1) == 255) {
-			iOut = i;
-			jOut = j - 1;
-			return;
+		if (j - 1 >= 0 && j - 1 < cols && i < rows) {
+			if (inputImage->getAtPosition(i, j - 1) != 0) {
+				iOut = i;
+				jOut = j - 1;
+				return;
+			}
 		}
 	}
 
 	if (pos == NORTHWEST) {
-		if (j - 1 >= 0 && inputImage->getAtPosition(i, j - 1) == 255) {
-			iOut = i;
-			jOut = j - 1;
-			return;
-		}
-
-		for (int k = j - 1; k <= j + 1; k++) {
-			if (k >= 0 && k < cols && i + 1 < rows
-					&& inputImage->getAtPosition(i + 1, k) == 255) {
-				iOut = i + 1;
-				jOut = k;
+		if (j - 1 >= 0 && j - 1 < cols && i < rows) {
+			if (inputImage->getAtPosition(i, j - 1) != 0) {
+				iOut = i;
+				jOut = j - 1;
 				return;
 			}
 		}
-		if (j + 1 < cols && inputImage->getAtPosition(i, j + 1) == 255) {
-			iOut = i;
-			jOut = j + 1;
-			return;
+
+		for (int k = j - 1; k <= j + 1; k++) {
+			if (k >= 0 && k < cols && i + 1 < rows && i + 1 >= 0) {
+				if (inputImage->getAtPosition(i + 1, k) != 0) {
+					iOut = i + 1;
+					jOut = k;
+					return;
+				}
+			}
+		}
+		if (j + 1 < cols && j + 1 >= 0 && i < rows) {
+			if (inputImage->getAtPosition(i, j + 1) != 0) {
+				iOut = i;
+				jOut = j + 1;
+				return;
+			}
 		}
 		for (int k = j + 1; k >= j - 1; k--) {
-			if (k >= 0 && k < cols && i - 1 >= 0
-					&& inputImage->getAtPosition(i - 1, k) == 255) {
-				iOut = i - 1;
-				jOut = k;
-				return;
+			if (k >= 0 && k < cols && i - 1 >= 0 && i - 1 < rows) {
+				if (inputImage->getAtPosition(i - 1, k) != 0) {
+					iOut = i - 1;
+					jOut = k;
+					return;
+				}
 			}
 		}
 
@@ -480,69 +528,82 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 
 	if (pos == NORTH) {
 		for (int r = i - 1; r <= i + 1; r++) {
-			if (r >= 0 && r < rows && j - 1 >= 0
-					&& inputImage->getAtPosition(r, j - 1) == 255) {
-				iOut = r;
-				jOut = j - 1;
-				return;
+			if (r >= 0 && r < rows && j - 1 >= 0 && j - 1 < cols) {
+				if (inputImage->getAtPosition(r, j - 1) != 0) {
+					iOut = r;
+					jOut = j - 1;
+					return;
+				}
 			}
 		}
-		if (i + 1 < rows && inputImage->getAtPosition(i + 1, j) == 255) {
-			iOut = i + 1;
-			jOut = j;
-			return;
+		if (i + 1 < rows && i + 1 >= 0 && j < cols) {
+			if (inputImage->getAtPosition(i + 1, j) != 0) {
+				iOut = i + 1;
+				jOut = j;
+				return;
+			}
 		}
 		for (int r = i + 1; r >= i - 1; r--) {
-			if (r >= 0 && r < rows && j + 1 < cols
-					&& inputImage->getAtPosition(r, j + 1) == 255) {
-				iOut = r;
-				jOut = j + 1;
-				return;
+			if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0) {
+				if (inputImage->getAtPosition(r, j + 1) != 0) {
+					iOut = r;
+					jOut = j + 1;
+
+					return;
+				}
 			}
 		}
-		if (i - 1 >= 0 && inputImage->getAtPosition(i - 1, j) == 255) {
-			iOut = i + 1;
-			jOut = j;
-			return;
+		if (i - 1 >= 0 && i - 1 < rows && j < cols) {
+			if (inputImage->getAtPosition(i - 1, j) != 0) {
+				iOut = i - 1;
+				jOut = j;
+				return;
+			}
 		}
 
 	}
 
 	if (pos == NORTHEAST) {
-		if (i - 1 >= 0 && inputImage->getAtPosition(i - 1, j) == 255) {
-			iOut = i - 1;
-			jOut = j;
-			return;
+		if (i - 1 >= 0 && i - 1 < rows && j < cols) {
+			if (inputImage->getAtPosition(i - 1, j) != 0) {
+				iOut = i - 1;
+				jOut = j;
+				return;
+			}
 		}
 		for (int r = i - 1; r <= i + 1; r++) {
-			if (r >= 0 && r < rows && j - 1 >= 0
-					&& inputImage->getAtPosition(r, j - 1) == 255) {
-				iOut = r;
-				jOut = j - 1;
-				return;
+			if (r >= 0 && r < rows && j - 1 >= 0 && j - 1 < cols) {
+				if (inputImage->getAtPosition(r, j - 1) != 0) {
+					iOut = r;
+					jOut = j - 1;
+					return;
+				}
 			}
 		}
-		if (i + 1 < rows && inputImage->getAtPosition(i + 1, j) == 255) {
-			iOut = i + 1;
-			jOut = j;
-			return;
+		if (i + 1 < rows && i + 1 >= 0 && j < cols) {
+			if (inputImage->getAtPosition(i + 1, j) != 0) {
+				iOut = i + 1;
+				jOut = j;
+				return;
+			}
 		}
 		for (int r = i + 1; r >= i - 1; r--) {
-			if (r >= 0 && r < rows && j + 1 < cols
-					&& inputImage->getAtPosition(r, j + 1) == 255) {
-				iOut = r;
-				jOut = j + 1;
-				return;
+			if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0) {
+				if (inputImage->getAtPosition(r, j + 1) != 0) {
+					iOut = r;
+					jOut = j + 1;
+					return;
+				}
 			}
 		}
 
 	}
 
-	{
-		iOut = -1;
-		jOut = -1;
-		return;
-	}
+	/*{
+	 iOut = -1;
+	 jOut = -1;
+	 return;
+	 }*/
 
 }
 vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage) {
@@ -577,28 +638,28 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage) {
 					i3 = i;
 					j3 = j;
 
-					step33:
-					/*if (i3 == 2260 && j3 == 1352) {
+					step33: if (i3 == 2063 && j3 == 1573) {
 					 cout << "\nabc";
 					 cout << i + j;
-					 }*/
+					 }
 					edge.push_back(new Point(j3, i3));
 					counterClockWiseCheck(inputImage, i3, j3, i2, j2, i4, j4);
 
-					if (inputImage->getAtPosition(i3, j3 + 1) == 0) {
-						inputImage->setAtPosition(i3, j3, 0);
+					if (j3 + 1 < cols
+							&& inputImage->getAtPosition(i3, j3 + 1) == 0 && !flag) {
+						inputImage->setAtPosition(i3, j3, -nBD);
 
 					} else {
-						if (inputImage->getAtPosition(i3, j3 + 1) != 0
+						if (j3 + 1 < cols
+								&& inputImage->getAtPosition(i3, j3 + 1) != 0
 								&& inputImage->getAtPosition(i3, j3) == 255) {
-							inputImage->setAtPosition(i3, j3, 0);
+							inputImage->setAtPosition(i3, j3, nBD);
 
 						}
 					}
-					if ((i4 == -1 && j4 == -1)
-							|| (i4 == i && j4 == j && i3 == i1 && j3 == j1))
+					if (i4 == i && j4 == j && i3 == i1 && j3 == j1) {
 						goto step4;
-					else {
+					} else {
 
 						i2 = i3;
 						j2 = j3;
@@ -612,11 +673,16 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage) {
 			}
 
 			step4: if (inputImage->getAtPosition(i, j) != 255) {
-				lNBD = abs(inputImage->getAtPosition(i, j));
-
-				if (edge.size() > 1) {
+				if (edge.size() > 0 && (lNBD == 0 || lNBD == -2)) {
+					cout << "\ntete: " << edge.size() << "\t" << lNBD;
 					edges.push_back(edge);
+					//lNBD = inputImage->getAtPosition(i, j);
+					cout<<"\nvalue: "<< inputImage->getAtPosition(1361,964);
 				}
+
+				if(inputImage->getAtPosition(i,j) != 0)
+					lNBD = inputImage->getAtPosition(i, j);
+
 				edge.clear();
 			}
 
@@ -635,11 +701,13 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage) {
 		vector<ptr_Point> edge = edges.at(i);
 		countpx += edge.size();
 		result.push_back(new Edge(edge));
-		for (int j = 0; j < edge.size(); j++) {
-			ptr_Point p = edge.at(j);
-			output->setAtPosition(p->getY(), p->getX(), 255);
-			of << p->getY() << "\t" << p->getX() << "\n";
-		}
+		//if (i == 7 || i == 22 || i == 48 || i == 50 || i == 83) {
+			for (int j = 0; j < edge.size(); j++) {
+				ptr_Point p = edge.at(j);
+				output->setAtPosition(p->getY(), p->getX(), 255);
+				of << p->getY() << "\t" << p->getX() << "\n";
+			}
+		//}
 		of << "\n";
 
 	}

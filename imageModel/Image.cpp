@@ -286,6 +286,8 @@ vector<ptr_Edge> Image::cannyAlgorithm() {
 
 	vector<ptr_Edge> listOfEdges;
 	listOfEdges = suzuki(cannyMatrix);
+
+
 	return listOfEdges;
 
 }
