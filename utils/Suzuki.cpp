@@ -300,11 +300,12 @@ void clockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci, int cj,
 	}
 }
 void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
-		int cj, int &iOut, int &jOut) {
+		int cj, int &iOut, int &jOut, bool &flag) {
 
 	Direction pos = getPosition(i, j, ci, cj);
 	int rows = inputImage->getRows();
 	int cols = inputImage->getCols();
+	flag = false;
 
 	if (pos == EAST) {
 		for (int k = j + 1; k >= j - 1; k--) {
@@ -312,8 +313,11 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 				if (inputImage->getAtPosition(i - 1, k) != 0) {
 					iOut = i - 1;
 					jOut = k;
-
 					return;
+				} else {
+					if (inputImage->getAtPosition(i - 1, k) == 0) {
+						flag = true;
+					}
 				}
 			}
 		}
@@ -321,7 +325,6 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 			if (inputImage->getAtPosition(i, j - 1) != 0) {
 				iOut = i;
 				jOut = j - 1;
-
 				return;
 			}
 		}
@@ -349,8 +352,11 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 			if (inputImage->getAtPosition(i, j + 1) != 0) {
 				iOut = i;
 				jOut = j + 1;
-
 				return;
+			} else {
+				if (inputImage->getAtPosition(i, j + 1) == 0) {
+					flag = true;
+				}
 			}
 
 		}
@@ -385,10 +391,12 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 	if (pos == SOUTH) {
 		for (int r = i + 1; r >= i - 1; r--) {
 			if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0) {
+				if (r == i && inputImage->getAtPosition(r, j + 1) == 0) {
+					flag = true;
+				}
 				if (inputImage->getAtPosition(r, j + 1) != 0) {
 					iOut = r;
 					jOut = j + 1;
-
 					return;
 				}
 			}
@@ -428,6 +436,9 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 		}
 		for (int r = i + 1; r >= i - 1; r--) {
 			if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0) {
+				if (r == i && inputImage->getAtPosition(r, j + 1) == 0) {
+					flag = true;
+				}
 				if (inputImage->getAtPosition(r, j + 1) != 0) {
 					iOut = r;
 					jOut = j + 1;
@@ -469,6 +480,10 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 				iOut = i;
 				jOut = j + 1;
 				return;
+			} else {
+				if (inputImage->getAtPosition(i, j + 1) == 0) {
+					flag = true;
+				}
 			}
 		}
 		for (int k = j + 1; k >= j - 1; k--) {
@@ -512,6 +527,10 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 				iOut = i;
 				jOut = j + 1;
 				return;
+			} else {
+				if (inputImage->getAtPosition(i, j + 1) == 0) {
+					flag = true;
+				}
 			}
 		}
 		for (int k = j + 1; k >= j - 1; k--) {
@@ -545,6 +564,9 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 		}
 		for (int r = i + 1; r >= i - 1; r--) {
 			if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0) {
+				if (r == i && inputImage->getAtPosition(r, j + 1) == 0) {
+					flag = true;
+				}
 				if (inputImage->getAtPosition(r, j + 1) != 0) {
 					iOut = r;
 					jOut = j + 1;
@@ -589,6 +611,9 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 		}
 		for (int r = i + 1; r >= i - 1; r--) {
 			if (r >= 0 && r < rows && j + 1 < cols && j + 1 >= 0) {
+				if (r == i && inputImage->getAtPosition(r, j + 1) == 0) {
+					flag = true;
+				}
 				if (inputImage->getAtPosition(r, j + 1) != 0) {
 					iOut = r;
 					jOut = j + 1;
@@ -638,16 +663,21 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage) {
 					i3 = i;
 					j3 = j;
 
-					step33: if (i3 == 2063 && j3 == 1573) {
-					 cout << "\nabc";
-					 cout << i + j;
-					 }
+					step33: /*if (i3 == 2028 && j3 == 1566) {
+						cout << "\nabc ";
+						cout << i + j;
+					}*/
 					edge.push_back(new Point(j3, i3));
-					counterClockWiseCheck(inputImage, i3, j3, i2, j2, i4, j4);
+					bool flag = false;
+					counterClockWiseCheck(inputImage, i3, j3, i2, j2, i4, j4,
+							flag);
 
 					if (j3 + 1 < cols
-							&& inputImage->getAtPosition(i3, j3 + 1) == 0 && !flag) {
-						inputImage->setAtPosition(i3, j3, -nBD);
+							&& inputImage->getAtPosition(i3, j3 + 1) == 0) {
+						if (flag)
+							inputImage->setAtPosition(i3, j3, -nBD);
+						else
+							inputImage->setAtPosition(i3, j3, nBD);
 
 					} else {
 						if (j3 + 1 < cols
@@ -673,15 +703,14 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage) {
 			}
 
 			step4: if (inputImage->getAtPosition(i, j) != 255) {
-				if (edge.size() > 0 && (lNBD == 0 || lNBD == -2)) {
+				if (edge.size() > 0) {
 					cout << "\ntete: " << edge.size() << "\t" << lNBD;
 					edges.push_back(edge);
-					//lNBD = inputImage->getAtPosition(i, j);
-					cout<<"\nvalue: "<< inputImage->getAtPosition(1361,964);
+
 				}
 
-				if(inputImage->getAtPosition(i,j) != 0)
-					lNBD = inputImage->getAtPosition(i, j);
+				//if (inputImage->getAtPosition(i, j) != 0)
+					lNBD = abs(inputImage->getAtPosition(i, j));
 
 				edge.clear();
 			}
@@ -695,18 +724,18 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage) {
 	cout << "\n Size of edges: " << edges.size();
 	vector<ptr_Edge> result;
 
-	ofstream of("output/SuzukiValues.txt");
+	ofstream of("/home/linh/Desktop/compare/SuzukiValues.txt");
 	int countpx = 0;
-	for (int i = 0; i < edges.size(); i++) {
+	for (int i = edges.size() - 1; i >=0; i--) {
 		vector<ptr_Point> edge = edges.at(i);
 		countpx += edge.size();
 		result.push_back(new Edge(edge));
 		//if (i == 7 || i == 22 || i == 48 || i == 50 || i == 83) {
-			for (int j = 0; j < edge.size(); j++) {
-				ptr_Point p = edge.at(j);
-				output->setAtPosition(p->getY(), p->getX(), 255);
-				of << p->getY() << "\t" << p->getX() << "\n";
-			}
+		for (int j = 0; j < edge.size(); j++) {
+			ptr_Point p = edge.at(j);
+			output->setAtPosition(p->getY(), p->getX(), 255);
+			of << p->getY() << "\t" << p->getX()<< "\n";
+		}
 		//}
 		of << "\n";
 
