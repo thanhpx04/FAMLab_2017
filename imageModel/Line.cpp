@@ -5,7 +5,7 @@
  *      Author: linh
  */
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
@@ -20,7 +20,8 @@ using namespace std;
 
 //=================================================== Constructor ===========================================
 Line::Line()
-{}
+{
+}
 Line::Line(const Line& otherLine)
 {
 	begin = otherLine.begin;
@@ -33,47 +34,47 @@ Line::Line(const Line& otherLine)
 
 Line::Line(ptr_Point ep1, ptr_Point ep2)
 {
-    begin = ep1;
-    end = ep2;
+	begin = ep1;
+	end = ep2;
 
-    dx = end->getX() - begin->getX();
-    dy = end->getY() - begin->getY();
+	dx = end->getX() - begin->getX();
+	dy = end->getY() - begin->getY();
 
-    length = lengthOfLine();
+	length = lengthOfLine();
 
-    equation = equationOfLine();
+	equation = equationOfLine();
 }
 
 Line::~Line()
 {
-    // TODO Auto-generated destructor stub
+	// TODO Auto-generated destructor stub
 }
 //=================================================== Get and set ===========================================
 ptr_Point Line::getBegin()
 {
-    return begin;
+	return begin;
 }
 ptr_Point Line::getEnd()
 {
-    return end;
+	return end;
 }
 
 void Line::setBegin(ptr_Point ep1)
 {
-    begin = ep1;
+	begin = ep1;
 }
 void Line::setEnd(ptr_Point ep2)
 {
-    end = ep2;
+	end = ep2;
 }
 
 double Line::getLength()
 {
-    return length;
+	return length;
 }
 std::vector<double> Line::getEquation()
 {
-    return equation;
+	return equation;
 }
 
 //=================================================== Private methods ===========================================
@@ -82,9 +83,9 @@ std::vector<double> Line::getEquation()
  */
 bool Line::isPoint()
 {
-    if (begin->getX() == end->getX() && begin->getY() == end->getY())
+	if (begin->getX() == end->getX() && begin->getY() == end->getY())
 		return true;
-    return false;
+	return false;
 }
 
 /*
@@ -92,7 +93,7 @@ bool Line::isPoint()
  */
 double Line::lengthOfLine()
 {
-    return sqrt(pow((double)dx, 2) + pow((double)dy, 2));
+	return sqrt(pow((double) dx, 2) + pow((double) dy, 2));
 }
 
 /*
@@ -100,120 +101,138 @@ double Line::lengthOfLine()
  */
 std::vector<double> Line::equationOfLine()
 {
-    std::vector<double> equa;
-    if (dy == 0)
-    { // line y = m
-		equa.push_back(0);
-		equa.push_back(1);
-		equa.push_back(-(begin->getY()));
+	std::vector<double> equa;
+	if (dx == 0)
+	{ //line x = n
+		equa.push_back(1.0);
+		equa.push_back(0.0);
+		equa.push_back((double)(end->getX()));
 		return equa;
-    }
+	}
+	else
+	{
+		if (dy == 0)
+		{ // line y = m
+			equa.push_back(0);
+			equa.push_back(1);
+			equa.push_back((end->getY()));
+			return equa;
+		}
+		else
+		{
+			if (dx != 0 && dy != 0)
+			{ // normal line
+				double m = (double) dy / (double) dx;
 
-    if (dx == 0)
-    { //line x = n
-		equa.push_back(1);
-		equa.push_back(0);
-		equa.push_back(-(begin->getX()));
-		return equa;
-    }
+				equa.push_back(m);
+				equa.push_back(-1);
+				equa.push_back((double)(begin->getY() - (m * begin->getX())));
+				return equa;
+			}
+		}
+	}
 
-    if (dx != 0 && dy != 0)
-    { // normal line
-		double m = (double)dy / (double)dx;
-
-		equa.push_back(m);
-		equa.push_back(-1);
-		equa.push_back(begin->getY() - (m * begin->getX()));
-		return equa;
-    }
-    return equa; // NULL
+	return equa; // NULL
 }
 //=================================================== Public Methods ===========================================
 double Line::perpendicularDistance(ptr_Point point)
 {
-    double a = equation.at(0);
-    double b = equation.at(1);
-    double c = equation.at(2);
-
-    if (a == 0 && b == 1)
-    {				       // y = c
-	return abs(point->getY() + c); //because the eqution of line is y - c = 0
-    }
-    if (a == 1 && b == 0)
-    { // x-c = 0
-	return abs(point->getX() + c);
-    }
-    return abs((a * ((double)point->getX())) + (b * ((double)point->getY())) + c) / (sqrt(pow((double)a, 2) + pow((double)b, 2)));
+	double a = equation.at(0);
+	double b = equation.at(1);
+	double c = equation.at(2);
+	double distance = 0;
+	if (b != 0 && a != 0)
+	{
+		distance = abs(((a * point->getX()) + (b * point->getY()) + c)
+						/ (sqrt(pow(a, 2) + pow(b, 2))));
+	}
+	if (b == 0 && a == 1)
+		distance = abs(point->getX() - c);
+	if (a == 0 && b == 1)
+		distance = abs(point->getY() - c);
+	return distance;
 }
 
 double Line::angleLines(Line otherLine)
 {
 
-    double slope1, slope2;
-    if (dx == 0 && dy == 0)
-	return 0;
-    if (dx == 0 && otherLine.dx != 0)
-    { // line 1 is parallel with Oy
-	slope2 = (double)otherLine.dy / (double)otherLine.dx;
-	return atan(abs(1 / slope2)) * 180 / M_PI;
-    }
-    if (dx != 0 && otherLine.dx == 0)
-    { //otherLine is parallel with Oy
-	slope1 = (double)dy / (double)dx;
-	return atan(abs(1 / slope1)) * 180 / M_PI;
-    }
+	double slope1, slope2;
+	if (dx == 0 && otherLine.dx == 0)
+		return 0;
+	if (dx == 0 && otherLine.dx != 0)
+	{ // line 1 is parallel with Oy
+		slope2 = (double) otherLine.dy / (double) otherLine.dx;
+		return atan(abs(1 / slope2)) * 180 / M_PI;
+	}
+	if (dx != 0 && otherLine.dx == 0)
+	{ //otherLine is parallel with Oy
+		slope1 = (double) dy / (double) dx;
+		return atan(abs(1 / slope1)) * 180 / M_PI;
+	}
 
-    slope1 = (double)dy / (double)dx;
-    slope2 = (double)otherLine.dy / (double)otherLine.dx;
+	slope1 = (double) dy / (double) dx;
+	slope2 = (double) otherLine.dy / (double) otherLine.dx;
 
-    if (slope1 == slope2) // parallel lines
-	return 0;
-    if (slope1 * slope2 == -1) // perpendicular lines
-	return 90;
-    if (slope1 == 0 && slope2 != 0)
-    { // line 1 is parallel with Ox
-	return atan(abs(slope2)) * 180 / M_PI;
-    }
-    if (slope1 != 0 && slope2 == 0)
-    { // otherLine is parallel with Ox
-	return atan(abs(slope1)) * 180 / M_PI;
-    }
-    return atan(abs((slope1 - slope2) / (1 + slope1 * slope2))) * 180 / M_PI;
+	if ((slope1 == 0 && slope2 == 0) || (slope1 == slope2)) // parallel lines
+		return 0;
+	if (slope1 * slope2 == -1) // perpendicular lines
+		return 90;
+	if (slope1 == 0 && slope2 != 0)
+	{ // line 1 is parallel with Ox
+		return atan(abs(slope2)) * 180 / M_PI;
+	}
+	if (slope1 != 0 && slope2 == 0)
+	{ // otherLine is parallel with Ox
+		return atan(abs(slope1)) * 180 / M_PI;
+	}
+	return atan(abs((slope1 - slope2) / (1 + slope1 * slope2))) * 180 / M_PI;
 }
 
 ptr_Point Line::intersection(Line otherLine)
 {
 
-    std::vector<double> otherEquation = otherLine.equation;
+	double a1 = equation.at(0);
+	double b1 = equation.at(1);
+	double c1 = equation.at(2);
 
-    if (equation.at(0) == 0 && otherEquation.at(0) != 0)
-    {
-		return new Point((otherEquation.at(1) * equation.at(2) - otherEquation.at(2) * equation.at(1)) / (otherEquation.at(0) * equation.at(1)), -equation.at(2) / equation.at(1));
-    }
-    if (equation.at(0) != 0 && otherEquation.at(0) == 0)
-    {
-		return new Point((equation.at(1) * otherEquation.at(2) - (equation.at(2) * otherEquation.at(1))) / (equation.at(0) * otherEquation.at(1)), -otherEquation.at(2) / otherEquation.at(1));
-    }
-    if (equation.at(1) == 0 && otherEquation.at(1) != 0)
-    {
-		return new Point(-equation.at(2), otherEquation.at(0) * equation.at(2) - otherEquation.at(2));
-    }
-    if (equation.at(1) != 0 && otherEquation.at(1) == 0)
-    {
-		return new Point(-otherEquation.at(2), (equation.at(0) * otherEquation.at(2) - equation.at(2)) / equation.at(1));
-    }
-    if ((equation.at(0) == otherEquation.at(0)) || (equation.at(1) == otherEquation.at(1) && equation.at(1) == 0))
-    { // parallel lines
+	double a2 = otherLine.equation.at(0);
+	double b2 = otherLine.equation.at(1);
+	double c2 = otherLine.equation.at(2);
+
+	if ((b1 == 0 && b2 == 0) || (a1 == a2)) // parallel lines
 		return new Point(-1, -1);
-    }
-    double da = equation.at(0) - otherEquation.at(0);
-    double dc = otherEquation.at(2) - equation.at(2);
-    return new Point(round(dc / da), round((equation.at(0) * (dc / da)) + equation.at(2)));
+
+	double a; // = a1 - a2;
+	double c; // = c2 - c1;
+	double x = 0; // = c / a;
+	double y = 0; // = (a1 * x) + c1;
+
+	if (b1 == 0 && b2 != 0)
+	{
+		x = c1;
+		y = (a2 * x) + c2;
+	}
+	else
+	{
+		if (b1 != 0 && b2 == 0)
+		{
+			x = c2;
+			y = (a1 * x) + c1;
+		}
+	}
+	if (b1 != 0 && b2 != 0)
+	{
+		a = a1 - a2;
+		c = c2 - c1;
+		x = c / a;
+		y = (a1 * x) + c1;
+	}
+	return new Point(round(x), round(y));
 }
 
 bool Line::checkBelongPoint(ptr_Point point)
 {
-    if (perpendicularDistance(point) == 0)
-	return true;
-    return false;
+	if (perpendicularDistance(point) == 0)
+		return true;
+	return false;
 }

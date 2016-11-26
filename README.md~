@@ -59,6 +59,15 @@ Problems:
 Continue with the works on 28 Oct and finished:
 	- The problem (1)(date: 28 Oct) has fixed.
 	- (3)
+17 Nov 2016
+Finished the Canny algorithm (after verifying the result with Opencv).
+Continue with Suzuki algorithm to extract the edge from Canny.
+Some notes:
+	- Suzuki apply to extract the outer border and hole border, the algorithm look like DFS search, but when 
+	it comeback a position, they also import the position into the list. So, the total point after Suzuki can be
+	double the total points after Canny
+	- New idea: 1. consider each point one time => we loss some points, and more discrete edge (1 point/edge, 2 points/edge)
+		    2. Consider all point but if the point had added into list, did not add again.	
 
 
 

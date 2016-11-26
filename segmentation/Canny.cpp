@@ -372,20 +372,13 @@ ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage,
 ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	int highThreshold)
 {
-
 	ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
-	//cout << "\nFinished apply sobel filter.\n";
-
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
-	//cout << "\nFinished non maximum suppression.\n";
-
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, sobelFilter,
 		lowThreshold, highThreshold);
-	//cout << "\nFinished double threshold.\n";
 
-	int i = 0, count = 0;
-	ofstream of("output/edgeValues.txt");
-
+	/*int count = 0;
+	ofstream of("/home/linh/Desktop/compare/cannyValues.txt");
 	for (int r = 0; r < thresholdImage->getRows(); r++)
 	{
 		for (int c = 0; c < thresholdImage->getCols(); c++)
@@ -399,9 +392,8 @@ ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 		}
 
 	}
-	cout << endl << "Total points: " << count;
-	of.close();
-	saveGrayScale("output/new_canny.jpg", thresholdImage);
+	cout << endl << "Total points in Canny: " << count;
+	of.close();*/
 
 	delete sobelFilter;
 	delete nonMaxSuppress;

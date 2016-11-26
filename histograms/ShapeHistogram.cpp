@@ -27,14 +27,6 @@ const int m_bin_720 = 5;
 const int m_bin_3600 = 1;
 #include "ShapeHistogram.h"
 
-/*LocalHistogram::LocalHistogram() {
- // TODO Auto-generated constructor stub
-
- }
-
- LocalHistogram::~LocalHistogram() {
- // TODO Auto-generated destructor stub
- }*/
 
 GFeature pairwiseHistogram(ptr_Line refLine, ptr_Line objLine) {
 	GFeature pgh;// = GFeature();
@@ -47,7 +39,7 @@ GFeature pairwiseHistogram(ptr_Line refLine, ptr_Line objLine) {
 	return pgh;
 }
 
-double addGFeature(LocalHistogram lhist, GFeature feature) {
+double addGFeature(LocalHistogram &lhist, GFeature feature) {
 	lhist.features.push_back(feature);
 	if (feature.dmax > lhist.maxDistance) {
 		lhist.maxDistance = feature.dmax;
@@ -202,6 +194,6 @@ ptr_IntMatrix shapeHistogram(Image grayImage, AngleAccuracy angleAcc, int cols){
 // compute the Bhattacharrya distance between two images
 double bhattacharyyaDistance(Image refImage, Image sceneImage,AngleAccuracy angleAcc, int cols){
 	ptr_IntMatrix refHistogram = shapeHistogram(refImage,angleAcc,cols);
-	//ptr_IntMatrix sceneHistogram = shapeHistogram(sceneImage,angleAcc,cols);
-	return bhattacharyyaMetric(refHistogram,refHistogram);
+	ptr_IntMatrix sceneHistogram = shapeHistogram(sceneImage,angleAcc,cols);
+	return bhattacharyyaMetric(refHistogram,sceneHistogram);
 }

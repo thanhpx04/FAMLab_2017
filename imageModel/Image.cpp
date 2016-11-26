@@ -14,6 +14,7 @@
 #include <fstream>
 #include <time.h>
 #include <string>
+#include <algorithm>
 using namespace std;
 
 #include "Point.h"
@@ -21,8 +22,9 @@ using namespace std;
 #include "Edge.h"
 #include "Matrix.h"
 #include "../io/Reader.h"
-#include "../utils/Canny.h"
-#include "../utils/Suzuki.h"
+#include "../segmentation/Thresholds.h"
+#include "../segmentation/Canny.h"
+#include "../segmentation/Suzuki.h"
 
 #include "Image.h"
 
@@ -41,37 +43,42 @@ const int MAX_GRAY_VALUE = 255;
  *
  */
 //================================================= Utils methods =================================================
-ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix) {
+ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix)
+{
 	ptr_IntMatrix grayMatrix;
 	unsigned int width = rgbMatrix->getCols();
 	unsigned int height = rgbMatrix->getRows();
 
 	grayMatrix = new Matrix<int>(height, width);
-	for (int h = 0; h < height; h++) {
-		for (int w = 0; w < width; w++) {
+	for (int h = 0; h < height; h++)
+	{
+		for (int w = 0; w < width; w++)
+		{
 
 			grayMatrix->setAtPosition(h, w,
-					round(
-							((double) rgbMatrix->getAtPosition(h, w).R
-									* RED_COEFFICIENT)
-									+ ((double) rgbMatrix->getAtPosition(h, w).G
-											* GREEN_COEFFICIENT)
-									+ ((double) rgbMatrix->getAtPosition(h, w).B
-											* BLUE_COEFFICIENT)));
+				round(
+					((double) rgbMatrix->getAtPosition(h, w).R * RED_COEFFICIENT)
+						+ ((double) rgbMatrix->getAtPosition(h, w).G
+							* GREEN_COEFFICIENT)
+						+ ((double) rgbMatrix->getAtPosition(h, w).B
+							* BLUE_COEFFICIENT)));
 		}
 	}
 
 	return grayMatrix;
 }
 
-ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue,
-		int maxValue) {
+/*ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue,
+	int maxValue)
+{
 	int rows = inputMatrix->getRows();
 	int cols = inputMatrix->getCols();
 
 	ptr_IntMatrix result = new Matrix<int>(rows, cols);
-	for (int r = 0; r < rows; r++) {
-		for (int c = 0; c < cols; c++) {
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
 			if (inputMatrix->getAtPosition(r, c) > tValue)
 				result->setAtPosition(r, c, maxValue);
 			else
@@ -79,20 +86,23 @@ ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue,
 		}
 	}
 	return result;
-}
+}*/
 // ================================================== End utils methods =============================================
 //===================================================== Constructor =================================================
-Image::Image() {
+Image::Image()
+{
 	// TODO Auto-generated constructor stub
 	medianHistogram = 0;
 	meanHistogram = 0;
 	thresholdValue = 0;
 }
 
-Image::~Image() {
+Image::~Image()
+{
 	// TODO Auto-generated destructor stub
 }
-Image::Image(std::string filePath) {
+Image::Image(std::string filePath)
+{
 	medianHistogram = 0;
 	meanHistogram = 0;
 	thresholdValue = 0;
@@ -102,35 +112,18 @@ Image::Image(std::string filePath) {
 	grayMatrix = convertRGBToGray(imgMatrix);
 	calcGrayHistogram();
 	calThresholdValue();
-
-	/*ofstream of("output/imageValues.txt");
-	 for (int r = 0; r < imgMatrix->getRows(); ++r) {
-	 for (int c = 0; c < imgMatrix->getCols(); ++c) {
-	 of <<r<<"\t"<<c<<"\t"<< (int) imgMatrix->getAtPosition(r, c).B << "\t"
-	 << (int) imgMatrix->getAtPosition(r, c).G << "\t"
-	 << (int) imgMatrix->getAtPosition(r, c).R << "\t"
-	 << (int) grayMatrix->getAtPosition(r, c) << "\n";
-
-	 }
-	 }
-	 of.close();*/
-
 	cout << endl << "Threshold value: " << thresholdValue;
-	/*cout << endl << "Test value in histogram matrix: "
-	 << (int) grayHistogram->getAtPosition(0, 200);
-	 cout << endl << "The histogram values: " << endl;
-	 for (int i = 0; i < 256; i++) {
-	 cout << "\t" << grayHistogram->getAtPosition(0, i);
-	 }*/
 }
 
 //===================================================== End constructor ================================================
 
 //================================================ Public methods ======================================================
-void Image::setFileName(std::string filePath) {
+void Image::setFileName(std::string filePath)
+{
 	fileName = filePath;
 }
-std::string Image::getFileName() {
+std::string Image::getFileName()
+{
 	return fileName;
 }
 /*void Image::setEdges(std::vector<Edge> edges){
@@ -139,74 +132,82 @@ std::string Image::getFileName() {
  std::vector<Edge> Image::getEdge(){
  return listOfEdges;
  }*/
-void Image::setMLandmarks(string tpsFile) {
+void Image::setMLandmarks(string tpsFile)
+{
 	//listOfMLandmarks = readTPSFile(tpsFile.c_str());
 
 }
-ptr_IntMatrix Image::getGrayMatrix() {
+ptr_IntMatrix Image::getGrayMatrix()
+{
 	return grayMatrix;
 }
-ptr_RGBMatrix Image::getRGBMatrix() {
+ptr_RGBMatrix Image::getRGBMatrix()
+{
 	return imgMatrix;
 }
-float Image::getMedianHistogram() {
+float Image::getMedianHistogram()
+{
 	if (medianHistogram == 0)
 		calcGrayHistogram();
 	return medianHistogram;
 
 }
-float Image::getMeanHistogram() {
+float Image::getMeanHistogram()
+{
 	if (meanHistogram == 0)
 		calcGrayHistogram();
 	return meanHistogram;
 }
-float Image::getThresholdValue() {
+float Image::getThresholdValue()
+{
 	if (thresholdValue == 0)
 		calThresholdValue();
 	return thresholdValue;
 }
 
-vector<ptr_Line> Image::getApproximateLines(int minDistance = 3) { // min distance to seperate the edge to list of approximate lines
-
+vector<ptr_Line> Image::getApproximateLines(int minDistance = 3)
+{
 	vector<ptr_Edge> listOfEdges = cannyAlgorithm();
-
-	vector<ptr_Line> lines;
-	for (size_t t = 0; t < listOfEdges.size(); t++) {
-		ptr_Edge edgei = listOfEdges.at(t);
-		vector<ptr_Line> templines = edgei->segment(minDistance);
-
-		if (templines.size() > 0)
-			lines.insert(lines.end(), templines.begin(), templines.end());
-
+	vector<ptr_Line> totalLines;
+	for (size_t i = 0; i < listOfEdges.size(); i++)
+	{
+		ptr_Edge ed = listOfEdges.at(i);
+		vector<ptr_Point> breakPoints = ed->segment(3);
+		vector<ptr_Line> lines = ed->getLines(breakPoints);
+		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
 	}
-	cout << "\n Total approximated lines: " << lines.size();
-	listOfLines = lines;
+	cout << "\n Total lines after segment the edge: " << totalLines.size();
+	ofstream of("/home/linh/Desktop/compare/Lines.txt");
 
-	ofstream of("output/Lines.txt");
+	for (size_t i = 0; i < totalLines.size(); i++)
+	{
+		ptr_Line line = totalLines.at(i);
+		of << line->getBegin()->getX() << "\t" << line->getBegin()->getY()
+			<< "\t" << line->getEnd()->getX() << "\t" << line->getEnd()->getY()
+			<< "\n";
 
-	for (size_t i = 0; i < lines.size(); i++) {
-		ptr_Line line = lines.at(i);
-		of << line->getBegin()->getX() << "\t" << line->getEnd()->getY() << "\t"
-				<< line->getEnd()->getX() << "\t" << line->getEnd()->getY()
-				<< "\n";
 	}
 	of.close();
-
-	return lines;
+	return totalLines;
 }
 //================================================ End public methods ==================================================
 
 //================================================ Private methods =====================================================
-void Image::calcGrayHistogram() {
+void Image::calcGrayHistogram()
+{
 
-	if (grayMatrix->getCols() != 0) {
+	if (grayMatrix->getCols() != 0)
+	{
 
 		float total = 0;
 		float pi = 0;
-		int array[BIN_SIZE] = { 0 };
+		int array[BIN_SIZE] =
+		{ 0 };
 
-		for (int c = 0; c < grayMatrix->getRows(); c++) {
-			for (int r = 0; r < grayMatrix->getCols(); r++) {
+		for (int c = 0; c < grayMatrix->getRows(); c++)
+		{
+			for (int r = 0; r < grayMatrix->getCols(); r++)
+			{
 				int k = grayMatrix->getAtPosition(c, r);
 				array[k]++;
 			}
@@ -214,7 +215,8 @@ void Image::calcGrayHistogram() {
 
 		grayHistogram = new Matrix<int>(1, BIN_SIZE, 0);
 
-		for (int k = 0; k < BIN_SIZE; k++) {
+		for (int k = 0; k < BIN_SIZE; k++)
+		{
 			grayHistogram->setAtPosition(0, k, array[k]);
 			total += array[k];
 			pi += (k * array[k]);
@@ -226,9 +228,11 @@ void Image::calcGrayHistogram() {
 		// calculate the median of histogram
 		float avm = total / 2;
 		float temp = 0;
-		for (int m = 0; m < BIN_SIZE; m++) {
+		for (int m = 0; m < BIN_SIZE; m++)
+		{
 			temp += array[m];
-			if (temp >= avm) {
+			if (temp >= avm)
+			{
 				medianHistogram = m;
 				break;
 			}
@@ -237,34 +241,41 @@ void Image::calcGrayHistogram() {
 
 }
 
-void Image::calThresholdValue() {
+void Image::calThresholdValue()
+{
 	if (medianHistogram == 0 || meanHistogram == 0)
 		calcGrayHistogram();
 	int limit1 =
-			meanHistogram > medianHistogram ? medianHistogram : meanHistogram;
+		meanHistogram > medianHistogram ? medianHistogram : meanHistogram;
 	limit1 = (limit1 >= 120) ? (limit1 - DECREASE_25) : (limit1 - DECREASE_5);
 	int imax1 = -1, max1 = -1;
-	for (int index = 0; index < limit1; index++) {
+	for (int index = 0; index < limit1; index++)
+	{
 		int temp = grayHistogram->getAtPosition(0, index);
-		if (temp > max1) {
+		if (temp > max1)
+		{
 			max1 = temp;
 			imax1 = index;
 		}
 	}
 	int limit2 =
-			meanHistogram > medianHistogram ? meanHistogram : medianHistogram;
+		meanHistogram > medianHistogram ? meanHistogram : medianHistogram;
 	int imin = -1, min = max1;
-	for (int k = imax1; k < limit2; k++) {
+	for (int k = imax1; k < limit2; k++)
+	{
 		int temp = grayHistogram->getAtPosition(0, k);
-		if (temp < min) {
+		if (temp < min)
+		{
 			min = temp;
 			imin = k;
 		}
 	}
 	int max2 = -1, imax2 = -1;
-	for (int k = limit2; k < BIN_SIZE; k++) {
+	for (int k = limit2; k < BIN_SIZE; k++)
+	{
 		int temp = grayHistogram->getAtPosition(0, k);
-		if (temp > max2) {
+		if (temp > max2)
+		{
 			max2 = temp;
 			imax2 = k;
 		}
@@ -274,19 +285,47 @@ void Image::calThresholdValue() {
 	thresholdValue = (mid1 + mid2) / 2;
 }
 
-vector<ptr_Edge> Image::cannyAlgorithm() {
+ptr_IntMatrix createTest()
+{
+	ptr_IntMatrix testMatrix = new Matrix<int>(8, 13, 0);
+	testMatrix->setAtPosition(2, 2,1);
+	testMatrix->setAtPosition(2, 3,1);
+	testMatrix->setAtPosition(2, 4,1);
+	testMatrix->setAtPosition(2, 5,1);
+	testMatrix->setAtPosition(2, 6,1);
+	testMatrix->setAtPosition(2, 7,1);
+	testMatrix->setAtPosition(2, 8,1);
+	testMatrix->setAtPosition(3, 2,1);
+	testMatrix->setAtPosition(3, 5,1);
+	testMatrix->setAtPosition(3, 8,1);
+	testMatrix->setAtPosition(3, 10,1);
+	testMatrix->setAtPosition(4, 2,1);
+	testMatrix->setAtPosition(4, 5,1);
+	testMatrix->setAtPosition(4, 8,1);
+	testMatrix->setAtPosition(5, 2,1);
+	testMatrix->setAtPosition(5, 3,1);
+	testMatrix->setAtPosition(5, 4,1);
+	testMatrix->setAtPosition(5, 5,1);
+	testMatrix->setAtPosition(5, 6,1);
+	testMatrix->setAtPosition(5, 7,1);
+	testMatrix->setAtPosition(5, 8,1);
+
+	return testMatrix;
+}
+
+vector<ptr_Edge> Image::cannyAlgorithm()
+{
 	if (thresholdValue == 0)
 		calThresholdValue();
 
 	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, (int) thresholdValue,
-			MAX_GRAY_VALUE);
+		MAX_GRAY_VALUE);
 
 	ptr_IntMatrix cannyMatrix = cannyProcess(binMatrix, (int) thresholdValue,
-			3 * (int) thresholdValue);
+		3 * (int) thresholdValue);
 
 	vector<ptr_Edge> listOfEdges;
 	listOfEdges = suzuki(cannyMatrix);
-
 
 	return listOfEdges;
 
