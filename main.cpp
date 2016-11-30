@@ -33,19 +33,22 @@ using namespace std;
 
 
 int main() {
+	cout.precision(20);
 	cout << "MAELab test" << endl << endl;
 
-
 	//Image image("/home/linh/Desktop/Temps/md/images/Md 009.JPG");
-	Image image("data/Md 036.JPG");
-	image.cannyAlgorithm();
+	Image image("data/Md039.JPG");
+	//image.cannyAlgorithm();
 	//vector<ptr_Line> lines = image.getApproximateLines(3);
 	//shapeHistogram(image,Degree,500);
 
-	//Image simage("data/Mg_019.JPG");
+	Image simage("data/Md_046.jpg");
 
-	//double bhatMeasure = bhattacharyyaDistance(image,image,Degree,500);
-	//cout<<"\nBhattacharyya metric: "<< bhatMeasure;
+
+	ShapeHistogram shapeHist;
+	//shapeHist.shapeHistogram(image,Degree,500);
+	double bhatMeasure = shapeHist.bhattacharyyaDistance(image,simage,Degree,500);
+	cout<<"\nBhattacharyya metric: "<< bhatMeasure;
 
 	cout << endl << "finish\n";
 	return 0;

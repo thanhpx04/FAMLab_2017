@@ -173,7 +173,7 @@ double Line::angleLines(Line otherLine)
 	slope1 = (double) dy / (double) dx;
 	slope2 = (double) otherLine.dy / (double) otherLine.dx;
 
-	if ((slope1 == 0 && slope2 == 0) || (slope1 == slope2)) // parallel lines
+	if ((slope1 == 0 && slope2 == 0)) // parallel lines
 		return 0;
 	if (slope1 * slope2 == -1) // perpendicular lines
 		return 90;

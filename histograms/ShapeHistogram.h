@@ -9,13 +9,14 @@
 #define SHAPEHISTOGRAM_H_
 
 /*class LocalHistogram {
-private:
-	vector<GFeature> listFeatures;
-public:
-	LocalHistogram();
-	virtual ~LocalHistogram();
-};*/
-enum AngleAccuracy {
+ private:
+ vector<GFeature> listFeatures;
+ public:
+ LocalHistogram();
+ virtual ~LocalHistogram();
+ };*/
+enum AngleAccuracy
+{
 	HaftDegree = 0,
 	Degree = 1,
 	TwoTimeDegree = 2,
@@ -24,22 +25,40 @@ enum AngleAccuracy {
 	TwelveTimeDegree = 12,
 	SixtyTimeDegree = 60
 };
-struct GFeature {
-	double angle;
+struct GFeature
+{
+	double angle; // angle in degree
 	double dmin;
 	double dmax;
 };
 
-struct LocalHistogram {
+struct LocalHistogram
+{
 	vector<GFeature> features;
 	double maxDistance;
 };
 
-vector<LocalHistogram> constructPGH(vector<ptr_Line> listOfLines,
-		double &maxDistance);
+class ShapeHistogram
+{
+private:
+	ptr_IntMatrix matrix;
+	vector<LocalHistogram> listLocalHistogram;
+	double totalEntries;
+	double max_distance;
+public:
+	ShapeHistogram();
+	virtual ~ShapeHistogram();
 
+	double getEntries();
+	ptr_IntMatrix getMatrix();
 
+	vector<LocalHistogram> constructPGH(vector<ptr_Line> listOfLines);
+	ptr_IntMatrix constructPGHMatrix(vector<LocalHistogram> localHists,
+		AngleAccuracy angleAcc, int cols);
+	ShapeHistogram shapeHistogram(Image grayImage, AngleAccuracy angleAcc,
+		int cols);
+	double bhattacharyyaDistance(Image refImage, Image sceneImage,
+		AngleAccuracy angleAcc, int cols);
+};
 
-ptr_IntMatrix shapeHistogram(Image grayImage, AngleAccuracy angleAcc, int cols);
-double bhattacharyyaDistance(Image refImage, Image sceneImage,AngleAccuracy angleAcc, int cols);
 #endif /* LOCALHISTOGRAM_H_ */

@@ -169,6 +169,12 @@ vector<ptr_Line> Image::getApproximateLines(int minDistance = 3)
 {
 	vector<ptr_Edge> listOfEdges = cannyAlgorithm();
 	vector<ptr_Line> totalLines;
+	/*vector<ptr_Edge> drawEdge;
+	std::sort(listOfEdges.begin(),listOfEdges.end());
+	ptr_Edge edge0 = listOfEdges.at(0);
+	drawEdge.push_back(edge0);*/
+
+
 	for (size_t i = 0; i < listOfEdges.size(); i++)
 	{
 		ptr_Edge ed = listOfEdges.at(i);
