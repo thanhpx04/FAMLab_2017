@@ -29,7 +29,10 @@ Treatments::Treatments()
 	// TODO Auto-generated constructor stub
 
 }
-
+Treatments::Treatments(Image img)
+{
+	refImage = img;
+}
 Treatments::~Treatments()
 {
 	// TODO Auto-generated destructor stub

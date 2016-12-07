@@ -20,23 +20,18 @@ using namespace std;
 #include "imageModel/Edge.h"
 #include "imageModel/Matrix.h"
 #include "imageModel/Image.h"
-/*
- #include "io/TPSReader.h"
- #include "io/LoadJPG.h"
- */
-/*
- #include "io/Reader.h"
- #include "io/JPEGReader.h"
- #include "imageModel/Image.h"
- #include "utils/Canny.h"
- #include "utils/Suzuki.h"*/
+
 #include "histograms/ShapeHistogram.h"
 #include "pht/PHTEntry.h"
 #include "pht/PHoughTransform.h"
-
-#include "pointInterest/Treatments.h"
-#include "pointInterest/ProHoughTransform.h"
 #include "correlation/CrossCorrelation.h"
+#include "pointInterest/Treatments.h"
+#include "pointInterest/Segmentation.h"
+#include "pointInterest/GeometricHistgoram.h"
+#include "pointInterest/ProHoughTransform.h"
+#include "pointInterest/LandmarkDetection.h"
+
+#include "Analysis.h"
 
 int main()
 {
@@ -44,9 +39,20 @@ int main()
 	cout << "MAELab test" << endl << endl;
 
 	//Image image("/home/linh/Desktop/Temps/md/images/Md 009.JPG");
-	Image image("data/Md039.JPG");
-	image.readManualLandmarks("/home/linh/Desktop/Temps/md/landmarks/Md 039.TPS");
-	//image.cannyAlgorithm();
+	Image modelImage("data/Md039.JPG");
+	modelImage.readManualLandmarks("/home/linh/Desktop/Temps/md/landmarks/Md 039.TPS");
+
+	Image sceneimage("data/Md_046.jpg");
+
+	LandmarkDetection lm;
+	ptr_Treatments tr = new LandmarkDetection();
+	tr->setRefImage(modelImage);
+
+	Analysis analys(tr);
+	vector<ptr_Point> esLandmarks = analys.estimatedLandmarks(sceneimage,Degree,500,400,500);
+
+	cout<<"\nTotal landmarks: "<<esLandmarks.size();
+	/*//image.cannyAlgorithm();
 	vector<ptr_Line> lines = image.getApproximateLines(3);
 
 	PHoughTransform phTransform;
@@ -88,12 +94,8 @@ int main()
 	//ptr_IntMatrix sRotate = simage.rotate(ePoint, angleDiff, 1);
 
 	verifyLandmarks(image, simage, image.getListOfManualLandmarks(), esLandmarks,
-		400, 500, angleDiff, ePoint);
+		400, 500, angleDiff, ePoint);*/
 
-//ShapeHistogram shapeHist;
-//shapeHist.shapeHistogram(image,Degree,500);
-//double bhatMeasure = shapeHist.bhattacharyyaDistance(image,simage,Degree,500);
-//cout<<"\nBhattacharyya metric: "<< bhatMeasure;
 
 	cout << endl << "finish\n";
 	return 0;

@@ -22,6 +22,7 @@ class Point
     void setX(int xCoor){x = xCoor;}
     int getY(){return y;}
     void setY(int yCoor) {y = yCoor;}
+    Point operator+(Point p);
 };
 
 typedef Point *ptr_Point;

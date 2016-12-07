@@ -129,15 +129,7 @@ vector<ptr_Point> verifyLandmarks(Image mImage, Image sImage,
 {
 	ptr_IntMatrix mMatrix = mImage.getGrayMatrix();
 	ptr_IntMatrix sRotateImg = sImage.rotate(ePoint, angleDiff, 1);
-	ofstream of("/home/linh/Desktop/compare/Com.txt");
-	/*for (int i = 0; i < 100; i++)
-	 {
-	 for (int j = 0; j < sRotateImg->getCols(); j++)
-	 {
-	 of << i << "\t" << j << "\t" << (int) sRotateImg->getAtPosition(i, j)
-	 << "\n";
-	 }
-	 }*/
+
 	vector<ptr_Point> mcResult;
 	for (size_t i = 0; i < esLandmarks.size(); i++)
 	{
@@ -145,17 +137,8 @@ vector<ptr_Point> verifyLandmarks(Image mImage, Image sImage,
 		ptr_Point tLocation, tDistance, iLocation, iDistance;
 		ptr_IntMatrix templ = createTemplate(mMatrix, manualLM.at(i), templSize,
 			tLocation, tDistance);
-		ptr_IntMatrix sceneM = createTemplate(sImage.getGrayMatrix(),
-			esLandmarks.at(i), sceneSize, iLocation, iDistance);
-
-		for (int i = 0; i < sceneM->getRows(); i++)
-		{
-			for (int j = 0; j < sceneM->getCols(); j++)
-			{
-				of << i << "\t" << j << "\t" << (int) sceneM->getAtPosition(i, j)
-					<< "\n";
-			}
-		}
+		ptr_IntMatrix sceneM = createTemplate(sRotateImg, esLandmarks.at(i),
+			sceneSize, iLocation, iDistance);
 
 		ptr_Point maxLoc = matCrossCorrelation(templ, sceneM);
 		cout << "\n[" << maxLoc->getX() << "," << maxLoc->getY() << "]\t" << "["
@@ -166,8 +149,7 @@ vector<ptr_Point> verifyLandmarks(Image mImage, Image sImage,
 		mcResult.push_back(new Point(lmx, lmy));
 
 	}
-	of.close();
-	for (int k = 0; k < mcResult.size(); k++)
+	for (size_t k = 0; k < mcResult.size(); k++)
 	{
 		ptr_Point p = mcResult.at(k);
 		cout << "\nE: " << p->getX() << "\t" << p->getY();

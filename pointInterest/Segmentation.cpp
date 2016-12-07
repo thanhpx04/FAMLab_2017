@@ -50,7 +50,7 @@ vector<ptr_Edge> Segmentation::canny()
 {
 	return Treatments::refImage.cannyAlgorithm();
 }
-vector<ptr_Line> Segmentation::segment(int minDistance)
+vector<ptr_Line> Segmentation::segment(int minDistance = 3)
 {
 	return Treatments::refImage.getApproximateLines(minDistance);
 }

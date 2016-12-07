@@ -14,13 +14,11 @@ protected:
 	Image refImage;
 public:
 	Treatments();
+	Treatments(Image);
 	virtual ~Treatments();
 	void setRefImage(Image);
 	Image getRefImage();
 
-	//virtual vector<ptr_Line> segment(int minDistance) = 0;
-	//virtual ShapeHistogram geomHistogram(AngleAccuracy angleAcc, int cols);
-
 };
-
+typedef Treatments* ptr_Treatments;
 #endif /* TREATMENTS_H_ */

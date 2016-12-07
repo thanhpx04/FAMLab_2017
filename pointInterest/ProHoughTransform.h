@@ -13,10 +13,9 @@ ptr_PHTEntry matchingInScene(vector<ptr_PHTEntry> entryTable,
 	vector<ptr_Line> &maxVector);
 ptr_Point refPointInScene(ptr_PHTEntry entry, vector<ptr_Line> matchLines,
 	double &angleDiff, vector<ptr_Point> refLandmarks, int width, int height);
-vector<ptr_Point> estimateLandmarks(Image mImage, Image sImage,
-	double &angleDiff, ptr_Point &ePoint);
-
-
+vector<ptr_Point> phtLandmarks(vector<ptr_PHTEntry> entriesTable,
+	ptr_Point refPoint, vector<ptr_Line> sceneLines, int width, int height,
+	vector<ptr_Point> mLandmarks, double &angleDiff, ptr_Point &ePoint);
 
 
 class ProHoughTransform: public Treatments
@@ -24,7 +23,9 @@ class ProHoughTransform: public Treatments
 public:
 	ProHoughTransform();
 	virtual ~ProHoughTransform();
-	PHoughTransform constructPHT(Image image);
+	PHoughTransform constructPHT();
+	vector<ptr_Point> estimateLandmarks(Image sImage,
+		double &angleDiff, ptr_Point &ePoint);
 };
 
 #endif /* PROHOUGHTRANSFORM_H_ */

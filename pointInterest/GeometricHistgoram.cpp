@@ -56,8 +56,8 @@ GeometricHistgoram::~GeometricHistgoram()
 {
 	// TODO Auto-generated destructor stub
 }
-ShapeHistogram GeometricHistgoram::geomHistogram(Image image,AngleAccuracy angleAcc,
-	int cols)
+ShapeHistogram GeometricHistgoram::gmHistogram(Image image,
+	AngleAccuracy angleAcc, int cols)
 {
 	ShapeHistogram shapeHist;
 	vector<ptr_Line> lines = image.getListOfLines();
@@ -65,11 +65,16 @@ ShapeHistogram GeometricHistgoram::geomHistogram(Image image,AngleAccuracy angle
 	shapeHist.constructPGHMatrix(listLocalHists, angleAcc, cols);
 	return shapeHist;
 }
-
+ShapeHistogram GeometricHistgoram::geomHistogram(AngleAccuracy angleAcc,
+	int cols)
+{
+	return gmHistogram(Treatments::refImage, angleAcc, cols);
+}
 double GeometricHistgoram::bhattacharyyaDistance(Image sceneImage,
 	AngleAccuracy angleAcc, int cols)
 {
-	ShapeHistogram refHistogram = geomHistogram(Treatments::refImage, angleAcc, cols);
-	ShapeHistogram sceneHistogram = geomHistogram(sceneImage, angleAcc, cols);
+	ShapeHistogram refHistogram = gmHistogram(Treatments::refImage, angleAcc,
+		cols);
+	ShapeHistogram sceneHistogram = gmHistogram(sceneImage, angleAcc, cols);
 	return bhattacharyyaMetric(refHistogram, sceneHistogram);
 }

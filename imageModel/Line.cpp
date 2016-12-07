@@ -106,7 +106,7 @@ std::vector<double> Line::equationOfLine()
 	{ //line x = n
 		equa.push_back(1.0);
 		equa.push_back(0.0);
-		equa.push_back((double)(end->getX()));
+		equa.push_back((double) (end->getX()));
 		return equa;
 	}
 	else
@@ -126,7 +126,7 @@ std::vector<double> Line::equationOfLine()
 
 				equa.push_back(m);
 				equa.push_back(-1);
-				equa.push_back((double)(begin->getY() - (m * begin->getX())));
+				equa.push_back((double) (begin->getY() - (m * begin->getX())));
 				return equa;
 			}
 		}
@@ -143,8 +143,9 @@ double Line::perpendicularDistance(ptr_Point point)
 	double distance = 0;
 	if (b != 0 && a != 0)
 	{
-		distance = abs(((a * point->getX()) + (b * point->getY()) + c)
-						/ (sqrt(pow(a, 2) + pow(b, 2))));
+		distance = abs(
+			((a * point->getX()) + (b * point->getY()) + c)
+				/ (sqrt(pow(a, 2) + pow(b, 2))));
 	}
 	if (b == 0 && a == 1)
 		distance = abs(point->getX() - c);
@@ -235,4 +236,59 @@ bool Line::checkBelongPoint(ptr_Point point)
 	if (perpendicularDistance(point) == 0)
 		return true;
 	return false;
+}
+vector<ptr_Point> Line::interParallel(Line line1, Line line2, double distance1,
+	double distance2, int width, int height)
+{
+	vector<double> equation1 = line1.equationOfLine();
+	vector<double> equation2 = line2.equationOfLine();
+	double a = equation1[0];
+	double b = equation1[2];
+	double c = equation2[0];
+	double d = equation2[2];
+	double e = distance1 * (sqrt((a * a) + 1));
+	double f = distance2 * (sqrt((c * c) + 1));
+
+	vector<ptr_Point> result;
+
+	//ptr_Point refPoint(width / 2, height / 2);
+
+	double x0 = 0, y0 = 0;
+	x0 = (f + b - d - e) / (c - a);
+	if (x0 >= 0 && x0 < width)
+	{
+		y0 = a * x0 + b - e;
+		if (y0 >= 0 && y0 < height)
+		{
+			result.push_back(new Point(x0, y0));
+		}
+	}
+	x0 = (b - e - f - d) / (c - a);
+	if (x0 >= 0 && x0 < width)
+	{
+		y0 = a * x0 + b - e;
+		if (y0 >= 0 && y0 < height)
+		{
+			result.push_back(new Point(x0, y0));
+		}
+	}
+	x0 = (f + b - d + e) / (c - a);
+	if (x0 >= 0 && x0 < width)
+	{
+		y0 = a * x0 + b + e;
+		if (y0 >= 0 && y0 < height)
+		{
+			result.push_back(new Point(x0, y0));
+		}
+	}
+	x0 = (b + e - f - d) / (c - a);
+	if (x0 >= 0 && x0 < width)
+	{
+		y0 = a * x0 + b + e;
+		if (y0 >= 0 && y0 < height)
+		{
+			result.push_back(new Point(x0, y0));
+		}
+	}
+	return result;
 }

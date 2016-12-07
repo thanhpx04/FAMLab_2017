@@ -27,27 +27,6 @@ using namespace std;
 #include "Treatments.h"
 #include "ProHoughTransform.h"
 
-ProHoughTransform::ProHoughTransform()
-{
-	// TODO Auto-generated constructor stub
-
-}
-
-ProHoughTransform::~ProHoughTransform()
-{
-	// TODO Auto-generated destructor stub
-}
-PHoughTransform ProHoughTransform::constructPHT(Image image)
-{
-	ptr_IntMatrix grayImage = image.getGrayMatrix();
-	int width = grayImage->getCols();
-	int height = grayImage->getRows();
-
-	PHoughTransform pht;
-	pht.setRefPoint(new Point(width / 2, height / 2));
-	pht.constructPHTTable(image.getApproximateLines(3));
-	return pht;
-}
 vector<ptr_Point> findLandmarks(ptr_Point refPoint, ptr_Point esPoint,
 	vector<ptr_Point> refLandmarks, int width, int height, int &positive)
 {
@@ -82,8 +61,8 @@ ptr_Point refPointInScene(ptr_PHTEntry entry, vector<ptr_Line> matchLines,
 	double &angleDiff, vector<ptr_Point> refLandmarks, int width, int height)
 {
 
-	ptr_Point inter = new Point(0,0);
-	ptr_Point refPoint = new Point(width/2,height/2);
+	ptr_Point inter = new Point(0, 0);
+	ptr_Point refPoint = new Point(width / 2, height / 2);
 
 	if (matchLines.size() <= 0)
 		return inter;
@@ -176,7 +155,8 @@ ptr_Point refPointInScene(ptr_PHTEntry entry, vector<ptr_Line> matchLines,
 			}
 		}
 	}
-	cout << "\n Reference point in scene: " << inter->getX() << ", " << inter->getY();
+	cout << "\n Reference point in scene: " << inter->getX() << ", "
+		<< inter->getY();
 
 	return inter;
 }
@@ -228,8 +208,8 @@ ptr_PHTEntry matchingInScene(vector<ptr_PHTEntry> entryTable,
 	vector<ptr_Line> sceneLines, int width, int height,
 	vector<ptr_Line> &maxVector)
 {
-	ptr_IntMatrix accumulator = new Matrix<int>(floor(sqrt(width * width + height * height)),
-		361);
+	ptr_IntMatrix accumulator = new Matrix<int>(
+		floor(sqrt(width * width + height * height)), 361);
 	int maxValue = 0;
 	ptr_PHTEntry maxEntry;
 	for (size_t i = 0; i < sceneLines.size(); i++)
@@ -279,28 +259,13 @@ ptr_PHTEntry matchingInScene(vector<ptr_PHTEntry> entryTable,
 	}
 	return maxEntry;
 }
-
-vector<ptr_Point> estimateLandmarks(Image mImage, Image sImage,
-	double &angleDiff, ptr_Point &ePoint)
+vector<ptr_Point> phtLandmarks(vector<ptr_PHTEntry> entriesTable,
+	ptr_Point refPoint, vector<ptr_Line> sceneLines, int width, int height,
+	vector<ptr_Point> mLandmarks, double &angleDiff, ptr_Point &ePoint)
 {
 	vector<ptr_Point> eLandmarks;
-	ptr_IntMatrix mMatrix = mImage.getGrayMatrix();
-	int width = mMatrix->getCols();
-	int height = mMatrix->getRows();
-
-	vector<ptr_Point> mLandmarks = mImage.getListOfManualLandmarks();
-	vector<ptr_Line> mLines = mImage.getApproximateLines(3);
-	vector<ptr_Line> sLines = sImage.getApproximateLines(3);
-
-	ptr_Point mPoint = new Point(width / 2, height / 2);
-
-	PHoughTransform pht;
-	pht.setRefPoint(mPoint);
-
-	vector<ptr_PHTEntry> entryTable = pht.constructPHTTable(mLines);
-
 	vector<ptr_Line> maxVector;
-	ptr_PHTEntry entry = matchingInScene(entryTable, sLines, width, height,
+	ptr_PHTEntry entry = matchingInScene(entriesTable, sceneLines, width, height,
 		maxVector);
 	if (maxVector.size() > 0)
 	{
@@ -310,9 +275,55 @@ vector<ptr_Point> estimateLandmarks(Image mImage, Image sImage,
 		double angle2 = maxVector.at(0)->angleLines(*maxVector.at(1));
 		angleDiff += abs(angle1 - angle2);
 		int positive = 0;
-		eLandmarks = findLandmarks(mPoint, ePoint, mLandmarks, width, height,
+		eLandmarks = findLandmarks(refPoint, ePoint, mLandmarks, width, height,
 			positive);
 	}
+	return eLandmarks;
+}
+ProHoughTransform::ProHoughTransform()
+{
+	// TODO Auto-generated constructor stub
+
+}
+
+ProHoughTransform::~ProHoughTransform()
+{
+	// TODO Auto-generated destructor stub
+}
+PHoughTransform ProHoughTransform::constructPHT()
+{
+	ptr_IntMatrix grayImage = Treatments::refImage.getGrayMatrix();
+	int width = grayImage->getCols();
+	int height = grayImage->getRows();
+
+	PHoughTransform pht;
+	pht.setRefPoint(new Point(width / 2, height / 2));
+	pht.constructPHTTable(Treatments::refImage.getListOfLines());
+	return pht;
+}
+
+vector<ptr_Point> ProHoughTransform::estimateLandmarks(Image sImage,
+	double &angleDiff, ptr_Point &ePoint)
+{
+	vector<ptr_Point> eLandmarks;
+	ptr_IntMatrix mMatrix = Treatments::refImage.getGrayMatrix();
+	int width = mMatrix->getCols();
+	int height = mMatrix->getRows();
+
+	vector<ptr_Point> mLandmarks =
+		Treatments::refImage.getListOfManualLandmarks();
+	vector<ptr_Line> mLines = Treatments::refImage.getListOfLines();
+	vector<ptr_Line> sLines = sImage.getListOfLines();
+
+	ptr_Point mPoint = new Point(width / 2, height / 2);
+
+	PHoughTransform pht;
+	pht.setRefPoint(mPoint);
+	vector<ptr_PHTEntry> entryTable = pht.constructPHTTable(mLines);
+
+	eLandmarks = phtLandmarks(entryTable, mPoint, sLines, width, height,
+		mLandmarks, angleDiff, ePoint);
+
 	return eLandmarks;
 
 }

@@ -16,7 +16,6 @@ public:
 	vector<ptr_Line> segment(int minDistance);
 	ptr_IntMatrix threshold(int tValue, int maxValue);
 	vector<ptr_Edge> canny();
-	//ShapeHistogram geomHistogram(AngleAccuracy angleAcc, int cols);
 };
 
 #endif /* SEGMENTATION_H_ */
