@@ -55,10 +55,6 @@ public:
 	vector<LocalHistogram> constructPGH(vector<ptr_Line> listOfLines);
 	ptr_IntMatrix constructPGHMatrix(vector<LocalHistogram> localHists,
 		AngleAccuracy angleAcc, int cols);
-	ShapeHistogram shapeHistogram(Image grayImage, AngleAccuracy angleAcc,
-		int cols);
-	double bhattacharyyaDistance(Image refImage, Image sceneImage,
-		AngleAccuracy angleAcc, int cols);
 };
 
 #endif /* LOCALHISTOGRAM_H_ */
