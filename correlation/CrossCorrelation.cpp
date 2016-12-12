@@ -40,7 +40,7 @@ ptr_IntMatrix createTemplate(ptr_IntMatrix inputImage, ptr_Point centerPoint,
 	int cx = centerPoint->getX(); //col
 	int cy = centerPoint->getY(); // row
 	if (cx < 0 || cy < 0)
-		return inputImage;
+	 return inputImage;
 	int rows = inputImage->getRows();
 	int cols = inputImage->getCols();
 
@@ -129,20 +129,23 @@ vector<ptr_Point> verifyLandmarks(Image mImage, Image sImage,
 	for (size_t i = 0; i < esLandmarks.size(); i++)
 	{
 		//ptr_Point lm = new Point(manualLM.at(i)->getX(), manualLM.at(i)->getY());
-		ptr_Point tLocation, tDistance, iLocation, iDistance;
-		ptr_IntMatrix templ = createTemplate(mMatrix, manualLM.at(i), templSize,
-			tLocation, tDistance);
-		ptr_IntMatrix sceneM = createTemplate(sRotateImg, esLandmarks.at(i),
-			sceneSize, iLocation, iDistance);
+		ptr_Point pi = esLandmarks.at(i);
+		if (pi->getX() > 0 && pi->getY() > 0)
+		{
+			ptr_Point tLocation, tDistance, iLocation, iDistance;
+			ptr_IntMatrix templ = createTemplate(mMatrix, manualLM.at(i), templSize,
+				tLocation, tDistance);
+			ptr_IntMatrix sceneM = createTemplate(sRotateImg, esLandmarks.at(i),
+				sceneSize, iLocation, iDistance);
 
-		ptr_Point maxLoc = matCrossCorrelation(templ, sceneM);
-		cout << "\n[" << maxLoc->getX() << "," << maxLoc->getY() << "]\t" << "["
-			<< iLocation->getX() << ", " << iLocation->getY() << "]\t["
-			<< tDistance->getX() << ", " << tDistance->getY() << "]";
-		int lmx = iLocation->getX() + maxLoc->getX() + tDistance->getX();
-		int lmy = iLocation->getY() + maxLoc->getY() + tDistance->getY();
-		mcResult.push_back(new Point(lmx, lmy));
-
+			ptr_Point maxLoc = matCrossCorrelation(templ, sceneM);
+			cout << "\n[" << maxLoc->getX() << "," << maxLoc->getY() << "]\t" << "["
+				<< iLocation->getX() << ", " << iLocation->getY() << "]\t["
+				<< tDistance->getX() << ", " << tDistance->getY() << "]";
+			int lmx = iLocation->getX() + maxLoc->getX() + tDistance->getX();
+			int lmy = iLocation->getY() + maxLoc->getY() + tDistance->getY();
+			mcResult.push_back(new Point(lmx, lmy));
+		}
 	}
 	for (size_t k = 0; k < mcResult.size(); k++)
 	{

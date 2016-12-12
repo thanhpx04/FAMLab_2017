@@ -63,6 +63,7 @@ vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 	sHistogram.constructPGHMatrix(sLocalHist, acc, cols);
 
 	double bhatt = bhattacharyyaMetric(mHistogram, sHistogram);
+
 	if (bhatt > 0.9)
 	{
 		double angleDiff;

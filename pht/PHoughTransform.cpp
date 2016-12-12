@@ -141,6 +141,6 @@ vector<ptr_PHTEntry> PHoughTransform::constructPHTTable(vector<ptr_Line> lines)
 		}
 	}
 	phtEntries = entries;
-	cout << "\nSize of pht table: " << entries.size() << endl;
+	//cout << "\nSize of pht table: " << entries.size() << endl;
 	return entries;
 }

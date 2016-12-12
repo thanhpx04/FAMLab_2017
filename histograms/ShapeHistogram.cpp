@@ -29,7 +29,7 @@ const int m_bin_3600 = 1;
 
 GFeature pairwiseHistogram(ptr_Line refLine, ptr_Line objLine)
 {
-	GFeature pgh; // = GFeature();
+	GFeature pgh;
 	pgh.angle = refLine->angleLines(*objLine);
 
 	double distance1 = refLine->perpendicularDistance(objLine->getBegin());
@@ -159,7 +159,6 @@ vector<LocalHistogram> ShapeHistogram::constructPGH(
 ptr_IntMatrix ShapeHistogram::constructPGHMatrix(
 	vector<LocalHistogram> localHists, AngleAccuracy angleAcc, int cols)
 {
-	//ofstream of("/home/linh/Desktop/compare/ShapeHistogram.txt");
 	int rows = heightOfAngleAxis(angleAcc);
 	double entries = 0;
 	ptr_IntMatrix result = new Matrix<int>(rows, cols, 0);
@@ -182,18 +181,13 @@ ptr_IntMatrix ShapeHistogram::constructPGHMatrix(
 					{
 						int value = result->getAtPosition(rowindex, k);
 						result->setAtPosition(rowindex, k, value + 1);
-						//entries++;
 					}
 				}
 			}
-			//of << feature.dmin << "\t" << feature.dmax << "\t" << rowindex << "\t"
-			//	<< feature.angle << "\n";
 		}
-		//break;
 	}
 	totalEntries = entries;
 	matrix = result;
-	//of.close();
 	return result;
 }
 
