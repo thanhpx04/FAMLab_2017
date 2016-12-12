@@ -39,20 +39,6 @@ Matrix<T>::Matrix(int nrows, int ncols, T value) {
 	InitWithValue(value);
 }
 
-/*
- template <typename T>
- Matrix<T>::Matrix(int nrows, int ncols)
- {
- rows = nrows;
- cols = ncols;
-
- // Initialization the matrix
- data.resize(nrows);
- for (int i = 0; i < nrows; ++i)
- data[i].resize(ncols);
- }
-
- */
 template<typename T>
 void Matrix<T>::Init() {
 	data.resize(getRows());
@@ -88,7 +74,6 @@ void Matrix<T>::printMatrix() {
 }
 
 template class Matrix<int> ;
-//template class Matrix<unsigned int> ;
 template class Matrix<double>;
 template class Matrix<RGB> ;
 

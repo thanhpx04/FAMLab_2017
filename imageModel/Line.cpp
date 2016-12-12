@@ -251,8 +251,6 @@ vector<ptr_Point> Line::interParallel(Line line1, Line line2, double distance1,
 
 	vector<ptr_Point> result;
 
-	//ptr_Point refPoint(width / 2, height / 2);
-
 	double x0 = 0, y0 = 0;
 	x0 = (f + b - d - e) / (c - a);
 	if (x0 >= 0 && x0 < width)

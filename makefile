@@ -14,7 +14,7 @@ CFLAGS 		= -O
 SYSDEPMEM= jmemnobs.o
 
 # source files: JPEG library proper
-SOURCES= main.cpp io/*.cpp io/LibJpeg/*.c imageModel/*.cpp segmentation/*.cpp histograms/*.cpp pht/*.cpp pointInterest/*.cpp correlation/*.cpp MAELab.cpp
+SOURCES= MAELab_CI.cpp io/*.cpp io/LibJpeg/*.c imageModel/*.cpp segmentation/*.cpp histograms/*.cpp pht/*.cpp pointInterest/*.cpp correlation/*.cpp MAELab.cpp
 # files included by source files
 INCLUDES= io/*.h io/LibJpeg/*.h imageModel/*.h segmentation/*.h histograms/*.h pht/*.h pointInterest/*.h correlation/*.h MAELab.h
 # library object files common to compression and decompression
@@ -37,10 +37,10 @@ USEOBJECTS= Point.o Line.o Edge.o Matrix.o Thresholds.o Image.o \
 # These objectfiles are included in libjpeg.a
 LIBOBJECTS= $(CLIBOBJECTS) $(DLIBOBJECTS) $(COMOBJECTS) $(USEOBJECTS)
 
-maelab: main.o			 
-	$(CC) $(CFLAGS) -std=c++11 -o maelab main.o $(LIBOBJECTS)
+maelab: MAELab_CI.o			 
+	$(CC) $(CFLAGS) -std=c++11 -o maelab MAELab_CI.o $(LIBOBJECTS)
 
-main.o: main.cpp $(INCLUDES)
+MAELab_CI.o: MAELab_CI.cpp $(INCLUDES)
 	$(CC) $(CFLAGS) -c $(SOURCES)
 
 

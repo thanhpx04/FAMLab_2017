@@ -47,8 +47,8 @@ const int MAX_GRAY_VALUE = 255;
 ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix)
 {
 	ptr_IntMatrix grayMatrix;
-	unsigned int width = rgbMatrix->getCols();
-	unsigned int height = rgbMatrix->getRows();
+	int width = rgbMatrix->getCols();
+	int height = rgbMatrix->getRows();
 
 	grayMatrix = new Matrix<int>(height, width);
 	for (int h = 0; h < height; h++)
@@ -106,15 +106,9 @@ std::string Image::getFileName()
 {
 	return fileName;
 }
-/*void Image::setEdges(std::vector<Edge> edges){
- listOfEdges = edges;
- }
- std::vector<Edge> Image::getEdge(){
- return listOfEdges;
- }*/
+
 void Image::setMLandmarks(string tpsFile)
 {
-	//listOfMLandmarks = readTPSFile(tpsFile.c_str());
 
 }
 ptr_IntMatrix Image::getGrayMatrix()
@@ -155,10 +149,6 @@ vector<ptr_Line> Image::getApproximateLines(int minDistance = 3)
 {
 	vector<ptr_Edge> listOfEdges = cannyAlgorithm();
 	vector<ptr_Line> totalLines;
-	/*vector<ptr_Edge> drawEdge;
-	 std::sort(listOfEdges.begin(),listOfEdges.end());
-	 ptr_Edge edge0 = listOfEdges.at(0);
-	 drawEdge.push_back(edge0);*/
 
 	for (size_t i = 0; i < listOfEdges.size(); i++)
 	{
@@ -168,16 +158,6 @@ vector<ptr_Line> Image::getApproximateLines(int minDistance = 3)
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
 	}
 	cout << "\n Total lines after segment the edge: " << totalLines.size();
-	ofstream of("/home/linh/Desktop/compare/Lines.txt");
-
-	for (size_t i = 0; i < totalLines.size(); i++)
-	{
-		ptr_Line line = totalLines.at(i);
-		of << line->getBegin()->getX() << "\t" << line->getBegin()->getY() << "\t"
-			<< line->getEnd()->getX() << "\t" << line->getEnd()->getY() << "\n";
-
-	}
-	of.close();
 	listOfLines = totalLines;
 	return totalLines;
 }
@@ -294,34 +274,6 @@ void Image::calThresholdValue()
 	thresholdValue = (mid1 + mid2) / 2;
 }
 
-ptr_IntMatrix createTest()
-{
-	ptr_IntMatrix testMatrix = new Matrix<int>(8, 13, 0);
-	testMatrix->setAtPosition(2, 2, 1);
-	testMatrix->setAtPosition(2, 3, 1);
-	testMatrix->setAtPosition(2, 4, 1);
-	testMatrix->setAtPosition(2, 5, 1);
-	testMatrix->setAtPosition(2, 6, 1);
-	testMatrix->setAtPosition(2, 7, 1);
-	testMatrix->setAtPosition(2, 8, 1);
-	testMatrix->setAtPosition(3, 2, 1);
-	testMatrix->setAtPosition(3, 5, 1);
-	testMatrix->setAtPosition(3, 8, 1);
-	testMatrix->setAtPosition(3, 10, 1);
-	testMatrix->setAtPosition(4, 2, 1);
-	testMatrix->setAtPosition(4, 5, 1);
-	testMatrix->setAtPosition(4, 8, 1);
-	testMatrix->setAtPosition(5, 2, 1);
-	testMatrix->setAtPosition(5, 3, 1);
-	testMatrix->setAtPosition(5, 4, 1);
-	testMatrix->setAtPosition(5, 5, 1);
-	testMatrix->setAtPosition(5, 6, 1);
-	testMatrix->setAtPosition(5, 7, 1);
-	testMatrix->setAtPosition(5, 8, 1);
-
-	return testMatrix;
-}
-
 vector<ptr_Edge> Image::cannyAlgorithm()
 {
 	if (thresholdValue == 0)
@@ -338,14 +290,15 @@ vector<ptr_Edge> Image::cannyAlgorithm()
 
 	return listOfEdges;
 }
+
 ptr_DoubleMatrix Image::getRotationMatrix2D(ptr_Point center, double angle,
 	double scale)
 {
 	if (angle > 0)
 		angle = -angle;
 
-	double alpha = cos(angle * M_PI/180) * scale;
-	double beta = sin(angle* M_PI/180) * scale;
+	double alpha = cos(angle * M_PI / 180) * scale;
+	double beta = sin(angle * M_PI / 180) * scale;
 
 	ptr_DoubleMatrix rotateM = new Matrix<double>(2, 3, 0);
 
@@ -382,15 +335,28 @@ ptr_IntMatrix Image::rotate(ptr_Point center, double angle, double scale)
 		{
 			int value = source->getAtPosition(row, col);
 			int xnew = round(a00 * col + a01 * row + b00);
-			//cout<<"\n"<<k<<"\t"<<xnew;
 			int ynew = round(a10 * col + a11 * row + b10);
-			//cout<<"\n"<<xnew<<"\t"<<ynew;
+
 			if (xnew >= 0 && xnew < cols && ynew >= 0 && ynew < rows)
 			{
-				result->setAtPosition((short)ynew,(short)xnew, value);
+				result->setAtPosition(ynew, xnew, value);
 			}
 		}
 	}
+	for (int row = 0; row < rows; row++)
+	{
+		for (int col = 1; col < cols-1; col++)
+		{
+			int value = result->getAtPosition(row,col);
+			int leftValue = result->getAtPosition(row,col -1);
+			int rightValue = result->getAtPosition(row,col +1);
+			if(value ==0 && leftValue > 0 && rightValue >= 0)
+			{
+				result->setAtPosition(row,col,(leftValue + rightValue)/2);
+			}
+		}
+	}
+
 	return result;
 }
 

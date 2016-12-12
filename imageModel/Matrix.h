@@ -63,6 +63,4 @@ typedef Matrix<int>* ptr_IntMatrix;
 typedef Matrix<double>* ptr_DoubleMatrix;
 typedef Matrix<RGB>* ptr_RGBMatrix;
 
-//typedef Matrix ptr_Matrix;
-
 #endif /* MATRIX_H_ */

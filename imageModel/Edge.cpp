@@ -127,7 +127,6 @@ std::vector<ptr_Point> Edge::segment(int minDistance)
 	breakEdge(minDistance);
 	listOfBreakPoints = vvp;
 
-	//vector<ptr_Line> lines = getLines(listOfBreakPoints);
 	return listOfBreakPoints;
 }
 vector<ptr_Line> Edge::getLines(vector<ptr_Point> listPoints) {

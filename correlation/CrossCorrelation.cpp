@@ -48,10 +48,6 @@ ptr_IntMatrix createTemplate(ptr_IntMatrix inputImage, ptr_Point centerPoint,
 	int ly = (cy - hsize) < 0 ? 0 : (cy - hsize);
 	location = new Point(lx, ly);
 	distance = new Point(cx - lx, cy - ly);
-	/*location->setX(lx);
-	 location->setY(ly);
-	 distance->setX(centerPoint->getX() - lx);
-	 distance->setY(centerPoint->getY() - ly);*/
 
 	int rx = (cx + hsize) > cols ? cols : (cx + hsize);
 	int ry = (cy + hsize) > rows ? rows : (cy + hsize);
@@ -129,7 +125,6 @@ vector<ptr_Point> verifyLandmarks(Image mImage, Image sImage,
 {
 	ptr_IntMatrix mMatrix = mImage.getGrayMatrix();
 	ptr_IntMatrix sRotateImg = sImage.rotate(ePoint, angleDiff, 1);
-
 	vector<ptr_Point> mcResult;
 	for (size_t i = 0; i < esLandmarks.size(); i++)
 	{
@@ -152,7 +147,7 @@ vector<ptr_Point> verifyLandmarks(Image mImage, Image sImage,
 	for (size_t k = 0; k < mcResult.size(); k++)
 	{
 		ptr_Point p = mcResult.at(k);
-		cout << "\nE: " << p->getX() << "\t" << p->getY();
+		cout << "\nEstimated landmark : " << p->getX() << "\t" << p->getY();
 	}
 
 	return mcResult;
