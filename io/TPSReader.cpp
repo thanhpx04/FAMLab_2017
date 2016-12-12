@@ -9,6 +9,7 @@
 #include <fstream>
 #include <vector>
 #include <string.h>
+#include <stdlib.h>
 using namespace std;
 
 #include "../imageModel/Point.h"
@@ -23,17 +24,19 @@ std::vector<ptr_Point> readTPS(const char* filename)
 	if(openFile.is_open())
 	{
 		getline(openFile,lineText);
-		cout<<(char*)lineText.c_str();
+		//cout<<(char*)lineText.c_str();
 		char* fline = strtok((char*)lineText.c_str(),"=");
 
 		int nPoints = (fline[3] - '0') * 10 + (fline[4] -'0' );
-		cout<<"n points: "<<nPoints;
+		//cout<<"n points: "<<nPoints;
 		int i =0;
 		while(i < nPoints)
 		{
 			getline(openFile,lineText);
-			fline = strtok((char*)lineText.c_str()," ");
-			mLandmarks.push_back(new Point((int)fline[0],(int)fline[1]));
+			int pos = lineText.find(" ");
+			string l1 = lineText.substr(0,pos);
+			string l2 = lineText.substr(pos+1,lineText.length() - pos - 1);
+			mLandmarks.push_back(new Point(atoi(l1.c_str()),atoi(l2.c_str())));
 			i++;
 		}
 	}else

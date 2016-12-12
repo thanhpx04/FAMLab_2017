@@ -14,9 +14,9 @@ CFLAGS 		= -O
 SYSDEPMEM= jmemnobs.o
 
 # source files: JPEG library proper
-SOURCES= main.cpp io/*.cpp io/LibJpeg/*.c imageModel/*.cpp segmentation/*.cpp histograms/*.cpp pht/*.cpp pointInterest/*.cpp correlation/*.cpp Analysis.cpp
+SOURCES= main.cpp io/*.cpp io/LibJpeg/*.c imageModel/*.cpp segmentation/*.cpp histograms/*.cpp pht/*.cpp pointInterest/*.cpp correlation/*.cpp MAELab.cpp
 # files included by source files
-INCLUDES= io/*.h io/LibJpeg/*.h imageModel/*.h segmentation/*.h histograms/*.h pht/*.h pointInterest/*.h correlation/*.h Analysis.h
+INCLUDES= io/*.h io/LibJpeg/*.h imageModel/*.h segmentation/*.h histograms/*.h pht/*.h pointInterest/*.h correlation/*.h MAELab.h
 # library object files common to compression and decompression
 COMOBJECTS= jaricom.o jcomapi.o jutils.o jerror.o jmemmgr.o $(SYSDEPMEM)
 # compression library object files
@@ -33,7 +33,7 @@ USEOBJECTS= Point.o Line.o Edge.o Matrix.o Thresholds.o Image.o \
 			Reader.o TPSReader.o JPEGReader.o \
 			Canny.o Suzuki.o ShapeHistogram.o PHTEntry.o PHoughTransform.o \
 			Treatments.o Segmentation.o GeometricHistgoram.o ProHoughTransform.o \
-			CrossCorrelation.o LandmarkDetection.o Analysis.o
+			CrossCorrelation.o LandmarkDetection.o MAELab.o
 # These objectfiles are included in libjpeg.a
 LIBOBJECTS= $(CLIBOBJECTS) $(DLIBOBJECTS) $(COMOBJECTS) $(USEOBJECTS)
 

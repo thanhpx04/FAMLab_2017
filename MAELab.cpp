@@ -32,24 +32,9 @@ using namespace std;
 #include "pointInterest/ProHoughTransform.h"
 #include "pointInterest/LandmarkDetection.h"
 
-#include "Analysis.h"
+#include "MAELab.h"
 
-Analysis::Analysis()
-{
-	// TODO Auto-generated constructor stub
-
-}
-
-Analysis::~Analysis()
-{
-	// TODO Auto-generated destructor stub
-}
-
-Analysis::Analysis(ptr_Treatments t)
-{
-	treatment = t;
-}
-vector<ptr_Line> Analysis::segment(Image image, int minDistance)
+vector<ptr_Line> segment(ptr_Treatments treatment, Image image, int minDistance)
 {
 
 	Segmentation sg;
@@ -60,33 +45,33 @@ vector<ptr_Line> Analysis::segment(Image image, int minDistance)
 	return lines;
 }
 
-ShapeHistogram Analysis::geomHistogram(Image image, AngleAccuracy angleAcc,
-	int cols)
+ShapeHistogram geomHistogram(ptr_Treatments treatment, Image image,
+	AngleAccuracy angleAcc, int cols)
 {
 	GeometricHistgoram geoHistogram;
 	treatment = &geoHistogram;
 	treatment->setRefImage(image);
 	return geoHistogram.geomHistogram(angleAcc, cols);
 }
-double Analysis::bhattacharyyaDistance(Image sceneImage, AngleAccuracy angleAcc,
-	int cols)
+double bhattacharyyaDistance(ptr_Treatments treatment, Image sceneImage,
+	AngleAccuracy angleAcc, int cols)
 {
 	GeometricHistgoram geoHistogram;
 	treatment = &geoHistogram;
 	return geoHistogram.bhattacharyyaDistance(sceneImage, angleAcc, cols);
 }
-PHoughTransform Analysis::phtEntriesTable(Image image)
+PHoughTransform phtEntriesTable(ptr_Treatments treatment, Image image)
 {
 	ProHoughTransform pht;
 	treatment = &pht;
 	treatment->setRefImage(image);
 	return pht.constructPHT();
 }
-vector<ptr_Point> Analysis::estimatedLandmarks(Image sceneImage,
+vector<ptr_Point> estimatedLandmarks(ptr_Treatments treatment, Image sceneImage,
 	AngleAccuracy acc, int cols, int templSize, int sceneSize)
 {
 	LandmarkDetection lmd;
 	lmd.setRefImage(treatment->getRefImage());
 	treatment = &lmd;
-	return lmd.landmarksAutoDectect(sceneImage,acc,cols,templSize,sceneSize);
+	return lmd.landmarksAutoDectect(sceneImage, acc, cols, templSize, sceneSize);
 }

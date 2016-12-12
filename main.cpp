@@ -15,6 +15,8 @@
 
 using namespace std;
 
+
+
 #include "imageModel/Point.h"
 #include "imageModel/Line.h"
 #include "imageModel/Edge.h"
@@ -31,71 +33,41 @@ using namespace std;
 #include "pointInterest/ProHoughTransform.h"
 #include "pointInterest/LandmarkDetection.h"
 
-#include "Analysis.h"
 
-int main()
+#include "MAELab.h"
+
+int main(int argc, char* argv[])
 {
 	//cout.precision(16);
 	cout << "MAELab test" << endl << endl;
+	string mImagePath,mLMPath,sImagePath;
+	int distanceAcc = 500; // distance accuracy to compute the geometric histgoram
+	int tempSize = 400; // template size uses in template matching
+	int sceneSize = 500; // image size uses in template matching
+	if(argc != 3)
+	{
+		mImagePath = "data/Md039.JPG";
+		mLMPath = "/home/linh/Desktop/Temps/md/landmarks/Md 039.TPS";
+		sImagePath = "data/Md_046.jpg";
+	}
+	else
+	{
+		mImagePath = argv[0];
+		mLMPath = argv[1];
+		sImagePath = argv[2];
+	}
 
-	//Image image("/home/linh/Desktop/Temps/md/images/Md 009.JPG");
-	Image modelImage("data/Md039.JPG");
-	modelImage.readManualLandmarks("/home/linh/Desktop/Temps/md/landmarks/Md 039.TPS");
-
-	Image sceneimage("data/Md_046.jpg");
+	Image modelImage(mImagePath);
+	modelImage.readManualLandmarks(mLMPath);
+	Image sceneimage(sImagePath);
 
 	LandmarkDetection lm;
 	ptr_Treatments tr = new LandmarkDetection();
 	tr->setRefImage(modelImage);
 
-	Analysis analys(tr);
-	vector<ptr_Point> esLandmarks = analys.estimatedLandmarks(sceneimage,Degree,500,400,500);
+	vector<ptr_Point> esLandmarks = estimatedLandmarks(tr, sceneimage,Degree,distanceAcc,tempSize,sceneSize);
 
 	cout<<"\nTotal landmarks: "<<esLandmarks.size();
-	/*//image.cannyAlgorithm();
-	vector<ptr_Line> lines = image.getApproximateLines(3);
-
-	PHoughTransform phTransform;
-	phTransform.setRefPoint(new Point(1632, 1224));
-	phTransform.constructPHTTable(lines);
-
-	//shapeHistogram(image,Degree,500);
-
-	Image simage("data/Md_046.jpg");
-	vector<ptr_Line> line2 = simage.getApproximateLines(3);
-
-	int width = simage.getGrayMatrix()->getCols();
-	int height = simage.getGrayMatrix()->getRows();
-
-	vector<ptr_Line> maxVector;
-	ptr_PHTEntry pht = matchingInScene(phTransform.getPHTEntries(), line2, width,
-		height, maxVector);
-	cout << "\nTotal entries: " << maxVector.size();
-	cout << "\n" << maxVector[0]->getBegin()->getX() << "\t"
-		<< maxVector[0]->getBegin()->getY() << "\t"
-		<< maxVector[0]->getEnd()->getX() << "\t" << maxVector[0]->getEnd()->getY();
-	cout << "\n" << maxVector[1]->getBegin()->getX() << "\t"
-		<< maxVector[1]->getBegin()->getY() << "\t"
-		<< maxVector[1]->getEnd()->getX() << "\t" << maxVector[1]->getEnd()->getY();
-
-	double angleDiff = 0;
-	refPointInScene(pht, maxVector, angleDiff, image.getListOfManualLandmarks(),
-		width, height);
-
-	ptr_Point ePoint;
-	vector<ptr_Point> esLandmarks = estimateLandmarks(image, simage, angleDiff,
-		ePoint);
-	cout << "\nTotal estimated landmarks: " << esLandmarks.size();
-	for (int k = 0; k < esLandmarks.size(); k++)
-	{
-		ptr_Point p = esLandmarks.at(k);
-		cout << "\nCoordinate: " << p->getX() << "\t" << p->getY();
-	}
-	//ptr_IntMatrix sRotate = simage.rotate(ePoint, angleDiff, 1);
-
-	verifyLandmarks(image, simage, image.getListOfManualLandmarks(), esLandmarks,
-		400, 500, angleDiff, ePoint);*/
-
 
 	cout << endl << "finish\n";
 	return 0;
