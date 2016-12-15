@@ -68,6 +68,9 @@ Some notes:
 	double the total points after Canny
 	- New idea: 1. consider each point one time => we loss some points, and more discrete edge (1 point/edge, 2 points/edge)
 		    2. Consider all point but if the point had added into list, did not add again.	
+26 Nov 2016
+Finished the Suzuki algorithm (veryfied).
+Next: break to the edge and calculate the Bhattacharrya.
 
 
 
