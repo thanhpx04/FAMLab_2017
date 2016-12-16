@@ -47,5 +47,5 @@ public:
 		double scale);
 	ptr_IntMatrix rotate(ptr_Point center, double angle, double scale);
 };
-
+typedef Image* ptr_Image;
 #endif /* IMAGE_H_ */

@@ -33,63 +33,61 @@ using namespace std;
 #include "pointInterest/ProHoughTransform.h"
 #include "pointInterest/LandmarkDetection.h"
 
+#include <QtGui/QApplication>
+#include "ui/ImageViewer.h"
+
 #include "MAELab.h"
 
-void workOnDir(Image mImage, string sceneFolder, int distanceAcc, int tempSize,
-	int sceneSize)
-{
-	DIR *pDir;
-	struct dirent *entry;
-	string filePath;
-	pDir = opendir(sceneFolder.c_str());
-	if (pDir == NULL)
-	{
-		cout << "\n Error when reading the folder";
-		return;
-	}
-	while (entry = readdir(pDir))
-	{
-		if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
-		{
-			filePath = sceneFolder + "/" + entry->d_name;
-			cout << "\n" << filePath;
-			Image sceneimage(filePath);
+/*
+ int main(int argc, char* argv[])
+ {
+ //cout.precision(16);
+ cout << "MAELab test" << endl << endl;
+ string mImagePath, mLMPath, sImagePath;
+ int distanceAcc = 500; // distance accuracy to compute the geometric histgoram
+ int tempSize = 400; // template size uses in template matching
+ int sceneSize = 500; // image size uses in template matching
+ if (argc != 3)
+ {
+ mImagePath = "data/Md039.JPG";
+ mLMPath = "data/Md 039.TPS";
+ sImagePath = "data/sceneImages/Md_046.jpg";
+ }
+ else
+ {
+ mImagePath = argv[0];
+ mLMPath = argv[1];
+ sImagePath = argv[2];
+ }
 
-			LandmarkDetection lm;
-			ptr_Treatments tr = new LandmarkDetection();
-			tr->setRefImage(mImage);
+ Image modelImage(mImagePath);
+ modelImage.readManualLandmarks(mLMPath);
+ Image sceneimage(sImagePath);
 
-			vector<ptr_Point> esLandmarks = estimatedLandmarks(tr, sceneimage, Degree,
-				distanceAcc, tempSize, sceneSize);
+ LandmarkDetection lm;
+ ptr_Treatments tr = new LandmarkDetection();
+ tr->setRefImage(modelImage);
 
-			cout << "\nTotal landmarks: " << esLandmarks.size();
-		}
-	}
-	closedir(pDir);
-}
+ vector<ptr_Point> esLandmarks = estimatedLandmarks(tr, sceneimage, Degree,
+ distanceAcc, tempSize, sceneSize);
+
+ cout << "\nTotal landmarks: " << esLandmarks.size();
+
+ cout << endl << "finish\n";
+ return 0;
+ }
+ */
 int main(int argc, char* argv[])
 {
-	cout << "MAELab test on the folder" << endl << endl;
-	string mImagePath, mLMPath, sImageFolder;
-	int distanceAcc = 500; // distance accuracy to compute the geometric histgoram
-	int tempSize = 400; // template size uses in template matching
-	int sceneSize = 500; // image size uses in template matching
-	if (argc != 3)
-	{
-		mImagePath = "data/Md039.JPG";
-		mLMPath = "data/Md 039.TPS";
-		sImageFolder = "data/sceneImages";
-	}
-	else
-	{
-		mImagePath = argv[0];
-		mLMPath = argv[1];
-		sImageFolder = argv[2];
-	}
-
-	Image modelImage(mImagePath);
-	modelImage.readManualLandmarks(mLMPath);
-	workOnDir(modelImage, sImageFolder, distanceAcc, tempSize, sceneSize);
-	cout << endl << "finish\n";
+	cout << "\n MAELab with graphic user interface !!!" << endl;
+	QApplication app(argc, argv);
+	ImageViewer imageViewer;
+#if defined(Q_OS_SYMBIAN)
+	imageViewer.showMaximized();
+#else
+	imageViewer.show();
+#endif
+	return app.exec();
 	return 0;
+
 }
