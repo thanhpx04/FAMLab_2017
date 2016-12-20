@@ -12,9 +12,10 @@
 #include <fstream>
 using namespace std;
 
-#include "../imageModel/Matrix.h"
+
 #include "../imageModel/Point.h"
 #include "../imageModel/Line.h"
+#include "../imageModel/Matrix.h"
 #include "../imageModel/Image.h"
 
 // the minutes per bin corresponds with angle accuracy

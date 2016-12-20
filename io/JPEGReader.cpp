@@ -17,6 +17,7 @@
 
 using namespace std;
 
+#include "../imageModel/Point.h"
 #include "../imageModel/Matrix.h"
 
 #include "JPEGReader.h"
@@ -48,7 +49,7 @@ ptr_RGBMatrix decompressJPEG(const char* filename) {
 
 	row_stride = cinfo.output_width * cinfo.output_components;
 	buffer = new unsigned char[cinfo.output_height * row_stride];
-	int i = 0;
+	//int i = 0;
 	while (cinfo.output_scanline < cinfo.output_height) {
 		int row = cinfo.output_scanline;
 		unsigned char* p = buffer

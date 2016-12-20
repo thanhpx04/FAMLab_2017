@@ -9,12 +9,6 @@
 #ifndef MATRIX_H_
 #define MATRIX_H_
 
-struct RGB {
-	unsigned short int R;
-	unsigned short int G;
-	unsigned short int B;
-};
-
 template<typename T>
 class Matrix {
 private:

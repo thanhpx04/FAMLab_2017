@@ -7,8 +7,8 @@
 
 using namespace std;
 
-#include "../imageModel/Matrix.h"
 #include "../imageModel/Point.h"
+#include "../imageModel/Matrix.h"
 
 #include "TPSReader.h"
 #include "JPEGReader.h"

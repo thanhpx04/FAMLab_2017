@@ -15,5 +15,5 @@ double bhattacharyyaDistance(ptr_Treatments treatment, Image sceneImage,
 	AngleAccuracy angleAcc, int cols);
 PHoughTransform phtEntriesTable(ptr_Treatments treatment, Image image);
 vector<ptr_Point> estimatedLandmarks(ptr_Treatments treatment, Image sceneImage,
-	AngleAccuracy acc, int cols, int templSize, int sceneSize);
+	AngleAccuracy acc, int cols, int templSize, int sceneSize,ptr_Point &ePoint, double angleDiff);
 #endif /* ANALYSIS_H_ */

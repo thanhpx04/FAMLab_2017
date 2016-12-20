@@ -9,9 +9,10 @@
 #include <math.h>
 #include <fstream>
 using namespace std;
-#include "../imageModel/Matrix.h"
+
 #include "../imageModel/Point.h"
 #include "../imageModel/Line.h"
+#include "../imageModel/Matrix.h"
 
 #include "PHTEntry.h"
 

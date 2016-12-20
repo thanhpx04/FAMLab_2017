@@ -318,6 +318,7 @@ ptr_IntMatrix Image::rotate(ptr_Point center, double angle, double scale)
 {
 	ptr_DoubleMatrix rotationMatrix = getRotationMatrix2D(center, angle, scale);
 	ptr_IntMatrix source = grayMatrix;
+
 	int rows = source->getRows();
 	int cols = source->getCols();
 
@@ -327,36 +328,57 @@ ptr_IntMatrix Image::rotate(ptr_Point center, double angle, double scale)
 	double a10 = rotationMatrix->getAtPosition(1, 0);
 	double a11 = rotationMatrix->getAtPosition(1, 1);
 	double b10 = rotationMatrix->getAtPosition(1, 2);
-
+	ptr_RGBMatrix rgbSource = imgMatrix;
+	RGB color;
+	color.R = color.G = color.B = 0;
+	ptr_RGBMatrix rgbDest = new Matrix<RGB>(rows, cols, color);
 	ptr_IntMatrix result = new Matrix<int>(rows, cols, 0);
 	for (int row = 0; row < rows; row++)
 	{
 		for (int col = 0; col < cols; col++)
 		{
 			int value = source->getAtPosition(row, col);
+			color = rgbSource->getAtPosition(row, col);
+
 			int xnew = round(a00 * col + a01 * row + b00);
 			int ynew = round(a10 * col + a11 * row + b10);
 
 			if (xnew >= 0 && xnew < cols && ynew >= 0 && ynew < rows)
 			{
 				result->setAtPosition(ynew, xnew, value);
+				rgbDest->setAtPosition(ynew, xnew, color);
 			}
 		}
 	}
 	for (int row = 0; row < rows; row++)
 	{
-		for (int col = 1; col < cols-1; col++)
+		for (int col = 1; col < cols - 1; col++)
 		{
-			int value = result->getAtPosition(row,col);
-			int leftValue = result->getAtPosition(row,col -1);
-			int rightValue = result->getAtPosition(row,col +1);
-			if(value ==0 && leftValue > 0 && rightValue >= 0)
+			int value = result->getAtPosition(row, col);
+			int leftValue = result->getAtPosition(row, col - 1);
+			int rightValue = result->getAtPosition(row, col + 1);
+			if (value == 0 && leftValue > 0 && rightValue >= 0)
 			{
-				result->setAtPosition(row,col,(leftValue + rightValue)/2);
+				result->setAtPosition(row, col, (leftValue + rightValue) / 2);
+			}
+
+			RGB color = rgbDest->getAtPosition(row, col);
+			RGB leftColor = rgbDest->getAtPosition(row, col - 1);
+			RGB rightColor = rgbDest->getAtPosition(row, col + 1);
+			if (color.R == 0 && color.G == 0 && color.B == 0
+				&& (leftColor.R != 0 || leftColor.G != 0 || leftColor.B != 0)
+				&& (rightColor.R != 0 || rightColor.G != 0 || rightColor.B != 0))
+			{
+				RGB newColor;
+				newColor.R = (leftColor.R + rightColor.R)/2;
+				newColor.G = (leftColor.G + rightColor.G)/2;
+				newColor.B = (leftColor.B + rightColor.B)/2;
+				rgbDest->setAtPosition(row,col,newColor);
 			}
 		}
 	}
-
+	imgMatrix = rgbDest;
+	grayMatrix = result;
 	return result;
 }
 

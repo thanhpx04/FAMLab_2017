@@ -30,6 +30,7 @@ public:
 	QDialog *parameterDialog;
 
 	void loadImage(QString fn);
+	void loadImage(Image *_matImage, QImage _qImage, QString tt);
 private slots:
 	void about();
 
@@ -41,6 +42,11 @@ private slots:
 	void zoomOut();
 	void normalSize();
 	void fitToWindow();
+
+	void binThreshold();
+	void cannyAlgorithm();
+
+	void extractLandmarks();
 
 private:
 
@@ -74,6 +80,15 @@ private:
 
 	QAction *aboutAct;
 
+	QAction *binaryThresholdAct;
+	QAction *cannyAct;
+
+	QAction *autoLandmarksAct;
+
+
+
+
+	// private methods
 	void createActions();
 	void createMenus();
 	void createToolBars();
@@ -81,6 +96,10 @@ private:
 	void createFileMenu();
 	void createViewMenu();
 	void createHelpMenu();
+	void createSegmentationMenu();
+	void createLandmarksMenu();
+
+
 	void activeFunction();
 	void viewMenuUpdateActions();
 	void scaleImage(double factor);

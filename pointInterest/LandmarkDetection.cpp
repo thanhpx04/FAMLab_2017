@@ -15,10 +15,10 @@
 
 using namespace std;
 
-#include "../imageModel/Matrix.h"
 #include "../imageModel/Point.h"
 #include "../imageModel/Line.h"
 #include "../imageModel/Edge.h"
+#include "../imageModel/Matrix.h"
 #include "../imageModel/Image.h"
 
 #include "../histograms/ShapeHistogram.h"
@@ -44,7 +44,7 @@ LandmarkDetection::~LandmarkDetection()
 }
 
 vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
-	AngleAccuracy acc, int cols, int templSize, int sceneSize)
+	AngleAccuracy acc, int cols, int templSize, int sceneSize,ptr_Point &ePoint, double &angleDiff)
 {
 	vector<ptr_Point> result;
 	Image modelImage = Treatments::refImage;
@@ -66,8 +66,8 @@ vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 
 	if (bhatt > 0.9)
 	{
-		double angleDiff;
-		ptr_Point ePoint;
+		//double angleDiff;
+		//ptr_Point ePoint;
 		PHoughTransform mpht;
 		mpht.setRefPoint(new Point(width / 2, height / 2));
 		vector<ptr_PHTEntry> entriesTabel = mpht.constructPHTTable(mLines);

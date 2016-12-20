@@ -15,10 +15,10 @@
 
 using namespace std;
 
-#include "imageModel/Matrix.h"
 #include "imageModel/Point.h"
 #include "imageModel/Line.h"
 #include "imageModel/Edge.h"
+#include "imageModel/Matrix.h"
 #include "imageModel/Image.h"
 
 #include "histograms/ShapeHistogram.h"
@@ -68,10 +68,12 @@ PHoughTransform phtEntriesTable(ptr_Treatments treatment, Image image)
 	return pht.constructPHT();
 }
 vector<ptr_Point> estimatedLandmarks(ptr_Treatments treatment, Image sceneImage,
-	AngleAccuracy acc, int cols, int templSize, int sceneSize)
+	AngleAccuracy acc, int cols, int templSize, int sceneSize, ptr_Point &ePoint,
+	double angleDiff)
 {
 	LandmarkDetection lmd;
 	lmd.setRefImage(treatment->getRefImage());
 	treatment = &lmd;
-	return lmd.landmarksAutoDectect(sceneImage, acc, cols, templSize, sceneSize);
+	return lmd.landmarksAutoDectect(sceneImage, acc, cols, templSize, sceneSize,
+		ePoint, angleDiff);
 }

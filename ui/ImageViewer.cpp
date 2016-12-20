@@ -44,6 +44,13 @@ using namespace std;
 #include "../segmentation/Suzuki.h"
 #include "../imageModel/Image.h"
 
+#include "../histograms/ShapeHistogram.h"
+#include "../pointInterest/Treatments.h"
+#include "../pointInterest/Segmentation.h"
+#include "../pointInterest/LandmarkDetection.h"
+#include "../utils/ImageConvert.h"
+#include "../utils/Drawing.h"
+
 #include "ImageViewer.h"
 
 void ImageViewer::createFileMenu()
@@ -135,12 +142,30 @@ void ImageViewer::createHelpMenu()
 	aboutAct = new QAction(tr("&About MAELab"), this);
 	connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 }
+void ImageViewer::createSegmentationMenu()
+{
+	binaryThresholdAct = new QAction(tr("&Binary threshold"), this);
+	binaryThresholdAct->setEnabled(false);
+	connect(binaryThresholdAct, SIGNAL(triggered()), this, SLOT(binThreshold()));
 
+	cannyAct = new QAction(tr("&Canny"), this);
+	cannyAct->setEnabled(false);
+	connect(cannyAct, SIGNAL(triggered()), this, SLOT(cannyAlgorithm()));
+}
+void ImageViewer::createLandmarksMenu()
+{
+	autoLandmarksAct = new QAction(tr("&Automatic Landmarks"), this);
+	autoLandmarksAct->setEnabled(false);
+	connect(autoLandmarksAct, SIGNAL(triggered()), this,
+		SLOT(extractLandmarks()));
+}
 void ImageViewer::createActions()
 {
 	createFileMenu();
 	createViewMenu();
 	createHelpMenu();
+	createSegmentationMenu();
+	createLandmarksMenu();
 }
 void ImageViewer::createMenus()
 {
@@ -163,8 +188,11 @@ void ImageViewer::createMenus()
 	helpMenu->addAction(aboutAct);
 
 	segmentationMenu = new QMenu(tr("&Segmentation"), this);
+	segmentationMenu->addAction(binaryThresholdAct);
+	segmentationMenu->addAction(cannyAct);
 
 	dominantPointMenu = new QMenu(tr("&Landmarks"), this);
+	dominantPointMenu->addAction(autoLandmarksAct);
 
 	// add menus to GUI
 	menuBar()->addMenu(fileMenu);
@@ -192,10 +220,16 @@ void ImageViewer::activeFunction()
 	openAct->setEnabled(true);
 	saveAct->setEnabled(true);
 	saveAsAct->setEnabled(true);
+
 	zoomInAct->setEnabled(true);
 	zoomOutAct->setEnabled(true);
 	fitToWindowAct->setEnabled(true);
 	normalSizeAct->setEnabled(true);
+
+	binaryThresholdAct->setEnabled(true);
+	cannyAct->setEnabled(true);
+
+	autoLandmarksAct->setEnabled(true);
 
 	viewMenuUpdateActions();
 	if (!fitToWindowAct->isChecked())
@@ -246,6 +280,19 @@ void ImageViewer::loadImage(QString fn)
 	this->fileName = fn;
 	setWindowTitle(tr("Image Viewer - ") + fileName);
 	statusBar()->showMessage(tr("File loaded"), 2000);
+}
+void ImageViewer::loadImage(Image *_matImage, QImage _qImage, QString tt)
+{
+	matImage = _matImage;
+	qImage = _qImage;
+	imageLabel->setPixmap(QPixmap::fromImage(qImage));
+	scaleFactor = 1.0;
+
+	saveAct->setEnabled(true);
+	activeFunction();
+
+	setWindowTitle(tr("Image Viewer - ") + tt);
+	statusBar()->showMessage(tr("Finished"), 2000);
 }
 // =========================== Slots =======================================
 void ImageViewer::about()
@@ -345,4 +392,96 @@ void ImageViewer::fitToWindow()
 		normalSize();
 	}
 	viewMenuUpdateActions();
+}
+
+void ImageViewer::binThreshold()
+{
+	cout << "\nBinary thresholding...\n";
+	float tValue = matImage->getThresholdValue();
+	Segmentation tr; // = new Segmentation();
+	tr.setRefImage(*matImage);
+	ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255); //binaryThreshold(matImage->getGrayMatrix(), tValue,
+	//255);
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrIntToQImage(rsMatrix), "Thresholding result");
+	other->show();
+
+}
+void ImageViewer::cannyAlgorithm()
+{
+	cout << "\nCanny Algorithm...\n";
+	Segmentation tr;
+	tr.setRefImage(*matImage);
+	vector<ptr_Edge> edges = tr.canny();
+
+	RGB color;
+	color.R = 255;
+	color.G = color.B = 0;
+	for (size_t i = 0; i < edges.size(); i++)
+	{
+		ptr_Edge edgei = edges.at(i);
+		for (int k = 0; k < edgei->getPoints().size(); k++)
+		{
+			ptr_Point pi = edgei->getPoints().at(k);
+			matImage->getRGBMatrix()->setAtPosition(pi->getY(), pi->getX(), color);
+		}
+	}
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
+		"Canny result");
+	other->move(x() - 40, y() - 40);
+	other->show();
+}
+void ImageViewer::extractLandmarks()
+{
+	cout << "\n Automatic extraction the landmarks.\n";
+	QMessageBox msgbox;
+	msgbox.setText("Select the landmark file of model image.");
+	msgbox.exec();
+
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+	matImage->readManualLandmarks(reflmPath.toStdString());
+
+	LandmarkDetection tr;
+	tr.setRefImage(*matImage);
+
+	msgbox.setText("Select the scene image.");
+	msgbox.exec();
+
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	qDebug() << fileName2;
+
+	Image *sceneImage = new Image(fileName2.toStdString());
+	ptr_Point ePoint;
+	double angleDiff;
+	vector<ptr_Point> lms = tr.landmarksAutoDectect(*sceneImage, Degree, 500, 400,
+		500, ePoint, angleDiff);
+	cout << "\nNumber of the landmarks: " << lms.size();
+	RGB color;
+	color.R = 255;
+	color.G = 255;
+	color.B = 0;
+
+	sceneImage->rotate(ePoint, angleDiff, 1);
+	for (int i = 0; i < lms.size(); i++)
+	{
+		ptr_Point lm = lms.at(i);
+		vector<ptr_Point> dPoints = drawingCircle(lm, 5, color);
+		for (int k = 0; k < dPoints.size(); k++)
+		{
+			ptr_Point p = dPoints.at(k);
+			sceneImage->getRGBMatrix()->setAtPosition(p->getY(), p->getX(),
+				p->getColor());
+		}
+	}
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(sceneImage, ptrRGBToQImage(sceneImage->getRGBMatrix()),
+		"Landmarks result");
+	other->move(x() - 40, y() - 40);
+	other->show();
+	cout << "\nFinish.\n";
 }

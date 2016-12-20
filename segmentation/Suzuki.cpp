@@ -8,10 +8,11 @@
 
 using namespace std;
 
-#include "../imageModel/Matrix.h"
+
 #include "../imageModel/Point.h"
 #include "../imageModel/Line.h"
 #include "../imageModel/Edge.h"
+#include "../imageModel/Matrix.h"
 #include "../io/Reader.h"
 #include "Thresholds.h"
 
