@@ -77,3 +77,34 @@ vector<ptr_Point> estimatedLandmarks(ptr_Treatments treatment, Image sceneImage,
 	return lmd.landmarksAutoDectect(sceneImage, acc, cols, templSize, sceneSize,
 		ePoint, angleDiff);
 }
+double measureCentroidPoint(vector<ptr_Point> landmarks, ptr_Point &ebary)
+{
+	ebary->setX(0);
+	ebary->setY(0);
+
+	int totalX = 0;
+	int totalY = 0;
+	size_t lmSize = landmarks.size();
+
+	for (int i = 0; i < lmSize; i++)
+	{
+		ptr_Point pi = landmarks.at(i);
+		totalX += pi->getX();
+		totalY += pi->getY();
+	}
+
+	if (lmSize > 0)
+	{
+		ebary->setX(totalX / lmSize);
+		ebary->setY(totalY / lmSize);
+	}
+	double totalDistance = 0;
+	for (size_t j = 0; j < lmSize; j++)
+	{
+		ptr_Point lm = landmarks.at(j);
+		ptr_Line line = new Line(lm, ebary);
+		totalDistance += (line->getLength() * line->getLength());
+	}
+	return sqrt(totalDistance);
+}
+

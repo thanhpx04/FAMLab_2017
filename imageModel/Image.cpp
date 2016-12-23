@@ -111,6 +111,14 @@ void Image::setMLandmarks(string tpsFile)
 {
 
 }
+void Image::setRGBMatrix(ptr_RGBMatrix rgbMatrix)
+{
+	imgMatrix = rgbMatrix;
+}
+void Image::setAutoLandmarks(vector<ptr_Point> eLandmarks)
+{
+	autoLandmarks = eLandmarks;
+}
 ptr_IntMatrix Image::getGrayMatrix()
 {
 	return grayMatrix;
@@ -178,6 +186,10 @@ vector<ptr_Point> Image::getListOfManualLandmarks()
 		mLandmarks.push_back(p);
 	}
 	return mLandmarks;
+}
+vector<ptr_Point> Image::getListOfAutoLandmarks()
+{
+	return autoLandmarks;
 }
 //================================================ End public methods ==================================================
 
@@ -370,10 +382,10 @@ ptr_IntMatrix Image::rotate(ptr_Point center, double angle, double scale)
 				&& (rightColor.R != 0 || rightColor.G != 0 || rightColor.B != 0))
 			{
 				RGB newColor;
-				newColor.R = (leftColor.R + rightColor.R)/2;
-				newColor.G = (leftColor.G + rightColor.G)/2;
-				newColor.B = (leftColor.B + rightColor.B)/2;
-				rgbDest->setAtPosition(row,col,newColor);
+				newColor.R = (leftColor.R + rightColor.R) / 2;
+				newColor.G = (leftColor.G + rightColor.G) / 2;
+				newColor.B = (leftColor.B + rightColor.B) / 2;
+				rgbDest->setAtPosition(row, col, newColor);
 			}
 		}
 	}

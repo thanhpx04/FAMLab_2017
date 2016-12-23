@@ -5,16 +5,13 @@
  *      Author: linh
  */
 #include <iostream>
+#include <fstream>
+#include <vector>
 #include <math.h>
 #include <cmath>
-#include <stdlib.h>
-#include <stdio.h>
-#include <vector>
-#include <string.h>
 #include <fstream>
-#include <time.h>
-#include <string>
-#include <algorithm>
+#include <stdio.h>
+#include <stdlib.h>
 using namespace std;
 
 #include <QtGui/QApplication>
@@ -44,12 +41,17 @@ using namespace std;
 #include "../segmentation/Suzuki.h"
 #include "../imageModel/Image.h"
 
+#include "../pht/PHTEntry.h"
+#include "../pht/PHoughTransform.h"
+
 #include "../histograms/ShapeHistogram.h"
 #include "../pointInterest/Treatments.h"
 #include "../pointInterest/Segmentation.h"
 #include "../pointInterest/LandmarkDetection.h"
 #include "../utils/ImageConvert.h"
 #include "../utils/Drawing.h"
+
+#include "../MAELab.h"
 
 #include "ImageViewer.h"
 
@@ -109,6 +111,19 @@ void ImageViewer::createViewMenu()
 	fitToWindowAct->setShortcut(tr("Ctrl+J"));
 	connect(fitToWindowAct, SIGNAL(triggered()), this, SLOT(fitToWindow()));
 
+	displayMLandmarksAct = new QAction(tr("&Display manual landmarks"), this);
+	displayMLandmarksAct->setEnabled(false);
+	displayMLandmarksAct->setCheckable(true);
+	displayMLandmarksAct->setChecked(false);
+	connect(displayMLandmarksAct, SIGNAL(triggered()), this,
+		SLOT(displayManualLandmarks()));
+
+	displayALandmarksAct = new QAction(tr("&Display estimated landmarks"), this);
+	displayALandmarksAct->setEnabled(false);
+	displayALandmarksAct->setCheckable(true);
+	connect(displayALandmarksAct, SIGNAL(triggered()), this,
+		SLOT(displayAutoLandmarks()));
+
 }
 void ImageViewer::viewMenuUpdateActions()
 {
@@ -154,10 +169,18 @@ void ImageViewer::createSegmentationMenu()
 }
 void ImageViewer::createLandmarksMenu()
 {
-	autoLandmarksAct = new QAction(tr("&Automatic Landmarks"), this);
+	autoLandmarksAct = new QAction(tr("&Compute automatic landmarks"), this);
 	autoLandmarksAct->setEnabled(false);
 	connect(autoLandmarksAct, SIGNAL(triggered()), this,
 		SLOT(extractLandmarks()));
+
+	measureMBaryAct = new QAction(tr("&Measure manual centroid"), this);
+	measureMBaryAct->setEnabled(false);
+	connect(measureMBaryAct, SIGNAL(triggered()), this, SLOT(measureMBary()));
+
+	measureEBaryAct = new QAction(tr("&Measure estimated centroid"), this);
+	measureEBaryAct->setEnabled(false);
+	connect(measureEBaryAct, SIGNAL(triggered()), this, SLOT(measureEBary()));
 }
 void ImageViewer::createActions()
 {
@@ -183,6 +206,9 @@ void ImageViewer::createMenus()
 	viewMenu->addSeparator();
 	viewMenu->addAction(normalSizeAct);
 	viewMenu->addAction(fitToWindowAct);
+	viewMenu->addSeparator();
+	viewMenu->addAction(displayMLandmarksAct);
+	viewMenu->addAction(displayALandmarksAct);
 
 	helpMenu = new QMenu(tr("&Helps"), this);
 	helpMenu->addAction(aboutAct);
@@ -193,6 +219,9 @@ void ImageViewer::createMenus()
 
 	dominantPointMenu = new QMenu(tr("&Landmarks"), this);
 	dominantPointMenu->addAction(autoLandmarksAct);
+	dominantPointMenu->addSeparator();
+	dominantPointMenu->addAction(measureMBaryAct);
+	dominantPointMenu->addAction(measureEBaryAct);
 
 	// add menus to GUI
 	menuBar()->addMenu(fileMenu);
@@ -225,11 +254,18 @@ void ImageViewer::activeFunction()
 	zoomOutAct->setEnabled(true);
 	fitToWindowAct->setEnabled(true);
 	normalSizeAct->setEnabled(true);
+	displayMLandmarksAct->setEnabled(true);
+	if (matImage->getListOfAutoLandmarks().size() > 0)
+		displayALandmarksAct->setEnabled(true);
 
 	binaryThresholdAct->setEnabled(true);
 	cannyAct->setEnabled(true);
 
 	autoLandmarksAct->setEnabled(true);
+	if (matImage->getListOfManualLandmarks().size() > 0)
+		measureMBaryAct->setEnabled(true);
+	if (matImage->getListOfAutoLandmarks().size() > 0)
+		measureEBaryAct->setEnabled(true);
 
 	viewMenuUpdateActions();
 	if (!fitToWindowAct->isChecked())
@@ -293,6 +329,22 @@ void ImageViewer::loadImage(Image *_matImage, QImage _qImage, QString tt)
 
 	setWindowTitle(tr("Image Viewer - ") + tt);
 	statusBar()->showMessage(tr("Finished"), 2000);
+}
+
+void ImageViewer::displayLandmarks(Image *image, vector<ptr_Point> lms,
+	RGB color)
+{
+	for (int i = 0; i < lms.size(); i++)
+	{
+		ptr_Point lm = lms.at(i);
+		vector<ptr_Point> dPoints = drawingCircle(lm, 5, color);
+		for (int k = 0; k < dPoints.size(); k++)
+		{
+			ptr_Point p = dPoints.at(k);
+			image->getRGBMatrix()->setAtPosition(p->getY(), p->getX(), p->getColor());
+		}
+	}
+
 }
 // =========================== Slots =======================================
 void ImageViewer::about()
@@ -393,7 +445,105 @@ void ImageViewer::fitToWindow()
 	}
 	viewMenuUpdateActions();
 }
+void ImageViewer::displayManualLandmarks()
+{
+	cout << "\n Display the manual landmarks.\n";
 
+	bool currentState = displayMLandmarksAct->isChecked();
+	if (currentState)
+	{
+		if (matImage->getListOfManualLandmarks().size() <= 0)
+		{
+			QMessageBox msgbox;
+			msgbox.setText("Select the manual landmarks file.");
+			msgbox.exec();
+
+			QString reflmPath = QFileDialog::getOpenFileName(this);
+			matImage->readManualLandmarks(reflmPath.toStdString());
+
+		}
+		vector<ptr_Point> mLandmarks = matImage->getListOfManualLandmarks();
+		RGB color;
+		color.R = 255;
+		color.G = 0;
+		color.B = 0;
+		displayLandmarks(matImage, mLandmarks, color);
+		displayMLandmarksAct->setChecked(true);
+		measureMBaryAct->setEnabled(true);
+	}
+	else
+	{
+		Image *img = new Image(fileName.toStdString());
+		matImage->setRGBMatrix(img->getRGBMatrix());
+		displayMLandmarksAct->setChecked(false);
+	}
+
+	if (displayALandmarksAct->isChecked())
+	{
+		vector<ptr_Point> aLM = matImage->getListOfAutoLandmarks();
+		if (aLM.size() > 0)
+		{
+			RGB color;
+			color.R = 255;
+			color.G = 255;
+			color.B = 0;
+			displayLandmarks(matImage, aLM, color);
+			displayALandmarksAct->setChecked(true);
+		}
+	}
+
+	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
+		"Display manual landmarks.");
+	this->show();
+	cout << "\nFinish.\n";
+}
+void ImageViewer::displayAutoLandmarks()
+{
+	vector<ptr_Point> autoLM = matImage->getListOfAutoLandmarks();
+	QMessageBox message;
+	if (autoLM.size() <= 0)
+	{
+		message.setText(
+			"Automatic landmarks do not exists. You need to compute them.");
+		message.exec();
+	}
+	else
+	{
+		bool currentState = displayALandmarksAct->isChecked();
+		if (currentState)
+		{
+			RGB color;
+			color.R = 255;
+			color.G = 255;
+			color.B = 0;
+			displayLandmarks(matImage, autoLM, color);
+			displayALandmarksAct->setChecked(true);
+		}
+		else
+		{
+			Image *img = new Image(fileName.toStdString());
+			matImage->setRGBMatrix(img->getRGBMatrix());
+			displayALandmarksAct->setChecked(false);
+		}
+
+		if (displayMLandmarksAct->isChecked())
+		{
+			vector<ptr_Point> mLM = matImage->getListOfManualLandmarks();
+			if (mLM.size() > 0)
+			{
+				RGB color;
+				color.R = 255;
+				color.G = 0;
+				color.B = 0;
+				displayLandmarks(matImage, mLM, color);
+				displayMLandmarksAct->setChecked(true);
+			}
+		}
+		this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
+			"Display estimated landmarks.");
+	}
+
+}
 void ImageViewer::binThreshold()
 {
 	cout << "\nBinary thresholding...\n";
@@ -437,27 +587,29 @@ void ImageViewer::extractLandmarks()
 {
 	cout << "\n Automatic extraction the landmarks.\n";
 	QMessageBox msgbox;
-	msgbox.setText("Select the landmark file of model image.");
-	msgbox.exec();
 
-	QString reflmPath = QFileDialog::getOpenFileName(this);
-	matImage->readManualLandmarks(reflmPath.toStdString());
-
-	LandmarkDetection tr;
-	tr.setRefImage(*matImage);
-
-	msgbox.setText("Select the scene image.");
+	msgbox.setText("Select the model image.");
 	msgbox.exec();
 
 	QString fileName2 = QFileDialog::getOpenFileName(this);
 	if (fileName2.isEmpty())
 		return;
-	qDebug() << fileName2;
+	cout << endl << fileName2.toStdString() << endl;
 
-	Image *sceneImage = new Image(fileName2.toStdString());
+	Image *modelImage = new Image(fileName2.toStdString());
+
+	msgbox.setText("Select the landmark file of model image.");
+	msgbox.exec();
+
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+	modelImage->readManualLandmarks(reflmPath.toStdString());
+
+	LandmarkDetection tr;
+	tr.setRefImage(*modelImage);
+
 	ptr_Point ePoint;
 	double angleDiff;
-	vector<ptr_Point> lms = tr.landmarksAutoDectect(*sceneImage, Degree, 500, 400,
+	vector<ptr_Point> lms = tr.landmarksAutoDectect(*matImage, Degree, 500, 400,
 		500, ePoint, angleDiff);
 	cout << "\nNumber of the landmarks: " << lms.size();
 	RGB color;
@@ -465,7 +617,7 @@ void ImageViewer::extractLandmarks()
 	color.G = 255;
 	color.B = 0;
 
-	sceneImage->rotate(ePoint, angleDiff, 1);
+	matImage->rotate(ePoint, angleDiff, 1);
 	for (int i = 0; i < lms.size(); i++)
 	{
 		ptr_Point lm = lms.at(i);
@@ -473,15 +625,56 @@ void ImageViewer::extractLandmarks()
 		for (int k = 0; k < dPoints.size(); k++)
 		{
 			ptr_Point p = dPoints.at(k);
-			sceneImage->getRGBMatrix()->setAtPosition(p->getY(), p->getX(),
+			matImage->getRGBMatrix()->setAtPosition(p->getY(), p->getX(),
 				p->getColor());
 		}
 	}
-
-	ImageViewer *other = new ImageViewer;
-	other->loadImage(sceneImage, ptrRGBToQImage(sceneImage->getRGBMatrix()),
+	matImage->setAutoLandmarks(lms);
+	displayALandmarksAct->setEnabled(true);
+	displayALandmarksAct->setChecked(true);
+	measureEBaryAct->setEnabled(true);
+	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 		"Landmarks result");
-	other->move(x() - 40, y() - 40);
-	other->show();
+	this->show();
 	cout << "\nFinish.\n";
+}
+void ImageViewer::measureMBary()
+{
+	QMessageBox qmessage;
+	vector<ptr_Point> mLandmarks = matImage->getListOfManualLandmarks();
+	if (mLandmarks.size() > 0)
+	{
+		ptr_Point ebary;
+		double mCentroid = measureCentroidPoint(mLandmarks, ebary);
+
+		qmessage.setText(
+			"<p>Coordinate of bary point: (" + QString::number(ebary->getX()) + ", "
+				+ QString::number(ebary->getY()) + ")</p>"
+					"<p>Centroid value: " + QString::number(mCentroid) + "</p");
+	}
+	else
+	{
+		qmessage.setText("The image has not the manual landmarks.");
+	}
+	qmessage.exec();
+}
+void ImageViewer::measureEBary()
+{
+	QMessageBox qmessage;
+	vector<ptr_Point> mLandmarks = matImage->getListOfAutoLandmarks();
+	if (mLandmarks.size() > 0)
+	{
+		ptr_Point ebary;
+		double mCentroid = measureCentroidPoint(mLandmarks, ebary);
+
+		qmessage.setText(
+			"<p>Coordinate of bary point: (" + QString::number(ebary->getX()) + ", "
+				+ QString::number(ebary->getY()) + ")</p>"
+					"<p>Centroid value: " + QString::number(mCentroid) + "</p");
+	}
+	else
+	{
+		qmessage.setText("The image has not the automatic landmarks.");
+	}
+	qmessage.exec();
 }

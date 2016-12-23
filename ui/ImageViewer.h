@@ -8,6 +8,7 @@
 #ifndef IMAGEVIEWER_H_
 #define IMAGEVIEWER_H_
 
+#include "../imageModel/Point.h"
 #include <QtGui/qlabel.h>
 #include <QtGui/qscrollarea.h>
 #include <QtGui/QMainWindow>
@@ -42,11 +43,15 @@ private slots:
 	void zoomOut();
 	void normalSize();
 	void fitToWindow();
+	void displayManualLandmarks();
+	void displayAutoLandmarks();
 
 	void binThreshold();
 	void cannyAlgorithm();
 
 	void extractLandmarks();
+	void measureMBary();
+	void measureEBary();
 
 private:
 
@@ -77,6 +82,8 @@ private:
 	QAction *zoomOutAct;
 	QAction *normalSizeAct;
 	QAction *fitToWindowAct;
+	QAction *displayMLandmarksAct;
+	QAction *displayALandmarksAct;
 
 	QAction *aboutAct;
 
@@ -84,8 +91,8 @@ private:
 	QAction *cannyAct;
 
 	QAction *autoLandmarksAct;
-
-
+	QAction *measureMBaryAct;
+	QAction *measureEBaryAct;
 
 
 	// private methods
@@ -104,6 +111,8 @@ private:
 	void viewMenuUpdateActions();
 	void scaleImage(double factor);
 	void adjustScrollBar(QScrollBar *scrollBar, double factor);
+
+	void displayLandmarks(Image *image, std::vector<ptr_Point> lms, RGB color);
 };
 
 #endif /* IMAGEVIEWER_H_ */

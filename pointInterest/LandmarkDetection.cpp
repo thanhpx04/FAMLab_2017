@@ -74,6 +74,8 @@ vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 		vector<ptr_Point> phtEsLM = phtLandmarks(entriesTabel, mpht.getRefPoint(),
 			sLines, width, height, manualLMs, angleDiff, ePoint);
 
+		cout<<"\nAngle difference: "<<angleDiff;
+
 		result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
 			templSize, sceneSize, angleDiff, ePoint);
 	}

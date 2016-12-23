@@ -16,4 +16,5 @@ double bhattacharyyaDistance(ptr_Treatments treatment, Image sceneImage,
 PHoughTransform phtEntriesTable(ptr_Treatments treatment, Image image);
 vector<ptr_Point> estimatedLandmarks(ptr_Treatments treatment, Image sceneImage,
 	AngleAccuracy acc, int cols, int templSize, int sceneSize,ptr_Point &ePoint, double angleDiff);
+double measureCentroidPoint(vector<ptr_Point> landmarks, ptr_Point &ebary);
 #endif /* ANALYSIS_H_ */
