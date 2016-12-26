@@ -73,7 +73,7 @@ vector<ptr_Point> estimatedLandmarks(ptr_Treatments treatment, Image sceneImage,
 {
 	LandmarkDetection lmd;
 	lmd.setRefImage(treatment->getRefImage());
-	treatment = &lmd;
+	//treatment = &lmd;
 	return lmd.landmarksAutoDectect(sceneImage, acc, cols, templSize, sceneSize,
 		ePoint, angleDiff);
 }
