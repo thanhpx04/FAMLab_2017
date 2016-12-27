@@ -269,6 +269,7 @@ vector<ptr_Point> phtLandmarks(vector<ptr_PHTEntry> entriesTable,
 		maxVector);
 	if (maxVector.size() > 0)
 	{
+
 		ePoint = refPointInScene(entry, maxVector, angleDiff, mLandmarks, width,
 			height);
 		double angle1 = entry->getRefLine()->angleLines(*entry->getObjLine());

@@ -640,6 +640,7 @@ void ImageViewer::extractLandmarks()
 	for (int i = 0; i < lms.size(); i++)
 	{
 		ptr_Point lm = lms.at(i);
+		cout<<"\nCoordinate: "<<lm->getX()<<"\t"<<lm->getY()<<endl;
 		vector<ptr_Point> dPoints = drawingCircle(lm, 5, color);
 		for (int k = 0; k < dPoints.size(); k++)
 		{

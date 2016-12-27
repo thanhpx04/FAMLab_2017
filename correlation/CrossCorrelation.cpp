@@ -40,7 +40,7 @@ ptr_IntMatrix createTemplate(ptr_IntMatrix inputImage, ptr_Point centerPoint,
 	int cx = centerPoint->getX(); //col
 	int cy = centerPoint->getY(); // row
 	if (cx < 0 || cy < 0)
-	 return inputImage;
+		return inputImage;
 	int rows = inputImage->getRows();
 	int cols = inputImage->getCols();
 
@@ -49,8 +49,8 @@ ptr_IntMatrix createTemplate(ptr_IntMatrix inputImage, ptr_Point centerPoint,
 	location = new Point(lx, ly);
 	distance = new Point(cx - lx, cy - ly);
 
-	int rx = (cx + hsize) > cols ? cols : (cx + hsize);
-	int ry = (cy + hsize) > rows ? rows : (cy + hsize);
+	int rx = (cx + hsize) >= cols ? cols - 1 : (cx + hsize);
+	int ry = (cy + hsize) >= rows ? rows - 1 : (cy + hsize);
 
 	ptr_IntMatrix result = new Matrix<int>(ry - ly, rx - lx);
 	int i = -1, j = -1;
@@ -123,20 +123,30 @@ vector<ptr_Point> verifyLandmarks(Image mImage, Image sImage,
 	vector<ptr_Point> manualLM, vector<ptr_Point> esLandmarks, int templSize,
 	int sceneSize, double angleDiff, ptr_Point ePoint)
 {
+
 	ptr_IntMatrix mMatrix = mImage.getGrayMatrix();
 	ptr_IntMatrix sRotateImg = sImage.rotate(ePoint, angleDiff, 1);
-	vector<ptr_Point> mcResult;
+	int width =mMatrix->getCols();
+	int height = mMatrix->getRows();
+
+	std::vector<ptr_Point> mcResult;
 	for (size_t i = 0; i < esLandmarks.size(); i++)
 	{
-		//ptr_Point lm = new Point(manualLM.at(i)->getX(), manualLM.at(i)->getY());
-		ptr_Point pi = esLandmarks.at(i);
-		if (pi->getX() > 0 && pi->getY() > 0)
+		ptr_Point epi = esLandmarks.at(i);
+		ptr_Point mpi = manualLM.at(i);
+		if (epi->getX() > 0 && epi->getY() > 0
+			&& epi->getX() < width && epi->getY() < height
+		)
 		{
-			ptr_Point tLocation, tDistance, iLocation, iDistance;
-			ptr_IntMatrix templ = createTemplate(mMatrix, manualLM.at(i), templSize,
-				tLocation, tDistance);
-			ptr_IntMatrix sceneM = createTemplate(sRotateImg, esLandmarks.at(i),
-				sceneSize, iLocation, iDistance);
+			ptr_Point tLocation = new Point(0, 0);
+			ptr_Point tDistance = new Point(0, 0);
+			ptr_Point iLocation = new Point(0, 0);
+			ptr_Point iDistance = new Point(0, 0);
+
+			ptr_IntMatrix templ = createTemplate(mMatrix, mpi, templSize, tLocation,
+				tDistance);
+			ptr_IntMatrix sceneM = createTemplate(sRotateImg, epi, sceneSize,
+				iLocation, iDistance);
 
 			ptr_Point maxLoc = matCrossCorrelation(templ, sceneM);
 			cout << "\n[" << maxLoc->getX() << "," << maxLoc->getY() << "]\t" << "["

@@ -130,7 +130,7 @@ ptr_RGBMatrix Image::getRGBMatrix()
 vector<ptr_Line> Image::getListOfLines()
 {
 	if (listOfLines.size() <= 0)
-		getApproximateLines(3);
+		getApproximateLines(4);
 	return listOfLines;
 }
 float Image::getMedianHistogram()
@@ -161,7 +161,7 @@ vector<ptr_Line> Image::getApproximateLines(int minDistance = 3)
 	for (size_t i = 0; i < listOfEdges.size(); i++)
 	{
 		ptr_Edge ed = listOfEdges.at(i);
-		vector<ptr_Point> breakPoints = ed->segment(3);
+		vector<ptr_Point> breakPoints = ed->segment(minDistance);
 		vector<ptr_Line> lines = ed->getLines(breakPoints);
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
 	}
