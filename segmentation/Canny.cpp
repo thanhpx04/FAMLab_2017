@@ -378,24 +378,6 @@ ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, sobelFilter,
 		lowThreshold, highThreshold);
 
-	/*int count = 0;
-	ofstream of("/home/linh/Desktop/compare/cannyValues.txt");
-	for (int r = 0; r < thresholdImage->getRows(); r++)
-	{
-		for (int c = 0; c < thresholdImage->getCols(); c++)
-		{
-			if (thresholdImage->getAtPosition(r, c) == 255)
-			{
-				of << r << "\t" << c << "\n";
-				count++;
-
-			}
-		}
-
-	}
-	cout << endl << "Total points in Canny: " << count;
-	of.close();*/
-
 	delete sobelFilter;
 	delete nonMaxSuppress;
 

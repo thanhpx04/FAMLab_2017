@@ -189,8 +189,7 @@ void ImageViewer::createLandmarksMenu()
 	connect(dirAutoLandmarksAct, SIGNAL(triggered()), this,
 		SLOT(dirAutoLandmarks()));
 
-	dirCentroidMeasureAct = new QAction(tr("Measure centroid on folder"),
-		this);
+	dirCentroidMeasureAct = new QAction(tr("Measure centroid on folder"), this);
 	dirCentroidMeasureAct->setEnabled(false);
 	connect(dirCentroidMeasureAct, SIGNAL(triggered()), this,
 		SLOT(dirCentroidMeasure()));
@@ -640,7 +639,7 @@ void ImageViewer::extractLandmarks()
 	for (int i = 0; i < lms.size(); i++)
 	{
 		ptr_Point lm = lms.at(i);
-		cout<<"\nCoordinate: "<<lm->getX()<<"\t"<<lm->getY()<<endl;
+		cout << "\nCoordinate: " << lm->getX() << "\t" << lm->getY() << endl;
 		vector<ptr_Point> dPoints = drawingCircle(lm, 5, color);
 		for (int k = 0; k < dPoints.size(); k++)
 		{
@@ -664,7 +663,7 @@ void ImageViewer::measureMBary()
 	vector<ptr_Point> mLandmarks = matImage->getListOfManualLandmarks();
 	if (mLandmarks.size() > 0)
 	{
-		ptr_Point ebary = new Point(0,0);
+		ptr_Point ebary = new Point(0, 0);
 		double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
 		qmessage.setText(
@@ -684,7 +683,7 @@ void ImageViewer::measureEBary()
 	vector<ptr_Point> mLandmarks = matImage->getListOfAutoLandmarks();
 	if (mLandmarks.size() > 0)
 	{
-		ptr_Point ebary = new Point(0,0);
+		ptr_Point ebary = new Point(0, 0);
 		double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
 		qmessage.setText(
@@ -716,50 +715,34 @@ void ImageViewer::dirAutoLandmarks()
 	msgbox.exec();
 	QString savefolder = QFileDialog::getExistingDirectory(this);
 
-	DIR *pDir;
-	struct dirent *entry;
-	string filePath;
-	pDir = opendir(folder.toStdString().c_str());
-	if (pDir == NULL)
+	vector<string> fileNames = readDirectory(folder.toStdString().c_str());
+	for (int i = 0; i < fileNames.size(); i++)
 	{
-		cout << "\n Error when reading the folder";
-		return;
-	}
-	while (entry = readdir(pDir))
-	{
-		if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+		string fileName = folder.toStdString() + "/" + fileNames.at(i);
+		Image sceneimage(fileName);
+		ptr_Point ePoint = new Point(0, 0);
+		double angleDiff = 0;
+		LandmarkDetection tr;
+		tr.setRefImage(*matImage);
+
+		vector<ptr_Point> esLandmarks = tr.landmarksAutoDectect(sceneimage, Degree,
+			500, 400, 500, ePoint, angleDiff);
+		if (savefolder != NULL || savefolder != "")
 		{
-			filePath = folder.toStdString() + "/" + entry->d_name;
-			cout << "\n" << filePath;
-			Image sceneimage(filePath);
-
-			ptr_Point ePoint = new Point(0,0);
-			double angleDiff = 0;
-			///ptr_Treatments tr;
-			//tr->setRefImage(*matImage);
-
-			LandmarkDetection tr;
-			tr.setRefImage(*matImage);
-
-			vector<ptr_Point> esLandmarks = tr.landmarksAutoDectect(sceneimage,
-				Degree, 500, 400, 500, ePoint, angleDiff);
-			if (savefolder != NULL || savefolder != "")
+			string saveFile = savefolder.toStdString() + "/" + fileNames.at(i)
+				+ ".TPS";
+			ofstream inFile(saveFile.c_str());
+			inFile << "LM=" << esLandmarks.size() << "\n";
+			for (size_t k = 0; k < esLandmarks.size(); k++)
 			{
-				string saveFile = savefolder.toStdString() + "/" + entry->d_name
-					+ ".TPS";
-				ofstream inFile(saveFile.c_str());
-				inFile <<"LM="<<esLandmarks.size()<<"\n";
-				for (size_t k = 0; k < esLandmarks.size(); k++)
-				{
-					ptr_Point pk = esLandmarks.at(k);
-					inFile << pk->getX() << "\t" << pk->getY() << "\n";
-				}
-				inFile <<"IMAGE="<< saveFile << "\n";
-				inFile.close();
+				ptr_Point pk = esLandmarks.at(k);
+				inFile << pk->getX() << "\t" << pk->getY() << "\n";
 			}
+			inFile << "IMAGE=" << saveFile << "\n";
+			inFile.close();
 		}
 	}
-	closedir(pDir);
+
 	msgbox.setText("Finish");
 	msgbox.exec();
 
@@ -775,21 +758,9 @@ void ImageViewer::dirCentroidMeasure()
 	QString lmfolder = QFileDialog::getExistingDirectory(this);
 
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), ".",
-			tr("Measure file (*.txt)"));
-	/*qmessage.setText("Select the saving folder.");
-	qmessage.exec();
+		tr("Measure file (*.txt)"));
 
-	QString savefolder = QFileDialog::getExistingDirectory(this);*/
-
-	DIR *pDir;
-	struct dirent *entry;
-	string filePath;
-	pDir = opendir(lmfolder.toStdString().c_str());
-	if (pDir == NULL)
-	{
-		cout << "\n Error when reading the folder";
-		return;
-	}
+	vector<string> fileNames = readDirectory(lmfolder.toStdString().c_str());
 	string saveFile;
 	ofstream inFile;
 	if (fileName != NULL || fileName != "")
@@ -797,33 +768,28 @@ void ImageViewer::dirCentroidMeasure()
 		string saveFile = fileName.toStdString();
 		inFile.open(saveFile.c_str(), std::ofstream::out);
 	}
-	while (entry = readdir(pDir))
+	for (int i = 0; i < fileNames.size(); i++)
 	{
-		if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+		string filePath = lmfolder.toStdString() + "/" + fileNames.at(i);
+		matImage->readManualLandmarks(filePath);
+		vector<ptr_Point> mLandmarks = matImage->getListOfManualLandmarks();
+		if (mLandmarks.size() > 0)
 		{
-			filePath = lmfolder.toStdString() + "/" + entry->d_name;
-			cout << "\n" << filePath;
-			matImage->readManualLandmarks(filePath);
-			vector<ptr_Point> mLandmarks = matImage->getListOfManualLandmarks();
-			if (mLandmarks.size() > 0)
+			cout << "\nHow";
+			ptr_Point ebary = new Point(0, 0);
+			double mCentroid = measureCentroidPoint(mLandmarks, ebary);
+
+			if (fileName != NULL || fileName != "")
 			{
-				cout << "\nHow";
-				ptr_Point ebary = new Point(0, 0);
-				double mCentroid = measureCentroidPoint(mLandmarks, ebary);
+				inFile << fileNames.at(i) << "\t" << ebary->getX() << "\t"
+					<< ebary->getY() << "\t" << mCentroid << "\n";
 
-				if (fileName != NULL || fileName != "")
-				{
-					inFile << entry->d_name << "\t" << ebary->getX() << "\t"
-						<< ebary->getY() << "\t" << mCentroid << "\n";
-
-				}
 			}
 		}
 	}
 	inFile.close();
-	closedir(pDir);
+
 	qmessage.setText("Finish.");
 	qmessage.exec();
 }
-
 
