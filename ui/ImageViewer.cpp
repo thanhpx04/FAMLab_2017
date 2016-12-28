@@ -719,6 +719,7 @@ void ImageViewer::dirAutoLandmarks()
 	for (int i = 0; i < fileNames.size(); i++)
 	{
 		string fileName = folder.toStdString() + "/" + fileNames.at(i);
+		cout<<"\n"<<fileName<<endl;
 		Image sceneimage(fileName);
 		ptr_Point ePoint = new Point(0, 0);
 		double angleDiff = 0;
