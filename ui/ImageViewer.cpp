@@ -635,10 +635,11 @@ void ImageViewer::extractLandmarks()
 	color.G = 255;
 	color.B = 0;
 
+	ptr_Point lm;
 	matImage->rotate(ePoint, angleDiff, 1);
 	for (int i = 0; i < lms.size(); i++)
 	{
-		ptr_Point lm = lms.at(i);
+		lm = lms.at(i);
 		cout << "\nCoordinate: " << lm->getX() << "\t" << lm->getY() << endl;
 		vector<ptr_Point> dPoints = drawingCircle(lm, 5, color);
 		for (int k = 0; k < dPoints.size(); k++)
@@ -716,18 +717,21 @@ void ImageViewer::dirAutoLandmarks()
 	QString savefolder = QFileDialog::getExistingDirectory(this);
 
 	vector<string> fileNames = readDirectory(folder.toStdString().c_str());
+	ptr_Point pk;
+	vector<ptr_Point> esLandmarks;
+	ptr_Point ePoint = new Point(0, 0);
+	double angleDiff = 0;
+	LandmarkDetection tr;
+	tr.setRefImage(*matImage);
+
 	for (int i = 0; i < fileNames.size(); i++)
 	{
 		string fileName = folder.toStdString() + "/" + fileNames.at(i);
-		cout<<"\n"<<fileName<<endl;
+		cout << "\n" << fileName << endl;
 		Image sceneimage(fileName);
-		ptr_Point ePoint = new Point(0, 0);
-		double angleDiff = 0;
-		LandmarkDetection tr;
-		tr.setRefImage(*matImage);
 
-		vector<ptr_Point> esLandmarks = tr.landmarksAutoDectect(sceneimage, Degree,
-			500, 400, 500, ePoint, angleDiff);
+		esLandmarks = tr.landmarksAutoDectect(sceneimage, Degree, 500, 400, 500,
+			ePoint, angleDiff);
 		if (savefolder != NULL || savefolder != "")
 		{
 			string saveFile = savefolder.toStdString() + "/" + fileNames.at(i)
@@ -736,7 +740,7 @@ void ImageViewer::dirAutoLandmarks()
 			inFile << "LM=" << esLandmarks.size() << "\n";
 			for (size_t k = 0; k < esLandmarks.size(); k++)
 			{
-				ptr_Point pk = esLandmarks.at(k);
+				pk = esLandmarks.at(k);
 				inFile << pk->getX() << "\t" << pk->getY() << "\n";
 			}
 			inFile << "IMAGE=" << saveFile << "\n";

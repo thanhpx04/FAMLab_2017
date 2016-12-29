@@ -126,29 +126,41 @@ vector<ptr_Point> verifyLandmarks(Image mImage, Image sImage,
 
 	ptr_IntMatrix mMatrix = mImage.getGrayMatrix();
 	ptr_IntMatrix sRotateImg = sImage.rotate(ePoint, angleDiff, 1);
-	int width =mMatrix->getCols();
+	int width = mMatrix->getCols();
 	int height = mMatrix->getRows();
 
 	std::vector<ptr_Point> mcResult;
+	ptr_Point epi;
+	ptr_Point mpi;
+	ptr_Point tLocation = new Point(0, 0);
+	ptr_Point tDistance = new Point(0, 0);
+	ptr_Point iLocation = new Point(0, 0);
+	ptr_Point iDistance = new Point(0, 0);
+	ptr_IntMatrix templ;
+	ptr_IntMatrix sceneM;
+	ptr_Point maxLoc = new Point(0,0);
 	for (size_t i = 0; i < esLandmarks.size(); i++)
 	{
-		ptr_Point epi = esLandmarks.at(i);
-		ptr_Point mpi = manualLM.at(i);
-		if (epi->getX() > 0 && epi->getY() > 0
-			&& epi->getX() < width && epi->getY() < height
-		)
+		epi = esLandmarks.at(i);
+		mpi = manualLM.at(i);
+		if (epi->getX() > 0 && epi->getY() > 0 && epi->getX() < width
+			&& epi->getY() < height)
 		{
-			ptr_Point tLocation = new Point(0, 0);
-			ptr_Point tDistance = new Point(0, 0);
-			ptr_Point iLocation = new Point(0, 0);
-			ptr_Point iDistance = new Point(0, 0);
+			tLocation->setX(0);
+			tLocation->setY(0);
+			tDistance->setX(0);
+			tDistance->setY(0);
+			iLocation->setX(0);
+			iLocation->setY(0);
+			iDistance->setX(0);
+			iDistance->setY(0);
+			maxLoc->setX(0);
+			maxLoc->setY(0);
 
-			ptr_IntMatrix templ = createTemplate(mMatrix, mpi, templSize, tLocation,
-				tDistance);
-			ptr_IntMatrix sceneM = createTemplate(sRotateImg, epi, sceneSize,
-				iLocation, iDistance);
+			templ = createTemplate(mMatrix, mpi, templSize, tLocation, tDistance);
+			sceneM = createTemplate(sRotateImg, epi, sceneSize, iLocation, iDistance);
 
-			ptr_Point maxLoc = matCrossCorrelation(templ, sceneM);
+			maxLoc = matCrossCorrelation(templ, sceneM);
 			//cout << "\n[" << maxLoc->getX() << "," << maxLoc->getY() << "]\t" << "["
 			//	<< iLocation->getX() << ", " << iLocation->getY() << "]\t["
 			//	<< tDistance->getX() << ", " << tDistance->getY() << "]";
@@ -156,22 +168,26 @@ vector<ptr_Point> verifyLandmarks(Image mImage, Image sImage,
 			int lmy = iLocation->getY() + maxLoc->getY() + tDistance->getY();
 			mcResult.push_back(new Point(lmx, lmy));
 
-			delete templ;
-			delete sceneM;
-			delete tLocation;
-			delete tDistance;
-			delete iLocation;
-			delete iDistance;
-			delete maxLoc;
 		}
-		delete epi;
-		delete mpi;
+
 	}
+	// free memory
+	delete templ;
+	delete sceneM;
+	delete tLocation;
+	delete tDistance;
+	delete iLocation;
+	delete iDistance;
+	delete maxLoc;
+	delete epi;
+	delete mpi;
+
+	ptr_Point p;
 	for (size_t k = 0; k < mcResult.size(); k++)
 	{
-		ptr_Point p = mcResult.at(k);
+		p = mcResult.at(k);
 		cout << "\nEstimated landmark : " << p->getX() << "\t" << p->getY();
-		delete p;
+
 	}
 
 	return mcResult;
