@@ -780,7 +780,6 @@ void ImageViewer::dirCentroidMeasure()
 		vector<ptr_Point> mLandmarks = matImage->getListOfManualLandmarks();
 		if (mLandmarks.size() > 0)
 		{
-			cout << "\nHow";
 			ptr_Point ebary = new Point(0, 0);
 			double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 

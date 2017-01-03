@@ -68,19 +68,19 @@ vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 	if (bhatt > 0.9)
 	{
 		cout << "\nBhattacharrya: " << bhatt;
-		//double angleDiff;
-		//ptr_Point ePoint;
 		PHoughTransform mpht;
 		mpht.setRefPoint(new Point(width / 2, height / 2));
 		vector<ptr_PHTEntry> entriesTable = mpht.constructPHTTable(mLines);
-		cout << "\n" << entriesTable.size();
 		vector<ptr_Point> phtEsLM = phtLandmarks(entriesTable, mpht.getRefPoint(),
 			sLines, width, height, manualLMs, angleDiff, ePoint);
 
-		cout << "\nAngle difference: " << angleDiff;
+		cout << "\n Number of landmarks (pht): " << phtEsLM.size();
 		cout << "\nAngle difference 2: " << angleDiff;
-		result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
-			templSize, sceneSize, angleDiff, ePoint);
+		if (phtEsLM.size() > 0)
+		{
+			result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
+				templSize, sceneSize, angleDiff, ePoint);
+		}
 	}
 
 	return result;
