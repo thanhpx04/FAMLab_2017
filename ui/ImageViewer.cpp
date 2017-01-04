@@ -355,6 +355,7 @@ void ImageViewer::displayLandmarks(Image *image, vector<ptr_Point> lms,
 	for (int i = 0; i < lms.size(); i++)
 	{
 		ptr_Point lm = lms.at(i);
+		cout<<"\nManual landmark: "<< lm->getX()<<"\t"<<lm->getY();
 		vector<ptr_Point> dPoints = drawingCircle(lm, 5, color);
 		for (int k = 0; k < dPoints.size(); k++)
 		{
@@ -640,7 +641,6 @@ void ImageViewer::extractLandmarks()
 	for (int i = 0; i < lms.size(); i++)
 	{
 		lm = lms.at(i);
-		cout << "\nCoordinate: " << lm->getX() << "\t" << lm->getY() << endl;
 		vector<ptr_Point> dPoints = drawingCircle(lm, 5, color);
 		for (int k = 0; k < dPoints.size(); k++)
 		{
@@ -656,7 +656,9 @@ void ImageViewer::extractLandmarks()
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 		"Landmarks result");
 	this->show();
-	cout << "\nFinish.\n";
+
+	msgbox.setText("Finish");
+	msgbox.exec();
 }
 void ImageViewer::measureMBary()
 {

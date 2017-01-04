@@ -130,7 +130,7 @@ ptr_RGBMatrix Image::getRGBMatrix()
 vector<ptr_Line> Image::getListOfLines()
 {
 	if (listOfLines.size() <= 0)
-		getApproximateLines(4);
+		getApproximateLines(3.5);
 	return listOfLines;
 }
 float Image::getMedianHistogram()
@@ -153,7 +153,7 @@ float Image::getThresholdValue()
 	return thresholdValue;
 }
 
-vector<ptr_Line> Image::getApproximateLines(int minDistance = 3)
+vector<ptr_Line> Image::getApproximateLines(double minDistance)
 {
 	vector<ptr_Edge> listOfEdges = cannyAlgorithm();
 	vector<ptr_Line> totalLines;
@@ -165,6 +165,7 @@ vector<ptr_Line> Image::getApproximateLines(int minDistance = 3)
 		vector<ptr_Line> lines = ed->getLines(breakPoints);
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
 	}
+	cout << "\n Min distance: " <<minDistance;
 	cout << "\n Total lines after segment the edge: " << totalLines.size();
 	listOfLines = totalLines;
 	return totalLines;
