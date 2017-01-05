@@ -71,6 +71,7 @@ vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 		cout<<"\nasdfsdf";
 		PHoughTransform mpht;
 		mpht.setRefPoint(new Point(width / 2, height / 2));
+
 		vector<ptr_PHTEntry> entriesTable = mpht.constructPHTTable(mLines);
 		vector<ptr_Point> phtEsLM = phtLandmarks(entriesTable, mpht.getRefPoint(),
 			sLines, width, height, manualLMs, angleDiff, ePoint);
@@ -79,9 +80,9 @@ vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 		cout << "\nAngle difference: " << angleDiff <<endl;
 		if (phtEsLM.size() > 0)
 		{
-			//result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
-			//	templSize, sceneSize, angleDiff, ePoint);
-			result = phtEsLM;
+			result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
+				templSize, sceneSize, angleDiff, ePoint);
+			//result = phtEsLM;
 
 		}
 		//entriesTable.clear();

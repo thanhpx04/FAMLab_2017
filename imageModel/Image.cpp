@@ -158,12 +158,12 @@ vector<ptr_Line> Image::getApproximateLines(double minDistance)
 	vector<ptr_Edge> listOfEdges = cannyAlgorithm();
 	vector<ptr_Line> totalLines;
 
-	ptr_Edge ed = new Edge();
+
 	vector<ptr_Point> breakPoints;
 	vector<ptr_Line> lines;
 	for (size_t i = 0; i < listOfEdges.size(); i++)
 	{
-		*ed = *(listOfEdges.at(i));
+		ptr_Edge ed = listOfEdges.at(i);
 		breakPoints = ed->segment(minDistance);
 		lines = ed->getLines(breakPoints);
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
@@ -174,7 +174,7 @@ vector<ptr_Line> Image::getApproximateLines(double minDistance)
 	cout << "\n Min distance: " << minDistance;
 	cout << "\n Total lines after segment the edge: " << totalLines.size();
 	listOfLines = totalLines;
-	listOfEdges.clear();
+
 	return totalLines;
 }
 vector<ptr_Point> Image::readManualLandmarks(string fileName)
@@ -189,7 +189,7 @@ vector<ptr_Point> Image::readManualLandmarks(string fileName)
 		p = new Point(temp->getX(), rows - temp->getY());
 		manualLandmarks.push_back(p);
 	}
-	delete p;
+
 	delete temp;
 	mLandmarks.clear();
 

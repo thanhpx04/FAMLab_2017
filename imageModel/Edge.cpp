@@ -61,16 +61,16 @@ void Edge::setPoints(std::vector<ptr_Point> points)
  */
 bool Edge::checkPointInList(std::vector<ptr_Point> listPoints, ptr_Point point)
 {
-	ptr_Point p = new Point(0,0);
+	ptr_Point p;
 	for (size_t i = 0; i < listPoints.size(); i++)
 	{
-		*p = *(listPoints.at(i));
+		p = listPoints.at(i);
 		if (point->getX() == p->getX() && point->getY() == p->getY())
 		{
 			return true;
 		}
 	}
-	delete p;
+
 	return false;
 }
 
@@ -81,22 +81,22 @@ void Edge::breakEdge(double minDistance)
 { // in old program, minDistance is constant with value is 3
 	if (listOfPoints.size() <= 0)
 		return;
-	ptr_Point p0 = new Point(0,0);
-	ptr_Point pend = new Point(0,0);
+	ptr_Point p0;
+	ptr_Point pend;
 	int size = listOfPoints.size();
 
-	*p0 = *(listOfPoints.at(0));
-	*pend = *(listOfPoints.at(size - 1));
+	p0 = listOfPoints.at(0);
+	pend = listOfPoints.at(size - 1);
 
 	if (size > 2)
 	{
 		ptr_Line line = new Line(p0, pend);
 		double distance = 0, maxDistance = 0;
 		size_t imax = 0;
-		ptr_Point pi = new Point(0,0);
+		ptr_Point pi;
 		for (int i = 1; i < size - 1; i++)
 		{
-			*pi = *(listOfPoints.at(i));
+			pi = listOfPoints.at(i);
 			distance = line->perpendicularDistance(pi);
 			if (distance > maxDistance)
 			{
@@ -104,8 +104,7 @@ void Edge::breakEdge(double minDistance)
 				imax = i;
 			}
 		}
-		delete pi;
-		delete line;
+
 		if (maxDistance > minDistance)
 		{ // continue break the edge
 			std::vector<ptr_Point> part1(listOfPoints.begin(),

@@ -628,12 +628,12 @@ void ImageViewer::extractLandmarks()
 	 cout << endl << fileName2.toStdString() << endl;
 
 	 Image *modelImage = new Image(fileName2.toStdString());*/
-	string modelPath = "/home/linh/Desktop/Temps/md/images/Md 039.JPG";
+	string modelPath = "data/Md039.JPG";
 	Image *modelImage = new Image(modelPath);
 
 	//msgbox.setText("Select the landmark file of model image.");
 	//msgbox.exec();
-	string mlmPath = "/home/linh/Desktop/Temps/md/landmarks/Md 039.TPS";
+	string mlmPath = "data/Md 039.TPS";
 
 	/*QString reflmPath = QFileDialog::getOpenFileName(this);
 	 modelImage->readManualLandmarks(reflmPath.toStdString());*/
@@ -652,7 +652,7 @@ void ImageViewer::extractLandmarks()
 	color.G = 255;
 	color.B = 0;
 
-	ptr_Point lm;
+	/*ptr_Point lm;
 	matImage->rotate(ePoint, angleDiff, 1);
 	for (int i = 0; i < lms.size(); i++)
 	{
@@ -672,7 +672,7 @@ void ImageViewer::extractLandmarks()
 	measureEBaryAct->setEnabled(true);
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 		"Landmarks result");
-	this->show();
+	this->show();*/
 
 	msgbox.setText("Finish");
 	msgbox.exec();
