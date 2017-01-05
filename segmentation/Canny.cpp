@@ -140,6 +140,7 @@ ptr_IntMatrix gxSobelConvolution(ptr_IntMatrix inputMatrix)
 			gxConvol->setAtPosition(i + ksize, j + ksize, sumx);
 		}
 	}
+	xfilter.clear();
 	return gxConvol;
 }
 
@@ -185,6 +186,7 @@ ptr_IntMatrix gySobelConvolution(ptr_IntMatrix inputMatrix)
 			gyConvol->setAtPosition(i + ksize, j + ksize, sumy);
 		}
 	}
+	yfilter.clear();
 	return gyConvol;
 }
 
@@ -216,7 +218,8 @@ ptr_IntMatrix sobelOperation(ptr_IntMatrix gaussianImage)
 
 		}
 	}
-
+	delete dxMatrix;
+	delete dyMatrix;
 	return filteredImg;
 
 }
@@ -316,8 +319,7 @@ ptr_IntMatrix nonMaxSuppression(ptr_IntMatrix sobelImage)
 
 	return nonMaxSupped;
 }
-ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage,
-	ptr_IntMatrix sobelMatrix, int low, int high)
+ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage, int low, int high)
 {
 	int rows = nonMaxImage->getRows();
 	int cols = nonMaxImage->getCols();
@@ -339,7 +341,6 @@ ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage,
 				{
 					//edgeMatrix->setAtPosition(i, j, 0);
 					bool anyHigh = false;
-					bool anyBetween = false;
 					for (int x = i - 1; x < i + 2; x++)
 					{
 						for (int y = j - 1; y < j + 2; y++)
@@ -375,7 +376,7 @@ ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 {
 	ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
-	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, sobelFilter,
+	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress,
 		lowThreshold, highThreshold);
 
 	delete sobelFilter;

@@ -54,6 +54,7 @@ private slots:
 	void measureEBary();
 	void dirAutoLandmarks();
 	void dirCentroidMeasure();
+	void dirGenerateData();
 
 private:
 
@@ -97,6 +98,7 @@ private:
 	QAction *measureEBaryAct;
 	QAction *dirAutoLandmarksAct;
 	QAction *dirCentroidMeasureAct;
+	QAction *dirGenerateDataAct;
 
 	// private methods
 	void createActions();

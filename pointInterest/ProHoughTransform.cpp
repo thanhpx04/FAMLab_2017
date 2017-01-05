@@ -32,6 +32,7 @@ vector<ptr_Point> findLandmarks(ptr_Point refPoint, ptr_Point esPoint,
 {
 	vector<ptr_Point> esLandmarks;
 	positive = 0;
+
 	for (size_t t = 0; t < refLandmarks.size(); t++)
 	{
 		ptr_Point temp = refLandmarks.at(t);
@@ -161,6 +162,10 @@ ptr_Point refPointInScene(ptr_PHTEntry entry, vector<ptr_Line> matchLines,
 	cout << "\n Reference point in scene: " << inter->getX() << ", "
 		<< inter->getY();
 	delete refPoint;
+	delete objl1;
+	delete objl2;
+	delete lineEntry1;
+	delete lineEntry2;
 	return inter;
 }
 bool similarPairLines(ptr_Line ref1, ptr_Line ref2, ptr_Line scene1,
@@ -195,18 +200,18 @@ ptr_PHTEntry findHoughSpace(vector<ptr_PHTEntry> entryTable, ptr_Line line1,
 	ptr_Line line2)
 {
 	ptr_PHTEntry entry = NULL;
-	ptr_Line ref1;
+	ptr_Line ref1 = new Line();
 	ptr_Line ref2;
 	for (size_t i = 0; i < entryTable.size(); i++)
 	{
-		ref1 = entryTable.at(i)->getRefLine();
+		*ref1 = *(entryTable.at(i)->getRefLine());
 		ref2 = entryTable.at(i)->getObjLine();
 		if (similarPairLines(ref1, ref2, line1, line2))
 		{
 			entry = entryTable.at(i);
 		}
 	}
-
+	delete ref1;
 	return entry;
 }
 

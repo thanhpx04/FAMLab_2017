@@ -8,7 +8,6 @@
 
 using namespace std;
 
-
 #include "../imageModel/Point.h"
 #include "../imageModel/Line.h"
 #include "../imageModel/Edge.h"
@@ -905,31 +904,18 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage)
 		}
 
 	}
-
-	ptr_IntMatrix output = new Matrix<int>(inputImage->getRows(),
-		inputImage->getCols(), 0);
 	cout << "\n Size of edges: " << edges.size();
 	vector<ptr_Edge> result;
-
-	//ofstream of("/home/linh/Desktop/compare/suzukiValues.txt");
-	//int countpx = 0;
+	vector<ptr_Point> edgei;
 	for (int i = edges.size() - 1; i >= 0; i--)
 	{
-		vector<ptr_Point> edge = edges.at(i);
-		result.push_back(new Edge(edge));
-		/*countpx += edge.size();
-		 for (int j = 0; j < edge.size(); j++)
-		 {
-		 ptr_Point p = edge.at(j);
-		 output->setAtPosition(p->getY(), p->getX(), 255);
-		 of << p->getY() << "\t" << p->getX() << "\n";
-		 }
-
-		 of << "\n";*/
-
+		edgei = edges.at(i);
+		result.push_back(new Edge(edgei));
 	}
-	//of.close();
-	//cout << "\nTotal pixels after Suzuki: " << countpx;
+	edgei.clear();
+	edge.clear();
+	edges.clear();
+	delete sbinMatrix;
 
 	return result;
 }

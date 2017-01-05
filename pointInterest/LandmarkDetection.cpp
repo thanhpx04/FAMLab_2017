@@ -64,10 +64,11 @@ vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 	sHistogram.constructPGHMatrix(sLocalHist, acc, cols);
 
 	double bhatt = bhattacharyyaMetric(mHistogram, sHistogram);
-
+	cout << "\nBhattacharrya: " << bhatt<<endl;
 	if (bhatt > 0.9)
 	{
-		cout << "\nBhattacharrya: " << bhatt;
+		cout<<"\nModel lines: "<<sLines.size();
+		cout<<"\nasdfsdf";
 		PHoughTransform mpht;
 		mpht.setRefPoint(new Point(width / 2, height / 2));
 		vector<ptr_PHTEntry> entriesTable = mpht.constructPHTTable(mLines);
@@ -75,12 +76,16 @@ vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 			sLines, width, height, manualLMs, angleDiff, ePoint);
 
 		cout << "\n Number of landmarks (pht): " << phtEsLM.size();
-		cout << "\nAngle difference 2: " << angleDiff;
+		cout << "\nAngle difference: " << angleDiff <<endl;
 		if (phtEsLM.size() > 0)
 		{
-			result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
-				templSize, sceneSize, angleDiff, ePoint);
+			//result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
+			//	templSize, sceneSize, angleDiff, ePoint);
+			result = phtEsLM;
+
 		}
+		//entriesTable.clear();
+		//phtEsLM.clear();
 	}
 
 	return result;

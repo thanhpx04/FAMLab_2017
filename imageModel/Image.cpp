@@ -109,7 +109,7 @@ std::string Image::getFileName()
 
 void Image::setMLandmarks(string tpsFile)
 {
-
+	manualLandmarks = readManualLandmarks(tpsFile);
 }
 void Image::setRGBMatrix(ptr_RGBMatrix rgbMatrix)
 {
@@ -158,35 +158,46 @@ vector<ptr_Line> Image::getApproximateLines(double minDistance)
 	vector<ptr_Edge> listOfEdges = cannyAlgorithm();
 	vector<ptr_Line> totalLines;
 
+	ptr_Edge ed = new Edge();
+	vector<ptr_Point> breakPoints;
+	vector<ptr_Line> lines;
 	for (size_t i = 0; i < listOfEdges.size(); i++)
 	{
-		ptr_Edge ed = listOfEdges.at(i);
-		vector<ptr_Point> breakPoints = ed->segment(minDistance);
-		vector<ptr_Line> lines = ed->getLines(breakPoints);
+		*ed = *(listOfEdges.at(i));
+		breakPoints = ed->segment(minDistance);
+		lines = ed->getLines(breakPoints);
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
+
+		breakPoints.clear();
+		lines.clear();
 	}
-	cout << "\n Min distance: " <<minDistance;
+	cout << "\n Min distance: " << minDistance;
 	cout << "\n Total lines after segment the edge: " << totalLines.size();
 	listOfLines = totalLines;
+	listOfEdges.clear();
 	return totalLines;
 }
 vector<ptr_Point> Image::readManualLandmarks(string fileName)
 {
 	vector<ptr_Point> mLandmarks = readTPSFile(fileName.c_str());
-	manualLandmarks = mLandmarks;
-	return mLandmarks;
+	int rows = grayMatrix->getRows();
+	ptr_Point temp = new Point();
+	ptr_Point p;
+	for (size_t t = 0; t < mLandmarks.size(); t++)
+	{
+		*temp = *(mLandmarks.at(t));
+		p = new Point(temp->getX(), rows - temp->getY());
+		manualLandmarks.push_back(p);
+	}
+	delete p;
+	delete temp;
+	mLandmarks.clear();
+
+	return manualLandmarks;
 }
 vector<ptr_Point> Image::getListOfManualLandmarks()
 {
-	vector<ptr_Point> mLandmarks;
-	int rows = grayMatrix->getRows();
-	for (int t = 0; t < manualLandmarks.size(); t++)
-	{
-		ptr_Point temp = manualLandmarks.at(t);
-		ptr_Point p = new Point(temp->getX(), rows - temp->getY());
-		mLandmarks.push_back(p);
-	}
-	return mLandmarks;
+	return manualLandmarks;
 }
 vector<ptr_Point> Image::getListOfAutoLandmarks()
 {
@@ -301,6 +312,9 @@ vector<ptr_Edge> Image::cannyAlgorithm()
 	vector<ptr_Edge> listOfEdges;
 	listOfEdges = suzuki(cannyMatrix);
 
+	delete cannyMatrix;
+	delete binMatrix;
+
 	return listOfEdges;
 }
 
@@ -392,6 +406,12 @@ ptr_IntMatrix Image::rotate(ptr_Point center, double angle, double scale)
 	}
 	imgMatrix = rgbDest;
 	grayMatrix = result;
+
+	delete rotationMatrix;
+	//delete source;
+	//delete rgbSource;
+	//delete rgbDest;
+
 	return result;
 }
 

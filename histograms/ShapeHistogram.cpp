@@ -131,25 +131,31 @@ vector<LocalHistogram> ShapeHistogram::constructPGH(
 {
 	vector<LocalHistogram> result;
 	double mDistance = 0;
+	ptr_Line refLine;
 	for (size_t t = 0; t < listOfLines.size(); t++)
 	{
-		ptr_Line refLine = listOfLines.at(t);
+		refLine = listOfLines.at(t);
 		LocalHistogram lh;
+		ptr_Line objLine = new Line();
+		GFeature pgh;
 		for (size_t i = 0; i < listOfLines.size(); i++)
 		{
 			if (t != i)
 			{
-				ptr_Line objLine = listOfLines.at(i);
-				GFeature pgh = pairwiseHistogram(refLine, objLine);
+				*objLine = *(listOfLines.at(i));
+				pgh = pairwiseHistogram(refLine, objLine);
 				addGFeature(lh, pgh);
 			}
 		}
+		delete objLine;
 		result.push_back(lh);
 		if (lh.maxDistance > mDistance)
 			mDistance = lh.maxDistance;
 	}
 	max_distance = mDistance;
 	listLocalHistogram = result;
+
+	delete refLine;
 
 	return result;
 }

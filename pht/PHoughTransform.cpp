@@ -81,16 +81,24 @@ double computeAngle(ptr_Line objLine, ptr_Point rPoint)
 	ptr_Point pCloset = closestPoint(objLine, rPoint);
 	ptr_Line distanceLine = new Line(rPoint, pCloset);
 	double theta = oX->angleLines(*distanceLine);
+	int angle = theta;
 	if (pCloset->getY() > rPoint->getY())
-		return (360 - theta);
-	return theta;
+	{
+		angle = 360 - theta;
+
+	}
+	//delete distanceLine;
+
+	//delete pCloset;
+
+	return angle;
 }
 
 //==================================== Methods in class ==================================================
 PHoughTransform::PHoughTransform()
 {
 	// TODO Auto-generated constructor stub
-
+	refPoint = new Point();
 }
 
 PHoughTransform::~PHoughTransform()
@@ -100,7 +108,7 @@ PHoughTransform::~PHoughTransform()
 
 void PHoughTransform::setRefPoint(ptr_Point rpoint)
 {
-	refPoint = rpoint;
+	*refPoint = *rpoint;
 }
 ptr_Point PHoughTransform::getRefPoint()
 {
@@ -114,13 +122,16 @@ vector<ptr_PHTEntry> PHoughTransform::getPHTEntries()
 }
 vector<ptr_PHTEntry> PHoughTransform::constructPHTTable(vector<ptr_Line> lines)
 {
+
 	vector<ptr_PHTEntry> entries;
+
 	for (size_t i = 0; i < lines.size(); i++)
 	{
 		ptr_Line line1 = lines.at(i);
 		HoughSpace hs1;
 		hs1.angle = computeAngle(line1, refPoint);
 		hs1.distance = computeDistance(line1, refPoint);
+
 		for (size_t j = 0; j < lines.size(); j++)
 		{
 			ptr_Line line2 = lines.at(j);
@@ -141,7 +152,10 @@ vector<ptr_PHTEntry> PHoughTransform::constructPHTTable(vector<ptr_Line> lines)
 			}
 		}
 	}
+
 	phtEntries = entries;
-	//cout << "\nSize of pht table: " << entries.size() << endl;
+	cout << "\n Loi miet" << refPoint->getX() << "\t" << refPoint->getY();
+	cout << "\n Loi miet 2";
+	cout << "\n Loi miet 3";
 	return entries;
 }

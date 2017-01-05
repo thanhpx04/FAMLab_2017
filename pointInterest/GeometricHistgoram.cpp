@@ -43,6 +43,8 @@ double bhattacharyyaMetric(ShapeHistogram refHist, ShapeHistogram sceneHist)
 			distance += value_1 * value_2;
 		}
 	}
+	delete refMatrix;
+	delete sceneMatrix;
 	return distance;
 }
 
@@ -63,6 +65,8 @@ ShapeHistogram GeometricHistgoram::gmHistogram(Image image,
 	vector<ptr_Line> lines = image.getListOfLines();
 	vector<LocalHistogram> listLocalHists = shapeHist.constructPGH(lines);
 	shapeHist.constructPGHMatrix(listLocalHists, angleAcc, cols);
+
+	lines.clear();
 	return shapeHist;
 }
 ShapeHistogram GeometricHistgoram::geomHistogram(AngleAccuracy angleAcc,
