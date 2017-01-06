@@ -30,6 +30,7 @@ class Point
     void setY(int yCoor) {y = yCoor;}
     RGB getColor();
     void setColor(RGB rgb);
+    void toString();
 };
 
 typedef Point *ptr_Point;

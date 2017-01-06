@@ -61,16 +61,12 @@ void Edge::setPoints(std::vector<ptr_Point> points)
  */
 bool Edge::checkPointInList(std::vector<ptr_Point> listPoints, ptr_Point point)
 {
-	ptr_Point p;
 	for (size_t i = 0; i < listPoints.size(); i++)
 	{
-		p = listPoints.at(i);
+		ptr_Point p = listPoints.at(i);
 		if (point->getX() == p->getX() && point->getY() == p->getY())
-		{
 			return true;
-		}
 	}
-
 	return false;
 }
 
@@ -93,10 +89,9 @@ void Edge::breakEdge(double minDistance)
 		ptr_Line line = new Line(p0, pend);
 		double distance = 0, maxDistance = 0;
 		size_t imax = 0;
-		ptr_Point pi;
 		for (int i = 1; i < size - 1; i++)
 		{
-			pi = listOfPoints.at(i);
+			ptr_Point pi = listOfPoints.at(i);
 			distance = line->perpendicularDistance(pi);
 			if (distance > maxDistance)
 			{
@@ -104,7 +99,6 @@ void Edge::breakEdge(double minDistance)
 				imax = i;
 			}
 		}
-
 		if (maxDistance > minDistance)
 		{ // continue break the edge
 			std::vector<ptr_Point> part1(listOfPoints.begin(),
@@ -115,8 +109,6 @@ void Edge::breakEdge(double minDistance)
 			ptr_Edge edge2 = new Edge(part2);
 			edge1->breakEdge(minDistance);
 			edge2->breakEdge(minDistance);
-			//delete edge1;
-			//delete edge2;
 		}
 	}
 
@@ -124,8 +116,7 @@ void Edge::breakEdge(double minDistance)
 		vvp.push_back(p0);
 	if (!checkPointInList(vvp, pend))
 		vvp.push_back(pend);
-	//delete p0;
-	//delete pend;
+
 }
 
 //=================================================== Public methods ===========================================
@@ -140,19 +131,17 @@ std::vector<ptr_Point> Edge::segment(double minDistance)
 }
 vector<ptr_Line> Edge::getLines(vector<ptr_Point> listPoints) {
 	vector<ptr_Line> listLines;
-	ptr_Point p0;
-	ptr_Point p1;
 
 	if (listPoints.size() > 0) {
-		p0 = listPoints.at(0);
+		ptr_Point p0 = listPoints.at(0);
 		for (size_t i = 1; i < listPoints.size(); i++) {
-			p1 = listPoints.at(i);
+			ptr_Point p1 = listPoints.at(i);
 			ptr_Line l = new Line(p0, p1);
 			listLines.push_back(l);
 			p0 = p1;
 		}
-	}
 
+	}
 	return listLines;
 }
 void Edge::sortByX()

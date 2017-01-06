@@ -16,6 +16,9 @@ public:
 	vector<ptr_Point> landmarksAutoDectect(Image sceneImage, AngleAccuracy acc,
 		int cols, int templSize, int sceneSize, ptr_Point &ePoint,
 		double &angleDiff);
+	void landmarksOnDir(string modelName,string folderScene,
+		vector<string> sceneImages, AngleAccuracy acc, int cols, int templSize,
+		int sceneSize, ptr_Point &ePoint, double &angleDiff,string saveFolder);
 };
 
 #endif /* LANDMARKDETECTION_H_ */

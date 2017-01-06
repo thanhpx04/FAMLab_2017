@@ -906,13 +906,13 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage)
 	}
 	cout << "\n Size of edges: " << edges.size();
 	vector<ptr_Edge> result;
-	vector<ptr_Point> edgei;
+
 	for (int i = edges.size() - 1; i >= 0; i--)
 	{
-		edgei = edges.at(i);
+		vector<ptr_Point> edgei = edges.at(i);
 		result.push_back(new Edge(edgei));
 	}
-	edgei.clear();
+	//edgei.clear();
 	edge.clear();
 	edges.clear();
 	delete sbinMatrix;

@@ -628,12 +628,12 @@ void ImageViewer::extractLandmarks()
 	 cout << endl << fileName2.toStdString() << endl;
 
 	 Image *modelImage = new Image(fileName2.toStdString());*/
-	string modelPath = "data/Md039.JPG";
+	string modelPath = "/home/linh/Desktop/Temps/md/images/Md 293.JPG";
 	Image *modelImage = new Image(modelPath);
 
 	//msgbox.setText("Select the landmark file of model image.");
 	//msgbox.exec();
-	string mlmPath = "data/Md 039.TPS";
+	string mlmPath = "/home/linh/Desktop/Temps/md/landmarks/Md 293.TPS";
 
 	/*QString reflmPath = QFileDialog::getOpenFileName(this);
 	 modelImage->readManualLandmarks(reflmPath.toStdString());*/
@@ -846,16 +846,16 @@ void ImageViewer::dirGenerateData()
 		matImage = new Image(model);
 		matImage->readManualLandmarks(lmFile);
 		tr.setRefImage(*matImage);
-
-		Image* sceneImg;
+		tr.landmarksOnDir(modelName,imageFolder,images,Degree,500,400,500,ePoint,angleDiff,saveFolder);
+		/*//Image* sceneImg;
 		for (size_t k = 0; k < images.size(); k++)
 		{
 			sceneName = images.at(k);
 			cout << "\n" << sceneName << endl;
-			sceneImg = new Image(imageFolder + "/" + sceneName);
+			Image* sceneImg = new Image(imageFolder + "/" + sceneName);
 			esLandmarks = tr.landmarksAutoDectect(*sceneImg, Degree, 500, 400, 500,
 				ePoint, angleDiff);
-			string saveFile = saveFolder + "/" + modelName + "." + sceneName + ".TPS";
+			string saveFile = saveFolder + "/" + sceneName + "_" + modelName + ".TPS";
 
 			ofstream inFile(saveFile.c_str());
 			inFile << "LM=" << esLandmarks.size() << "\n";
@@ -866,53 +866,8 @@ void ImageViewer::dirGenerateData()
 			}
 			inFile << "IMAGE=" << saveFile << "\n";
 			inFile.close();
-		}
+		}*/
 	}
-
-	/*msgbox.setText("Select the model's landmarks file");
-	 msgbox.exec();
-	 QString lpath = QFileDialog::getOpenFileName(this);
-	 matImage->readManualLandmarks(lpath.toStdString());
-
-	 msgbox.setText("Selecte the scene images folder.");
-	 msgbox.exec();
-	 QString folder = QFileDialog::getExistingDirectory(this);
-
-	 msgbox.setText("Selecte the saving folder.");
-	 msgbox.exec();
-	 QString savefolder = QFileDialog::getExistingDirectory(this);
-
-	 vector<string> fileNames = readDirectory(folder.toStdString().c_str());
-	 ptr_Point pk;
-	 vector<ptr_Point> esLandmarks;
-	 ptr_Point ePoint = new Point(0, 0);
-	 double angleDiff = 0;
-	 LandmarkDetection tr;
-	 tr.setRefImage(*matImage);
-
-	 for (int i = 0; i < fileNames.size(); i++)
-	 {
-	 string fileName = folder.toStdString() + "/" + fileNames.at(i);
-	 cout << "\n" << fileName << endl;
-	 Image sceneimage(fileName);
-
-	 esLandmarks = tr.landmarksAutoDectect(sceneimage, Degree, 500, 400, 500,
-	 ePoint, angleDiff);
-	 if (savefolder != NULL || savefolder != "")
-	 {
-	 string saveFile = savefolder.toStdString() + "/" + fileNames.at(i)
-	 + ".TPS";
-	 ofstream inFile(saveFile.c_str());
-	 inFile << "LM=" << esLandmarks.size() << "\n";
-	 for (size_t k = 0; k < esLandmarks.size(); k++)
-	 {
-	 pk = esLandmarks.at(k);
-	 inFile << pk->getX() << "\t" << pk->getY() << "\n";
-	 }
-	 inFile << "IMAGE=" << saveFile << "\n";
-	 inFile.close();
-	 }
-	 }*/
 
 	msgbox.setText("Finish");
 	msgbox.exec();

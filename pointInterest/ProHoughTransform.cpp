@@ -86,14 +86,14 @@ ptr_Point refPointInScene(ptr_PHTEntry entry, vector<ptr_Line> matchLines,
 	int max = 0;
 	vector<ptr_Point> estLM;
 	vector<double> angles;
-	ptr_Point esPoint;
-	vector<ptr_Point> lms;
+	/*ptr_Point esPoint;
+	vector<ptr_Point> lms;*/
 	int positive = 0;
 	for (size_t i = 0; i < intersects1.size(); i++)
 	{
-		esPoint = intersects1.at(i);
+		ptr_Point esPoint = intersects1.at(i);
 		positive = 0;
-		lms = findLandmarks(refPoint, esPoint, refLandmarks, width, height,
+		vector<ptr_Point> lms = findLandmarks(refPoint, esPoint, refLandmarks, width, height,
 			positive);
 		if (positive > max)
 		{
@@ -117,9 +117,9 @@ ptr_Point refPointInScene(ptr_PHTEntry entry, vector<ptr_Line> matchLines,
 		hs2.distance, hs1.distance, width, height);
 	for (size_t i = 0; i < intersects2.size(); i++)
 	{
-		esPoint = intersects2.at(i);
+		ptr_Point esPoint = intersects2.at(i);
 		positive = 0;
-		lms = findLandmarks(refPoint, esPoint, refLandmarks, width, height,
+		vector<ptr_Point> lms = findLandmarks(refPoint, esPoint, refLandmarks, width, height,
 			positive);
 		if (positive > max)
 		{
@@ -200,18 +200,16 @@ ptr_PHTEntry findHoughSpace(vector<ptr_PHTEntry> entryTable, ptr_Line line1,
 	ptr_Line line2)
 {
 	ptr_PHTEntry entry = NULL;
-	ptr_Line ref1 = new Line();
-	ptr_Line ref2;
+
 	for (size_t i = 0; i < entryTable.size(); i++)
 	{
-		*ref1 = *(entryTable.at(i)->getRefLine());
-		ref2 = entryTable.at(i)->getObjLine();
+		ptr_Line ref1 = entryTable.at(i)->getRefLine();
+		ptr_Line ref2 = entryTable.at(i)->getObjLine();
 		if (similarPairLines(ref1, ref2, line1, line2))
 		{
 			entry = entryTable.at(i);
 		}
 	}
-	delete ref1;
 	return entry;
 }
 
@@ -223,14 +221,14 @@ ptr_PHTEntry matchingInScene(vector<ptr_PHTEntry> entryTable,
 		floor(sqrt(width * width + height * height)), 361);
 	int maxValue = 0;
 	ptr_PHTEntry maxEntry = new PHTEntry();
-	ptr_Line objLine1;
-	ptr_Line objLine2;
+	//ptr_Line objLine1;
+	//ptr_Line objLine2;
 	for (size_t i = 0; i < sceneLines.size(); i++)
 	{
-		objLine1 = sceneLines.at(i);
+		ptr_Line objLine1 = sceneLines.at(i);
 		for (size_t j = 0; j < sceneLines.size(); j++)
 		{
-			objLine2 = sceneLines.at(j);
+			ptr_Line objLine2 = sceneLines.at(j);
 			if (i != j && closetLine(objLine2, objLine1))
 			{
 				ptr_PHTEntry entry = findHoughSpace(entryTable, objLine1, objLine2);

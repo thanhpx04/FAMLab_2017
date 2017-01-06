@@ -288,7 +288,5 @@ vector<ptr_Point> Line::interParallel(Line line1, Line line2, double distance1,
 			result.push_back(new Point(x0, y0));
 		}
 	}
-	//equation1.clear();
-	//equation2.clear();
 	return result;
 }

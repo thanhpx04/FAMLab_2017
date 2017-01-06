@@ -64,11 +64,67 @@ vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 	sHistogram.constructPGHMatrix(sLocalHist, acc, cols);
 
 	double bhatt = bhattacharyyaMetric(mHistogram, sHistogram);
-	cout << "\nBhattacharrya: " << bhatt<<endl;
-	if (bhatt > 0.9)
+	cout << "\nBhattacharrya: " << bhatt << endl;
+	//if (bhatt > 0.9)
+	//{
+	PHoughTransform mpht;
+	mpht.setRefPoint(new Point(width / 2, height / 2));
+
+	vector<ptr_PHTEntry> entriesTable = mpht.constructPHTTable(mLines);
+	vector<ptr_Point> phtEsLM = phtLandmarks(entriesTable, mpht.getRefPoint(),
+		sLines, width, height, manualLMs, angleDiff, ePoint);
+
+	cout << "\n Number of landmarks (pht): " << phtEsLM.size();
+	cout << "\nAngle difference: " << angleDiff << endl;
+	if (phtEsLM.size() > 0)
 	{
-		cout<<"\nModel lines: "<<sLines.size();
-		cout<<"\nasdfsdf";
+		result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
+			templSize, sceneSize, angleDiff, ePoint);
+		//result = phtEsLM;
+
+	}
+	entriesTable.clear();
+	phtEsLM.clear();
+	//}
+
+	return result;
+}
+
+void LandmarkDetection::landmarksOnDir(string modelName,string folderScene,
+	vector<string> sceneImages, AngleAccuracy acc, int cols, int templSize,
+	int sceneSize, ptr_Point &ePoint, double &angleDiff,string saveFolder)
+{
+
+	Image modelImage = Treatments::refImage;
+	vector<ptr_Point> manualLMs = modelImage.getListOfManualLandmarks();
+	vector<ptr_Line> mLines = modelImage.getListOfLines();
+	int width = modelImage.getGrayMatrix()->getCols();
+	int height = modelImage.getGrayMatrix()->getRows();
+	ofstream ofl("lineValues1.txt");
+
+		for (size_t k = 0; k < mLines.size(); k++)
+		{
+			ptr_Line line = mLines.at(k);
+			ofl<< line->getBegin()->getX()<<"\t"<<line->getBegin()->getY()<<"\n";
+			ofl<< line->getEnd()->getX()<<"\t"<<line->getEnd()->getY()<<"\n";
+
+		}
+		ofl.close();
+	ShapeHistogram mHistogram;
+	vector<LocalHistogram> mLocalHist = mHistogram.constructPGH(mLines);
+	mHistogram.constructPGHMatrix(mLocalHist, acc, cols);
+
+	for (size_t i = 0; i < sceneImages.size(); i++)
+	{
+		string sceneName = sceneImages.at(i);
+		vector<ptr_Point> result;
+		Image sceneImage(folderScene + "/" + sceneName);
+		vector<ptr_Line> sLines = sceneImage.getListOfLines();
+		ShapeHistogram sHistogram;
+		vector<LocalHistogram> sLocalHist = sHistogram.constructPGH(sLines);
+		sHistogram.constructPGHMatrix(sLocalHist, acc, cols);
+		double bhatt = bhattacharyyaMetric(mHistogram, sHistogram);
+		cout << "\nBhattacharrya: " << bhatt << endl;
 		PHoughTransform mpht;
 		mpht.setRefPoint(new Point(width / 2, height / 2));
 
@@ -77,17 +133,26 @@ vector<ptr_Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 			sLines, width, height, manualLMs, angleDiff, ePoint);
 
 		cout << "\n Number of landmarks (pht): " << phtEsLM.size();
-		cout << "\nAngle difference: " << angleDiff <<endl;
+		cout << "\nAngle difference: " << angleDiff << endl;
 		if (phtEsLM.size() > 0)
 		{
 			result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
 				templSize, sceneSize, angleDiff, ePoint);
-			//result = phtEsLM;
 
 		}
-		//entriesTable.clear();
-		//phtEsLM.clear();
+		entriesTable.clear();
+		phtEsLM.clear();
+
+		string saveFile = saveFolder + "/" + sceneName + "_" + modelName + ".TPS";
+		ofstream inFile(saveFile.c_str());
+		inFile << "LM=" << result.size() << "\n";
+		for (size_t k = 0; k < result.size(); k++)
+		{
+			ptr_Point pk = result.at(k);
+			inFile << pk->getX() << "\t" << pk->getY() << "\n";
+		}
+		inFile << "IMAGE=" << saveFile << "\n";
+		inFile.close();
 	}
 
-	return result;
 }

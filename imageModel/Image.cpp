@@ -158,30 +158,50 @@ vector<ptr_Line> Image::getApproximateLines(double minDistance)
 	vector<ptr_Edge> listOfEdges = cannyAlgorithm();
 	vector<ptr_Line> totalLines;
 
+	ofstream of("edgeValues.txt");
+	for (size_t k = 0; k < listOfEdges.size(); k++)
+	{
+		ptr_Edge ed = listOfEdges.at(k);
+		for (size_t m = 0; m < ed->getPoints().size(); m++)
+		{
+			ptr_Point pm = ed->getPoints().at(m);
+			of << pm->getX() << "\t" << pm->getY() << "\n";
+		}
+	}
+	of.close();
 
-	vector<ptr_Point> breakPoints;
-	vector<ptr_Line> lines;
 	for (size_t i = 0; i < listOfEdges.size(); i++)
 	{
 		ptr_Edge ed = listOfEdges.at(i);
-		breakPoints = ed->segment(minDistance);
-		lines = ed->getLines(breakPoints);
+		vector<ptr_Point> breakPoints = ed->segment(minDistance);
+		vector<ptr_Line> lines = ed->getLines(breakPoints);
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
 
 		breakPoints.clear();
 		lines.clear();
 	}
+
 	cout << "\n Min distance: " << minDistance;
 	cout << "\n Total lines after segment the edge: " << totalLines.size();
 	listOfLines = totalLines;
+	ofstream ofl("lineValues.txt");
 
+	for (size_t k = 0; k < listOfLines.size(); k++)
+	{
+		ptr_Line line = listOfLines.at(k);
+		ofl<< line->getBegin()->getX()<<"\t"<<line->getBegin()->getY()<<"\n";
+		ofl<< line->getEnd()->getX()<<"\t"<<line->getEnd()->getY()<<"\n";
+
+	}
+	ofl.close();
 	return totalLines;
 }
 vector<ptr_Point> Image::readManualLandmarks(string fileName)
 {
 	vector<ptr_Point> mLandmarks = readTPSFile(fileName.c_str());
 	int rows = grayMatrix->getRows();
-	ptr_Point temp = new Point();
+	ptr_Point temp;
+	temp = (Point *) malloc(sizeof(Point));
 	ptr_Point p;
 	for (size_t t = 0; t < mLandmarks.size(); t++)
 	{
@@ -189,8 +209,7 @@ vector<ptr_Point> Image::readManualLandmarks(string fileName)
 		p = new Point(temp->getX(), rows - temp->getY());
 		manualLandmarks.push_back(p);
 	}
-
-	delete temp;
+	free(temp);
 	mLandmarks.clear();
 
 	return manualLandmarks;
@@ -312,8 +331,8 @@ vector<ptr_Edge> Image::cannyAlgorithm()
 	vector<ptr_Edge> listOfEdges;
 	listOfEdges = suzuki(cannyMatrix);
 
-	delete cannyMatrix;
-	delete binMatrix;
+	//delete cannyMatrix;
+	//delete binMatrix;
 
 	return listOfEdges;
 }
@@ -407,7 +426,7 @@ ptr_IntMatrix Image::rotate(ptr_Point center, double angle, double scale)
 	imgMatrix = rgbDest;
 	grayMatrix = result;
 
-	delete rotationMatrix;
+	//delete rotationMatrix;
 	//delete source;
 	//delete rgbSource;
 	//delete rgbDest;
