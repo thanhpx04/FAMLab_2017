@@ -140,7 +140,7 @@ void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
 		entriesTable.clear();
 		phtEsLM.clear();
 
-		string saveFile = saveFolder + "/" + sceneName + "_" + modelName + ".TPS";
+		string saveFile = saveFolder + "/" + modelName + "_" + sceneName + ".TPS";
 		ofstream inFile(saveFile.c_str());
 		inFile << "LM=" << result.size() << "\n";
 		Point pk;
