@@ -31,6 +31,7 @@ double bhattacharyyaMetric(ShapeHistogram refHist, ShapeHistogram sceneHist)
 	double ref_size = refHist.getEntries();
 	double scene_size = sceneHist.getEntries();
 	double distance = 0;
+
 	ptr_IntMatrix refMatrix = refHist.getMatrix();
 	ptr_IntMatrix sceneMatrix = sceneHist.getMatrix();
 
@@ -43,8 +44,7 @@ double bhattacharyyaMetric(ShapeHistogram refHist, ShapeHistogram sceneHist)
 			distance += value_1 * value_2;
 		}
 	}
-	delete refMatrix;
-	delete sceneMatrix;
+
 	return distance;
 }
 
@@ -65,8 +65,6 @@ ShapeHistogram GeometricHistgoram::gmHistogram(Image image,
 	vector<Line> lines = image.getListOfLines();
 	vector<LocalHistogram> listLocalHists = shapeHist.constructPGH(lines);
 	shapeHist.constructPGHMatrix(listLocalHists, angleAcc, cols);
-
-	lines.clear();
 	return shapeHist;
 }
 ShapeHistogram GeometricHistgoram::geomHistogram(AngleAccuracy angleAcc,

@@ -12,7 +12,6 @@
 #include <fstream>
 using namespace std;
 
-
 #include "../imageModel/Point.h"
 #include "../imageModel/Line.h"
 #include "../imageModel/Matrix.h"
@@ -122,17 +121,40 @@ double ShapeHistogram::getEntries()
 {
 	return totalEntries;
 }
+void ShapeHistogram::setEntries(double entries)
+{
+	totalEntries = entries;
+}
 ptr_IntMatrix ShapeHistogram::getMatrix()
 {
 	return matrix;
 }
-vector<LocalHistogram> ShapeHistogram::constructPGH(
-	vector<Line> listOfLines)
+void ShapeHistogram::setMatrix(ptr_IntMatrix pghmatrix)
+{
+	matrix = pghmatrix;
+}
+void ShapeHistogram::setMaxDistance(double maxDist)
+{
+	max_distance = maxDist;
+}
+double ShapeHistogram::getMaxDistance()
+{
+	return max_distance;
+}
+void ShapeHistogram::setLocalHistogram(vector<LocalHistogram> localHist)
+{
+	listLocalHistogram = localHist;
+}
+vector<LocalHistogram> ShapeHistogram::getLocalHistogram()
+{
+	return listLocalHistogram;
+}
+vector<LocalHistogram> ShapeHistogram::constructPGH(vector<Line> listOfLines)
 {
 	vector<LocalHistogram> result;
 	double mDistance = 0;
 
-	Line refLine,objLine;
+	Line refLine, objLine;
 	for (size_t t = 0; t < listOfLines.size(); t++)
 	{
 		refLine = listOfLines.at(t);
@@ -150,9 +172,8 @@ vector<LocalHistogram> ShapeHistogram::constructPGH(
 		if (lh.maxDistance > mDistance)
 			mDistance = lh.maxDistance;
 	}
-	max_distance = mDistance;
-	listLocalHistogram = result;
-
+	setMaxDistance(mDistance);
+	setLocalHistogram(result);
 	return result;
 }
 
@@ -165,6 +186,7 @@ ptr_IntMatrix ShapeHistogram::constructPGHMatrix(
 	int rows = heightOfAngleAxis(angleAcc);
 	double entries = 0;
 	ptr_IntMatrix result = new Matrix<int>(rows, cols, 0);
+
 	for (size_t t = 0; t < localHists.size(); t++)
 	{
 		LocalHistogram lh = localHists.at(t);
@@ -189,8 +211,8 @@ ptr_IntMatrix ShapeHistogram::constructPGHMatrix(
 			}
 		}
 	}
-	totalEntries = entries;
-	matrix = result;
+	setEntries(entries);
+	setMatrix(result);
 	return result;
 }
 

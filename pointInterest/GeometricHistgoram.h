@@ -12,11 +12,11 @@ double bhattacharyyaMetric(ShapeHistogram refHist, ShapeHistogram sceneHist);
 
 class GeometricHistgoram: public Treatments
 {
-private:
-	ShapeHistogram gmHistogram(Image image, AngleAccuracy angleAcc, int cols);
+
 public:
 	GeometricHistgoram();
 	virtual ~GeometricHistgoram();
+	ShapeHistogram gmHistogram(Image image, AngleAccuracy angleAcc, int cols);
 	ShapeHistogram geomHistogram(AngleAccuracy angleAcc, int cols);
 	double bhattacharyyaDistance(Image sceneImage, AngleAccuracy angleAcc,
 		int cols);

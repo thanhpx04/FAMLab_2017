@@ -32,7 +32,7 @@ vector<Point> findLandmarks(Point refPoint, Point esPoint,
 {
 	vector<Point> esLandmarks;
 	positive = 0;
-	Point temp,lm;
+	Point temp, lm;
 	for (size_t t = 0; t < refLandmarks.size(); t++)
 	{
 		temp = refLandmarks.at(t);
@@ -81,19 +81,19 @@ Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 	double angle3 = lineEntry1.angleLines(objl1);
 	double angle4 = lineEntry1.angleLines(objl2);
 
-	vector<Point> intersects1 = objl1.interParallel(objl1, objl2,
-		hs1.distance, hs2.distance, width, height);
+	vector<Point> intersects1 = objl1.interParallel(objl1, objl2, hs1.distance,
+		hs2.distance, width, height);
 	int max = 0;
 	vector<Point> estLM;
 	vector<double> angles;
-	/*ptr_Point esPoint;
-	vector<ptr_Point> lms;*/
+	Point esPoint;
+	vector<Point> lms;
 	int positive = 0;
 	for (size_t i = 0; i < intersects1.size(); i++)
 	{
-		Point esPoint = intersects1.at(i);
+		esPoint = intersects1.at(i);
 		positive = 0;
-		vector<Point> lms = findLandmarks(refPoint, esPoint, refLandmarks, width, height,
+		lms = findLandmarks(refPoint, esPoint, refLandmarks, width, height,
 			positive);
 		if (positive > max)
 		{
@@ -113,13 +113,14 @@ Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 		}
 	}
 
-	vector<Point> intersects2 = objl1.interParallel(objl1, objl2,
-		hs2.distance, hs1.distance, width, height);
+	vector<Point> intersects2 = objl1.interParallel(objl1, objl2, hs2.distance,
+		hs1.distance, width, height);
+
 	for (size_t i = 0; i < intersects2.size(); i++)
 	{
-		Point esPoint = intersects2.at(i);
+		esPoint = intersects2.at(i);
 		positive = 0;
-		vector<Point> lms = findLandmarks(refPoint, esPoint, refLandmarks, width, height,
+		lms = findLandmarks(refPoint, esPoint, refLandmarks, width, height,
 			positive);
 		if (positive > max)
 		{
@@ -139,6 +140,9 @@ Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 		}
 	}
 
+	intersects1.clear();
+	intersects2.clear();
+
 	if (estLM.size() == 1)
 	{
 		inter = estLM.at(0);
@@ -147,9 +151,10 @@ Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 	else
 	{
 		double angleds = 180;
+		Point es;
 		for (size_t i = 0; i < estLM.size(); i++)
 		{
-			Point es = estLM.at(i);
+			es = estLM.at(i);
 			double angle = angles.at(i);
 			if (angle <= angleds)
 			{
@@ -164,8 +169,7 @@ Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 
 	return inter;
 }
-bool similarPairLines(Line ref1, Line ref2, Line scene1,
-	Line scene2)
+bool similarPairLines(Line ref1, Line ref2, Line scene1, Line scene2)
 {
 	int cond1 = 1;
 	int cond2 = 1;
@@ -192,8 +196,7 @@ bool similarPairLines(Line ref1, Line ref2, Line scene1,
 	return false;
 }
 
-PHTEntry findHoughSpace(vector<PHTEntry> entryTable, Line line1,
-	Line line2)
+PHTEntry findHoughSpace(vector<PHTEntry> entryTable, Line line1, Line line2)
 {
 	PHTEntry entry;
 	Line ref1, ref2;
@@ -209,9 +212,8 @@ PHTEntry findHoughSpace(vector<PHTEntry> entryTable, Line line1,
 	return entry;
 }
 
-PHTEntry matchingInScene(vector<PHTEntry> entryTable,
-	vector<Line> sceneLines, int width, int height,
-	vector<Line> &maxVector)
+PHTEntry matchingInScene(vector<PHTEntry> entryTable, vector<Line> sceneLines,
+	int width, int height, vector<Line> &maxVector)
 {
 	ptr_IntMatrix accumulator = new Matrix<int>(
 		floor(sqrt(width * width + height * height)), 361);
@@ -219,6 +221,8 @@ PHTEntry matchingInScene(vector<PHTEntry> entryTable,
 	PHTEntry maxEntry;
 	Line objLine1;
 	Line objLine2;
+	PHTEntry entry;
+	vector<HoughSpace> hspace;
 	for (size_t i = 0; i < sceneLines.size(); i++)
 	{
 		objLine1 = sceneLines.at(i);
@@ -227,14 +231,14 @@ PHTEntry matchingInScene(vector<PHTEntry> entryTable,
 			objLine2 = sceneLines.at(j);
 			if (i != j && closetLine(objLine2, objLine1))
 			{
-				PHTEntry entry = findHoughSpace(entryTable, objLine1, objLine2);
-				vector<HoughSpace> hspace = entry.getListHoughSpace();
+				entry = findHoughSpace(entryTable, objLine1, objLine2);
+				hspace = entry.getListHoughSpace();
 				if (hspace.size() != 0)
 				{
-					//vector<HoughSpace> hspace = entry.getListHoughSpace();
+					HoughSpace hsp;
 					for (size_t k = 0; k < hspace.size(); k++)
 					{
-						HoughSpace hsp = hspace.at(k);
+						hsp = hspace.at(k);
 						int angle = round(hsp.angle);
 						int distance = round(hsp.distance);
 						if (!isnan(angle) && !isnan(distance) && angle >= 0
@@ -272,9 +276,9 @@ PHTEntry matchingInScene(vector<PHTEntry> entryTable,
 	delete accumulator;
 	return maxEntry;
 }
-vector<Point> phtLandmarks(vector<PHTEntry> entriesTable,
-	Point refPoint, vector<Line> sceneLines, int width, int height,
-	vector<Point> mLandmarks, double &angleDiff, Point &ePoint)
+vector<Point> phtLandmarks(vector<PHTEntry> entriesTable, Point refPoint,
+	vector<Line> sceneLines, int width, int height, vector<Point> mLandmarks,
+	double &angleDiff, Point &ePoint)
 {
 	vector<Point> eLandmarks;
 	vector<Line> maxVector;
@@ -308,13 +312,18 @@ ProHoughTransform::~ProHoughTransform()
 }
 PHoughTransform ProHoughTransform::constructPHT()
 {
-	ptr_IntMatrix grayImage = Treatments::refImage.getGrayMatrix();
+	ptr_IntMatrix grayImage;
+	grayImage = (Matrix<int> *) malloc(sizeof(Matrix<int>));
+	*grayImage = *(Treatments::refImage.getGrayMatrix());
+	//grayImage = Treatments::refImage.getGrayMatrix();
 	int width = grayImage->getCols();
 	int height = grayImage->getRows();
 
 	PHoughTransform pht;
 	pht.setRefPoint(Point(width / 2, height / 2));
 	pht.constructPHTTable(Treatments::refImage.getListOfLines());
+
+	delete grayImage;
 	return pht;
 }
 
@@ -326,8 +335,7 @@ vector<Point> ProHoughTransform::estimateLandmarks(Image sImage,
 	int width = mMatrix->getCols();
 	int height = mMatrix->getRows();
 
-	vector<Point> mLandmarks =
-		Treatments::refImage.getListOfManualLandmarks();
+	vector<Point> mLandmarks = Treatments::refImage.getListOfManualLandmarks();
 	vector<Line> mLines = Treatments::refImage.getListOfLines();
 	vector<Line> sLines = sImage.getListOfLines();
 

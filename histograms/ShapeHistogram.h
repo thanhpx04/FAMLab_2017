@@ -50,7 +50,13 @@ public:
 	virtual ~ShapeHistogram();
 
 	double getEntries();
+	void setEntries(double);
 	ptr_IntMatrix getMatrix();
+	void setMatrix(ptr_IntMatrix);
+	void setMaxDistance(double);
+	double getMaxDistance();
+	void setLocalHistogram(vector<LocalHistogram>);
+	vector<LocalHistogram> getLocalHistogram();
 
 	vector<LocalHistogram> constructPGH(vector<Line> listOfLines);
 	ptr_IntMatrix constructPGHMatrix(vector<LocalHistogram> localHists,

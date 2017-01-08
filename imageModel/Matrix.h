@@ -24,9 +24,9 @@ public:
 	Matrix(int nrows, int ncols);
 	// constructor with number of rows, columns and default value
 	Matrix(int nrows, int ncols, T value);
-	Matrix(const Matrix<T>& tMatrix);
+	Matrix(const Matrix<T> &tMatrix);
 
-	Matrix<T>& operator=(const Matrix<T>& tMatrix);
+	void operator=(const Matrix<T> &tMatrix);
 	virtual ~Matrix() {
 	}
 	int getRows() {

@@ -631,12 +631,12 @@ void ImageViewer::extractLandmarks()
 	 cout << endl << fileName2.toStdString() << endl;
 
 	 Image *modelImage = new Image(fileName2.toStdString());*/
-	string modelPath = "/home/linh/Desktop/Morphometrics_Dataset/md/Md 251.JPG";
+	string modelPath = "/home/linh/Desktop/Temps/md/images/Md 251.JPG";
 	Image *modelImage = new Image(modelPath);
 
 	//msgbox.setText("Select the landmark file of model image.");
 	//msgbox.exec();
-	string mlmPath = "/home/linh/Desktop/Morphometrics_Dataset/landmarks/Md/Md 251.TPS";
+	string mlmPath = "/home/linh/Desktop/Temps/md/images/Md 251.TPS";
 
 	/*QString reflmPath = QFileDialog::getOpenFileName(this);
 	 modelImage->readManualLandmarks(reflmPath.toStdString());*/
