@@ -789,10 +789,10 @@ void counterClockWiseCheck(ptr_IntMatrix inputImage, int i, int j, int ci,
 
 }
 
-vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage)
+vector<Edge> suzuki(ptr_IntMatrix inputImage)
 {
-	vector<vector<ptr_Point> > edges;
-	vector<ptr_Point> edge;
+	vector<vector<Point> > edges;
+	vector<Point> edge;
 	int rows = inputImage->getRows();
 	int cols = inputImage->getCols();
 	int nBD = 1;
@@ -838,7 +838,7 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage)
 			if (i1 == -1 && j1 == -1)
 			{
 				sbinMatrix->setAtPosition(i, j, -nBD);
-				edge.push_back(new Point(j, i));
+				edge.push_back(Point(j, i));
 				goto step4;
 			}
 			else
@@ -849,7 +849,7 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage)
 				i3 = i;
 				j3 = j;
 
-				step33: edge.push_back(new Point(j3, i3));
+				step33: edge.push_back(Point(j3, i3));
 				flag = false;
 				counterClockWiseCheck(sbinMatrix, i3, j3, i2, j2, i4, j4, flag);
 
@@ -905,12 +905,12 @@ vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage)
 
 	}
 	cout << "\n Size of edges: " << edges.size();
-	vector<ptr_Edge> result;
+	vector<Edge> result;
 
 	for (int i = edges.size() - 1; i >= 0; i--)
 	{
-		vector<ptr_Point> edgei = edges.at(i);
-		result.push_back(new Edge(edgei));
+		vector<Point> edgei = edges.at(i);
+		result.push_back(Edge(edgei));
 	}
 	//edgei.clear();
 	edge.clear();

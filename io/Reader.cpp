@@ -57,7 +57,7 @@ vector<string> readDirectory(const char* dirPath)
 	return result;
 }
 // ============================================================== TPS File =====================================================
-vector<ptr_Point> readTPSFile(const char* filename)
+vector<Point> readTPSFile(const char* filename)
 {
 	return readTPS(filename);
 }

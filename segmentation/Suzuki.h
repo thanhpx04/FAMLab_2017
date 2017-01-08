@@ -8,6 +8,6 @@
 #ifndef SUZUKI_H_
 #define SUZUKI_H_
 
-vector<ptr_Edge> suzuki(ptr_IntMatrix inputImage);
+vector<Edge> suzuki(ptr_IntMatrix inputImage);
 
 #endif /* SUZUKI_H_ */

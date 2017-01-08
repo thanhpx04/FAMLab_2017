@@ -12,9 +12,9 @@ class Image
 {
 private:
 	std::string fileName;
-	vector<ptr_Line> listOfLines;
-	vector<ptr_Point> manualLandmarks;
-	vector<ptr_Point> autoLandmarks;
+	vector<Line> listOfLines;
+	vector<Point> manualLandmarks;
+	vector<Point> autoLandmarks;
 	ptr_IntMatrix grayMatrix;
 	ptr_RGBMatrix imgMatrix;
 	ptr_IntMatrix grayHistogram;
@@ -33,23 +33,23 @@ public:
 	std::string getFileName();
 	void setMLandmarks(string);
 	void setRGBMatrix(ptr_RGBMatrix);
-	void setAutoLandmarks(vector<ptr_Point>);
+	void setAutoLandmarks(vector<Point>);
 	ptr_IntMatrix getGrayMatrix();
 	ptr_RGBMatrix getRGBMatrix();
 	float getMedianHistogram();
 	float getMeanHistogram();
 	float getThresholdValue();
-	vector<ptr_Line> getListOfLines();
-	vector<ptr_Point> getListOfManualLandmarks();
-	vector<ptr_Point> getListOfAutoLandmarks();
+	vector<Line> getListOfLines();
+	vector<Point> getListOfManualLandmarks();
+	vector<Point> getListOfAutoLandmarks();
 
-	vector<ptr_Edge> cannyAlgorithm();
-	vector<ptr_Line> getApproximateLines(double minDistance);
-	vector<ptr_Point> readManualLandmarks(string fileName);
+	vector<Edge> cannyAlgorithm();
+	vector<Line> getApproximateLines(double minDistance);
+	vector<Point> readManualLandmarks(string fileName);
 
-	ptr_DoubleMatrix getRotationMatrix2D(ptr_Point center, double angle,
+	ptr_DoubleMatrix getRotationMatrix2D(Point center, double angle,
 		double scale);
-	ptr_IntMatrix rotate(ptr_Point center, double angle, double scale);
+	ptr_IntMatrix rotate(Point center, double angle, double scale);
 };
 typedef Image* ptr_Image;
 #endif /* IMAGE_H_ */

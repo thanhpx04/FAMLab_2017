@@ -7,9 +7,9 @@
 
 #ifndef CROSSCORRELATION_H_
 #define CROSSCORRELATION_H_
-vector<ptr_Point> verifyLandmarks(Image mImage, Image sImage,
-	vector<ptr_Point> manualLM, vector<ptr_Point> esLandmarks, int templSize,
-	int sceneSize, double angleDiff, ptr_Point ePoint);
+vector<Point> verifyLandmarks(Image mImage, Image sImage,
+	vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
+	int sceneSize, double angleDiff, Point ePoint);
 
 class CrossCorrelation
 {

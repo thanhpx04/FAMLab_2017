@@ -361,18 +361,19 @@ void ImageViewer::loadImage(Image *_matImage, QImage _qImage, QString tt)
 	statusBar()->showMessage(tr("Finished"), 2000);
 }
 
-void ImageViewer::displayLandmarks(Image *image, vector<ptr_Point> lms,
+void ImageViewer::displayLandmarks(Image *image, vector<Point> lms,
 	RGB color)
 {
+	Point lm,p;
 	for (int i = 0; i < lms.size(); i++)
 	{
-		ptr_Point lm = lms.at(i);
-		cout << "\nManual landmark: " << lm->getX() << "\t" << lm->getY();
-		vector<ptr_Point> dPoints = drawingCircle(lm, 5, color);
+		lm = lms.at(i);
+		cout << "\nManual landmark: " << lm.getX() << "\t" << lm.getY();
+		vector<Point> dPoints = drawingCircle(lm, 5, color);
 		for (int k = 0; k < dPoints.size(); k++)
 		{
-			ptr_Point p = dPoints.at(k);
-			image->getRGBMatrix()->setAtPosition(p->getY(), p->getX(), p->getColor());
+			p = dPoints.at(k);
+			image->getRGBMatrix()->setAtPosition(p.getY(), p.getX(), p.getColor());
 		}
 	}
 
@@ -493,7 +494,7 @@ void ImageViewer::displayManualLandmarks()
 			matImage->readManualLandmarks(reflmPath.toStdString());
 
 		}
-		vector<ptr_Point> mLandmarks = matImage->getListOfManualLandmarks();
+		vector<Point> mLandmarks = matImage->getListOfManualLandmarks();
 		RGB color;
 		color.R = 255;
 		color.G = 0;
@@ -511,7 +512,7 @@ void ImageViewer::displayManualLandmarks()
 
 	if (displayALandmarksAct->isChecked())
 	{
-		vector<ptr_Point> aLM = matImage->getListOfAutoLandmarks();
+		vector<Point> aLM = matImage->getListOfAutoLandmarks();
 		if (aLM.size() > 0)
 		{
 			RGB color;
@@ -530,7 +531,7 @@ void ImageViewer::displayManualLandmarks()
 }
 void ImageViewer::displayAutoLandmarks()
 {
-	vector<ptr_Point> autoLM = matImage->getListOfAutoLandmarks();
+	vector<Point> autoLM = matImage->getListOfAutoLandmarks();
 	QMessageBox message;
 	if (autoLM.size() <= 0)
 	{
@@ -559,7 +560,7 @@ void ImageViewer::displayAutoLandmarks()
 
 		if (displayMLandmarksAct->isChecked())
 		{
-			vector<ptr_Point> mLM = matImage->getListOfManualLandmarks();
+			vector<Point> mLM = matImage->getListOfManualLandmarks();
 			if (mLM.size() > 0)
 			{
 				RGB color;
@@ -594,18 +595,20 @@ void ImageViewer::cannyAlgorithm()
 	cout << "\nCanny Algorithm...\n";
 	Segmentation tr;
 	tr.setRefImage(*matImage);
-	vector<ptr_Edge> edges = tr.canny();
+	vector<Edge> edges = tr.canny();
 
 	RGB color;
 	color.R = 255;
 	color.G = color.B = 0;
+	Edge edgei;
+	Point pi;
 	for (size_t i = 0; i < edges.size(); i++)
 	{
-		ptr_Edge edgei = edges.at(i);
-		for (int k = 0; k < edgei->getPoints().size(); k++)
+		edgei = edges.at(i);
+		for (int k = 0; k < edgei.getPoints().size(); k++)
 		{
-			ptr_Point pi = edgei->getPoints().at(k);
-			matImage->getRGBMatrix()->setAtPosition(pi->getY(), pi->getX(), color);
+			pi = edgei.getPoints().at(k);
+			matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
 		}
 	}
 	ImageViewer *other = new ImageViewer;
@@ -628,12 +631,12 @@ void ImageViewer::extractLandmarks()
 	 cout << endl << fileName2.toStdString() << endl;
 
 	 Image *modelImage = new Image(fileName2.toStdString());*/
-	string modelPath = "/home/linh/Desktop/Temps/md/images/Md 293.JPG";
+	string modelPath = "/home/linh/Desktop/Morphometrics_Dataset/md/Md 251.JPG";
 	Image *modelImage = new Image(modelPath);
 
 	//msgbox.setText("Select the landmark file of model image.");
 	//msgbox.exec();
-	string mlmPath = "/home/linh/Desktop/Temps/md/landmarks/Md 293.TPS";
+	string mlmPath = "/home/linh/Desktop/Morphometrics_Dataset/landmarks/Md/Md 251.TPS";
 
 	/*QString reflmPath = QFileDialog::getOpenFileName(this);
 	 modelImage->readManualLandmarks(reflmPath.toStdString());*/
@@ -642,9 +645,9 @@ void ImageViewer::extractLandmarks()
 	LandmarkDetection tr;
 	tr.setRefImage(*modelImage);
 
-	ptr_Point ePoint;
+	Point ePoint;
 	double angleDiff;
-	vector<ptr_Point> lms = tr.landmarksAutoDectect(*matImage, Degree, 500, 400,
+	vector<Point> lms = tr.landmarksAutoDectect(*matImage, Degree, 500, 400,
 		500, ePoint, angleDiff);
 	cout << "\nNumber of the landmarks: " << lms.size() << endl;
 	RGB color;
@@ -680,15 +683,15 @@ void ImageViewer::extractLandmarks()
 void ImageViewer::measureMBary()
 {
 	QMessageBox qmessage;
-	vector<ptr_Point> mLandmarks = matImage->getListOfManualLandmarks();
+	vector<Point> mLandmarks = matImage->getListOfManualLandmarks();
 	if (mLandmarks.size() > 0)
 	{
-		ptr_Point ebary = new Point(0, 0);
+		Point ebary(0, 0);
 		double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
 		qmessage.setText(
-			"<p>Coordinate of bary point: (" + QString::number(ebary->getX()) + ", "
-				+ QString::number(ebary->getY()) + ")</p>"
+			"<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
+				+ QString::number(ebary.getY()) + ")</p>"
 					"<p>Centroid value: " + QString::number(mCentroid) + "</p");
 	}
 	else
@@ -700,15 +703,15 @@ void ImageViewer::measureMBary()
 void ImageViewer::measureEBary()
 {
 	QMessageBox qmessage;
-	vector<ptr_Point> mLandmarks = matImage->getListOfAutoLandmarks();
+	vector<Point> mLandmarks = matImage->getListOfAutoLandmarks();
 	if (mLandmarks.size() > 0)
 	{
-		ptr_Point ebary = new Point(0, 0);
+		Point ebary(0, 0);
 		double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
 		qmessage.setText(
-			"<p>Coordinate of bary point: (" + QString::number(ebary->getX()) + ", "
-				+ QString::number(ebary->getY()) + ")</p>"
+			"<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
+				+ QString::number(ebary.getY()) + ")</p>"
 					"<p>Centroid value: " + QString::number(mCentroid) + "</p");
 	}
 	else
@@ -736,16 +739,17 @@ void ImageViewer::dirAutoLandmarks()
 	QString savefolder = QFileDialog::getExistingDirectory(this);
 
 	vector<string> fileNames = readDirectory(folder.toStdString().c_str());
-	ptr_Point pk;
-	vector<ptr_Point> esLandmarks;
-	ptr_Point ePoint = new Point(0, 0);
+	Point pk;
+	vector<Point> esLandmarks;
+	Point ePoint(0, 0);
 	double angleDiff = 0;
 	LandmarkDetection tr;
 	tr.setRefImage(*matImage);
 
-	for (int i = 0; i < fileNames.size(); i++)
+	string fileName;
+	for (size_t i = 0; i < fileNames.size(); i++)
 	{
-		string fileName = folder.toStdString() + "/" + fileNames.at(i);
+		fileName = folder.toStdString() + "/" + fileNames.at(i);
 		cout << "\n" << fileName << endl;
 		Image sceneimage(fileName);
 
@@ -760,7 +764,7 @@ void ImageViewer::dirAutoLandmarks()
 			for (size_t k = 0; k < esLandmarks.size(); k++)
 			{
 				pk = esLandmarks.at(k);
-				inFile << pk->getX() << "\t" << pk->getY() << "\n";
+				inFile << pk.getX() << "\t" << pk.getY() << "\n";
 			}
 			inFile << "IMAGE=" << saveFile << "\n";
 			inFile.close();
@@ -792,20 +796,20 @@ void ImageViewer::dirCentroidMeasure()
 		string saveFile = fileName.toStdString();
 		inFile.open(saveFile.c_str(), std::ofstream::out);
 	}
-	for (int i = 0; i < fileNames.size(); i++)
+	for (size_t i = 0; i < fileNames.size(); i++)
 	{
 		string filePath = lmfolder.toStdString() + "/" + fileNames.at(i);
 		matImage->readManualLandmarks(filePath);
-		vector<ptr_Point> mLandmarks = matImage->getListOfManualLandmarks();
+		vector<Point> mLandmarks = matImage->getListOfManualLandmarks();
 		if (mLandmarks.size() > 0)
 		{
-			ptr_Point ebary = new Point(0, 0);
+			Point ebary(0, 0);
 			double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
 			if (fileName != NULL || fileName != "")
 			{
-				inFile << fileNames.at(i) << "\t" << ebary->getX() << "\t"
-					<< ebary->getY() << "\t" << mCentroid << "\n";
+				inFile << fileNames.at(i) << "\t" << ebary.getX() << "\t"
+					<< ebary.getY() << "\t" << mCentroid << "\n";
 
 			}
 		}
@@ -830,9 +834,9 @@ void ImageViewer::dirGenerateData()
 	string sceneName;
 	string lmFile;
 
-	ptr_Point pk;
-	vector<ptr_Point> esLandmarks;
-	ptr_Point ePoint = new Point(0, 0);
+	Point pk;
+	vector<Point> esLandmarks;
+	Point ePoint(0, 0);
 	double angleDiff = 0;
 	LandmarkDetection tr;
 	for (int i = 0; i < 21; i++)
@@ -847,26 +851,6 @@ void ImageViewer::dirGenerateData()
 		matImage->readManualLandmarks(lmFile);
 		tr.setRefImage(*matImage);
 		tr.landmarksOnDir(modelName,imageFolder,images,Degree,500,400,500,ePoint,angleDiff,saveFolder);
-		/*//Image* sceneImg;
-		for (size_t k = 0; k < images.size(); k++)
-		{
-			sceneName = images.at(k);
-			cout << "\n" << sceneName << endl;
-			Image* sceneImg = new Image(imageFolder + "/" + sceneName);
-			esLandmarks = tr.landmarksAutoDectect(*sceneImg, Degree, 500, 400, 500,
-				ePoint, angleDiff);
-			string saveFile = saveFolder + "/" + sceneName + "_" + modelName + ".TPS";
-
-			ofstream inFile(saveFile.c_str());
-			inFile << "LM=" << esLandmarks.size() << "\n";
-			for (size_t k = 0; k < esLandmarks.size(); k++)
-			{
-				pk = esLandmarks.at(k);
-				inFile << pk->getX() << "\t" << pk->getY() << "\n";
-			}
-			inFile << "IMAGE=" << saveFile << "\n";
-			inFile.close();
-		}*/
 	}
 
 	msgbox.setText("Finish");

@@ -52,7 +52,7 @@ public:
 	double getEntries();
 	ptr_IntMatrix getMatrix();
 
-	vector<LocalHistogram> constructPGH(vector<ptr_Line> listOfLines);
+	vector<LocalHistogram> constructPGH(vector<Line> listOfLines);
 	ptr_IntMatrix constructPGHMatrix(vector<LocalHistogram> localHists,
 		AngleAccuracy angleAcc, int cols);
 };

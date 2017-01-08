@@ -13,9 +13,9 @@ class Segmentation: public Treatments
 public:
 	Segmentation();
 	virtual ~Segmentation();
-	vector<ptr_Line> segment(int minDistance);
+	vector<Line> segment(int minDistance);
 	ptr_IntMatrix threshold(int tValue, int maxValue);
-	vector<ptr_Edge> canny();
+	vector<Edge> canny();
 };
 
 #endif /* SEGMENTATION_H_ */

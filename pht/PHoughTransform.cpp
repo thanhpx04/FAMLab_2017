@@ -24,28 +24,28 @@ using namespace std;
 
 #include "PHoughTransform.h"
 
-bool closetLine(ptr_Line line1, ptr_Line line2)
+bool closetLine(Line line1, Line line2)
 {
 	int cond1 = 60;
 	int cond2 = 15;
 	int cond3 = 5;
 
-	double distance1 = line2->perpendicularDistance(line1->getBegin());
-	double distance2 = line2->perpendicularDistance(line1->getEnd());
-	if (line1->getLength() > cond1 && line2->getLength() > cond1
-		&& line1->angleLines(*line2) >= cond2
+	double distance1 = line2.perpendicularDistance(line1.getBegin());
+	double distance2 = line2.perpendicularDistance(line1.getEnd());
+	if (line1.getLength() > cond1 && line2.getLength() > cond1
+		&& line1.angleLines(line2) >= cond2
 		&& (distance1 <= cond3 || distance2 <= cond3))
 		return true;
 	return false;
 }
-double computeDistance(ptr_Line objLine, ptr_Point rPoint)
+double computeDistance(Line objLine, Point rPoint)
 {
-	return objLine->perpendicularDistance(rPoint);
+	return objLine.perpendicularDistance(rPoint);
 }
 
-ptr_Point closestPoint(ptr_Line objLine, ptr_Point origin)
+Point closestPoint(Line objLine, Point origin)
 {
-	vector<double> equation = objLine->getEquation();
+	vector<double> equation = objLine.getEquation();
 	double a = equation.at(0);
 	double b = equation.at(1);
 	double c = equation.at(2);
@@ -53,7 +53,7 @@ ptr_Point closestPoint(ptr_Line objLine, ptr_Point origin)
 
 	if (a == 0 && b == 1)
 	{
-		x = origin->getX();
+		x = origin.getX();
 		y = c;
 	}
 	else
@@ -61,28 +61,28 @@ ptr_Point closestPoint(ptr_Line objLine, ptr_Point origin)
 		if (a == 1 && b == 0)
 		{
 			x = c;
-			y = origin->getY();
+			y = origin.getY();
 		}
 		else
 		{
-			x = (b * (b * origin->getX() - a * origin->getY()) - (a * c))
+			x = (b * (b * origin.getX() - a * origin.getY()) - (a * c))
 				/ (a * a + b * b);
-			y = (a * (-b * origin->getX() + a * origin->getY()) - (b * c))
+			y = (a * (-b * origin.getX() + a * origin.getY()) - (b * c))
 				/ (a * a + b * b);
 		}
 	}
-	return new Point(x, y);
+	return Point(x, y);
 }
 
-double computeAngle(ptr_Line objLine, ptr_Point rPoint)
+double computeAngle(Line objLine, Point rPoint)
 {
-	ptr_Line oX = new Line(rPoint,
-		new Point(rPoint->getX() + 100, rPoint->getY()));
-	ptr_Point pCloset = closestPoint(objLine, rPoint);
-	ptr_Line distanceLine = new Line(rPoint, pCloset);
-	double theta = oX->angleLines(*distanceLine);
+	Line oX(rPoint,
+		Point(rPoint.getX() + 100, rPoint.getY()));
+	Point pCloset = closestPoint(objLine, rPoint);
+	Line distanceLine(rPoint, pCloset);
+	double theta = oX.angleLines(distanceLine);
 
-	if (pCloset->getY() > rPoint->getY())
+	if (pCloset.getY() > rPoint.getY())
 	{
 		return 360 - theta;
 
@@ -102,26 +102,26 @@ PHoughTransform::~PHoughTransform()
 	// TODO Auto-generated destructor stub
 }
 
-void PHoughTransform::setRefPoint(ptr_Point rpoint)
+void PHoughTransform::setRefPoint(Point rpoint)
 {
 	refPoint = rpoint;
 }
-ptr_Point PHoughTransform::getRefPoint()
+Point PHoughTransform::getRefPoint()
 {
 
 	return refPoint;
 }
-vector<ptr_PHTEntry> PHoughTransform::getPHTEntries()
+vector<PHTEntry> PHoughTransform::getPHTEntries()
 {
 	//if (!phtEntries.empty())
 	return phtEntries;
 	//return null;
 }
-vector<ptr_PHTEntry> PHoughTransform::constructPHTTable(vector<ptr_Line> lines)
+vector<PHTEntry> PHoughTransform::constructPHTTable(vector<Line> lines)
 {
 
-	vector<ptr_PHTEntry> entries;
-	ofstream ofl("lineValues2.txt");
+	vector<PHTEntry> entries;
+	/*ofstream ofl("lineValues2.txt");
 
 	for (size_t k = 0; k < lines.size(); k++)
 	{
@@ -130,28 +130,29 @@ vector<ptr_PHTEntry> PHoughTransform::constructPHTTable(vector<ptr_Line> lines)
 		ofl << line->getEnd()->getX() << "\t" << line->getEnd()->getY() << "\n";
 
 	}
-	ofl.close();
+	ofl.close();*/
+	Line line1,line2;
 	for (size_t i = 0; i < lines.size(); i++)
 	{
-		ptr_Line line1 = lines.at(i);
+		line1 = lines.at(i);
 		HoughSpace hs1;
 		hs1.angle = computeAngle(line1, refPoint);
 		hs1.distance = computeDistance(line1, refPoint);
 
 		for (size_t j = 0; j < lines.size(); j++)
 		{
-			ptr_Line line2 = lines.at(j);
+			line2 = lines.at(j);
 			if (i != j && closetLine(line1, line2))
 			{
 				HoughSpace hs2;
 				hs2.angle = computeAngle(line2, refPoint);
 				hs2.distance = computeDistance(line2, refPoint);
 
-				ptr_PHTEntry entry = new PHTEntry();
-				entry->setRefLine(line1);
-				entry->setObjLine(line2);
-				entry->addHoughSpace(hs1);
-				entry->addHoughSpace(hs2);
+				PHTEntry entry;// = new PHTEntry();
+				entry.setRefLine(line1);
+				entry.setObjLine(line2);
+				entry.addHoughSpace(hs1);
+				entry.addHoughSpace(hs2);
 
 				entries.push_back(entry);
 			}

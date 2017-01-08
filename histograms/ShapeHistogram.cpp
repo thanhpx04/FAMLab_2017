@@ -28,13 +28,13 @@ const int m_bin_720 = 5;
 const int m_bin_3600 = 1;
 #include "ShapeHistogram.h"
 
-GFeature pairwiseHistogram(ptr_Line refLine, ptr_Line objLine)
+GFeature pairwiseHistogram(Line refLine, Line objLine)
 {
 	GFeature pgh;
-	pgh.angle = refLine->angleLines(*objLine);
+	pgh.angle = refLine.angleLines(objLine);
 
-	double distance1 = refLine->perpendicularDistance(objLine->getBegin());
-	double distance2 = refLine->perpendicularDistance(objLine->getEnd());
+	double distance1 = refLine.perpendicularDistance(objLine.getBegin());
+	double distance2 = refLine.perpendicularDistance(objLine.getEnd());
 	pgh.dmin = ((distance1 < distance2 ? distance1 : distance2));
 	pgh.dmax = ((distance1 < distance2 ? distance2 : distance1));
 	return pgh;
@@ -127,20 +127,21 @@ ptr_IntMatrix ShapeHistogram::getMatrix()
 	return matrix;
 }
 vector<LocalHistogram> ShapeHistogram::constructPGH(
-	vector<ptr_Line> listOfLines)
+	vector<Line> listOfLines)
 {
 	vector<LocalHistogram> result;
 	double mDistance = 0;
 
+	Line refLine,objLine;
 	for (size_t t = 0; t < listOfLines.size(); t++)
 	{
-		ptr_Line refLine = listOfLines.at(t);
+		refLine = listOfLines.at(t);
 		LocalHistogram lh;
 		for (size_t i = 0; i < listOfLines.size(); i++)
 		{
 			if (t != i)
 			{
-				ptr_Line objLine = listOfLines.at(i);
+				objLine = listOfLines.at(i);
 				GFeature pgh = pairwiseHistogram(refLine, objLine);
 				addGFeature(lh, pgh);
 			}

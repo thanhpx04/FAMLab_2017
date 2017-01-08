@@ -115,7 +115,7 @@ void Image::setRGBMatrix(ptr_RGBMatrix rgbMatrix)
 {
 	imgMatrix = rgbMatrix;
 }
-void Image::setAutoLandmarks(vector<ptr_Point> eLandmarks)
+void Image::setAutoLandmarks(vector<Point> eLandmarks)
 {
 	autoLandmarks = eLandmarks;
 }
@@ -127,7 +127,7 @@ ptr_RGBMatrix Image::getRGBMatrix()
 {
 	return imgMatrix;
 }
-vector<ptr_Line> Image::getListOfLines()
+vector<Line> Image::getListOfLines()
 {
 	if (listOfLines.size() <= 0)
 		getApproximateLines(3.5);
@@ -153,15 +153,16 @@ float Image::getThresholdValue()
 	return thresholdValue;
 }
 
-vector<ptr_Line> Image::getApproximateLines(double minDistance)
+vector<Line> Image::getApproximateLines(double minDistance)
 {
-	vector<ptr_Edge> listOfEdges = cannyAlgorithm();
-	vector<ptr_Line> totalLines;
+	vector<Edge> listOfEdges = cannyAlgorithm();
+	vector<Line> totalLines;
 
-	ofstream of("edgeValues.txt");
+	/*ofstream of("edgeValues.txt");
+	Edge ed;
 	for (size_t k = 0; k < listOfEdges.size(); k++)
 	{
-		ptr_Edge ed = listOfEdges.at(k);
+		ed = listOfEdges.at(k);
 		for (size_t m = 0; m < ed->getPoints().size(); m++)
 		{
 			ptr_Point pm = ed->getPoints().at(m);
@@ -169,12 +170,13 @@ vector<ptr_Line> Image::getApproximateLines(double minDistance)
 		}
 	}
 	of.close();
-
+*/
+	Edge ed;
 	for (size_t i = 0; i < listOfEdges.size(); i++)
 	{
-		ptr_Edge ed = listOfEdges.at(i);
-		vector<ptr_Point> breakPoints = ed->segment(minDistance);
-		vector<ptr_Line> lines = ed->getLines(breakPoints);
+		ed = listOfEdges.at(i);
+		vector<Point> breakPoints = ed.segment(minDistance);
+		vector<Line> lines = ed.getLines(breakPoints);
 		totalLines.insert(totalLines.end(), lines.begin(), lines.end());
 
 		breakPoints.clear();
@@ -184,7 +186,7 @@ vector<ptr_Line> Image::getApproximateLines(double minDistance)
 	cout << "\n Min distance: " << minDistance;
 	cout << "\n Total lines after segment the edge: " << totalLines.size();
 	listOfLines = totalLines;
-	ofstream ofl("lineValues.txt");
+	/*ofstream ofl("lineValues.txt");
 
 	for (size_t k = 0; k < listOfLines.size(); k++)
 	{
@@ -193,32 +195,32 @@ vector<ptr_Line> Image::getApproximateLines(double minDistance)
 		ofl<< line->getEnd()->getX()<<"\t"<<line->getEnd()->getY()<<"\n";
 
 	}
-	ofl.close();
+	ofl.close();*/
 	return totalLines;
 }
-vector<ptr_Point> Image::readManualLandmarks(string fileName)
+vector<Point> Image::readManualLandmarks(string fileName)
 {
-	vector<ptr_Point> mLandmarks = readTPSFile(fileName.c_str());
+	vector<Point> mLandmarks = readTPSFile(fileName.c_str());
 	int rows = grayMatrix->getRows();
-	ptr_Point temp;
-	temp = (Point *) malloc(sizeof(Point));
-	ptr_Point p;
+	Point temp;
+	Point p;
 	for (size_t t = 0; t < mLandmarks.size(); t++)
 	{
-		*temp = *(mLandmarks.at(t));
-		p = new Point(temp->getX(), rows - temp->getY());
+		temp = mLandmarks.at(t);
+		p.setX(temp.getX());
+		p.setY(rows - temp.getY());
 		manualLandmarks.push_back(p);
 	}
-	free(temp);
+
 	mLandmarks.clear();
 
 	return manualLandmarks;
 }
-vector<ptr_Point> Image::getListOfManualLandmarks()
+vector<Point> Image::getListOfManualLandmarks()
 {
 	return manualLandmarks;
 }
-vector<ptr_Point> Image::getListOfAutoLandmarks()
+vector<Point> Image::getListOfAutoLandmarks()
 {
 	return autoLandmarks;
 }
@@ -317,7 +319,7 @@ void Image::calThresholdValue()
 	thresholdValue = (mid1 + mid2) / 2;
 }
 
-vector<ptr_Edge> Image::cannyAlgorithm()
+vector<Edge> Image::cannyAlgorithm()
 {
 	if (thresholdValue == 0)
 		calThresholdValue();
@@ -328,16 +330,16 @@ vector<ptr_Edge> Image::cannyAlgorithm()
 	ptr_IntMatrix cannyMatrix = cannyProcess(binMatrix, (int) thresholdValue,
 		3 * (int) thresholdValue);
 
-	vector<ptr_Edge> listOfEdges;
+	vector<Edge> listOfEdges;
 	listOfEdges = suzuki(cannyMatrix);
 
-	//delete cannyMatrix;
-	//delete binMatrix;
+	delete cannyMatrix;
+	delete binMatrix;
 
 	return listOfEdges;
 }
 
-ptr_DoubleMatrix Image::getRotationMatrix2D(ptr_Point center, double angle,
+ptr_DoubleMatrix Image::getRotationMatrix2D(Point center, double angle,
 	double scale)
 {
 	if (angle > 0)
@@ -351,16 +353,16 @@ ptr_DoubleMatrix Image::getRotationMatrix2D(ptr_Point center, double angle,
 	rotateM->setAtPosition(0, 0, alpha);
 	rotateM->setAtPosition(0, 1, beta);
 	rotateM->setAtPosition(0, 2,
-		(1 - alpha) * center->getX() - beta * center->getY());
+		(1 - alpha) * center.getX() - beta * center.getY());
 	rotateM->setAtPosition(1, 0, -beta);
 	rotateM->setAtPosition(1, 1, alpha);
 	rotateM->setAtPosition(1, 2,
-		beta * center->getX() + (1 - alpha) * center->getY());
+		beta * center.getX() + (1 - alpha) * center.getY());
 
 	return rotateM;
 }
 
-ptr_IntMatrix Image::rotate(ptr_Point center, double angle, double scale)
+ptr_IntMatrix Image::rotate(Point center, double angle, double scale)
 {
 	ptr_DoubleMatrix rotationMatrix = getRotationMatrix2D(center, angle, scale);
 	ptr_IntMatrix source = grayMatrix;

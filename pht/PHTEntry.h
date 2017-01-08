@@ -15,18 +15,18 @@ struct HoughSpace
 class PHTEntry
 {
 private:
-	ptr_Line rLine; // reference line
-	ptr_Line oLine; // object line
+	Line rLine; // reference line
+	Line oLine; // object line
 	vector<HoughSpace> listHoughSpace;
 public:
 	PHTEntry();
 	virtual ~PHTEntry();
 	vector<HoughSpace> getListHoughSpace();
 	void setListHoughSpace(vector<HoughSpace> listHoughSpace);
-	ptr_Line getObjLine();
-	void setObjLine(ptr_Line line);
-	ptr_Line getRefLine();
-	void setRefLine(ptr_Line line);
+	Line getObjLine();
+	void setObjLine(Line line);
+	Line getRefLine();
+	void setRefLine(Line line);
 	void addHoughSpace(HoughSpace hSpace);
 };
 typedef PHTEntry* ptr_PHTEntry;

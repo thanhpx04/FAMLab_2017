@@ -8,6 +8,6 @@
 #ifndef TPSREADER_H_
 #define TPSREADER_H_
 
-std::vector<ptr_Point> readTPS(const char* filename);
+std::vector<Point> readTPS(const char* filename);
 
 #endif /* TPSREADER_H_ */

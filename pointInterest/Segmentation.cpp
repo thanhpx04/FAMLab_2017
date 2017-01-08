@@ -46,11 +46,11 @@ ptr_IntMatrix Segmentation::threshold(int tValue, int maxValue)
 	return binaryThreshold(inputMatrix, tValue, maxValue);
 }
 
-vector<ptr_Edge> Segmentation::canny()
+vector<Edge> Segmentation::canny()
 {
 	return Treatments::refImage.cannyAlgorithm();
 }
-vector<ptr_Line> Segmentation::segment(int minDistance = 3)
+vector<Line> Segmentation::segment(int minDistance)
 {
 	return Treatments::refImage.getApproximateLines(minDistance);
 }

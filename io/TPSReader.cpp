@@ -16,10 +16,10 @@ using namespace std;
 #include "TPSReader.h"
 
 
-std::vector<ptr_Point> readTPS(const char* filename)
+std::vector<Point> readTPS(const char* filename)
 {
 	ifstream openFile(filename);
-	vector<ptr_Point> mLandmarks;
+	vector<Point> mLandmarks;
 	string lineText;
 	if(openFile.is_open())
 	{
@@ -36,7 +36,7 @@ std::vector<ptr_Point> readTPS(const char* filename)
 			int pos = lineText.find(" ");
 			string l1 = lineText.substr(0,pos);
 			string l2 = lineText.substr(pos+1,lineText.length() - pos - 1);
-			mLandmarks.push_back(new Point(atoi(l1.c_str()),atoi(l2.c_str())));
+			mLandmarks.push_back(Point(atoi(l1.c_str()),atoi(l2.c_str())));
 			i++;
 		}
 	}else

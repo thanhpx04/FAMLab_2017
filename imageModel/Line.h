@@ -12,8 +12,8 @@ class Line
 {
 
   private:
-    ptr_Point begin;
-    ptr_Point end;
+    Point begin;
+    Point end;
     int dx; // slope of x
     int dy; // slope of y
     double length;
@@ -26,19 +26,19 @@ class Line
   public:
     Line();
     Line(const Line&);
-    Line(ptr_Point, ptr_Point);
+    Line(Point, Point);
     virtual ~Line();
-    ptr_Point getBegin();
-    ptr_Point getEnd();
+    Point getBegin();
+    Point getEnd();
     double getLength();
     std::vector<double> getEquation();
-    void setBegin(ptr_Point);
-    void setEnd(ptr_Point);
-    double perpendicularDistance(ptr_Point);
+    void setBegin(Point);
+    void setEnd(Point);
+    double perpendicularDistance(Point);
     double angleLines(Line);
-    ptr_Point intersection(Line);
-    bool checkBelongPoint(ptr_Point);
-    vector<ptr_Point> interParallel(Line line1, Line line2, double distance1,
+    Point intersection(Line);
+    bool checkBelongPoint(Point);
+    vector<Point> interParallel(Line line1, Line line2, double distance1,
     	double distance2, int width, int height);
 };
 typedef Line* ptr_Line;

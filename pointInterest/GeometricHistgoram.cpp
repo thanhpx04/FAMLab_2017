@@ -62,7 +62,7 @@ ShapeHistogram GeometricHistgoram::gmHistogram(Image image,
 	AngleAccuracy angleAcc, int cols)
 {
 	ShapeHistogram shapeHist;
-	vector<ptr_Line> lines = image.getListOfLines();
+	vector<Line> lines = image.getListOfLines();
 	vector<LocalHistogram> listLocalHists = shapeHist.constructPGH(lines);
 	shapeHist.constructPGHMatrix(listLocalHists, angleAcc, cols);
 

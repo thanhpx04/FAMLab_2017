@@ -37,22 +37,22 @@ void PHTEntry::setListHoughSpace(vector<HoughSpace> listHoughSpace)
 	this->listHoughSpace = listHoughSpace;
 }
 
-ptr_Line PHTEntry::getObjLine()
+Line PHTEntry::getObjLine()
 {
 	return oLine;
 }
 
-void PHTEntry::setObjLine(ptr_Line line)
+void PHTEntry::setObjLine(Line line)
 {
 	oLine = line;
 }
 
-ptr_Line PHTEntry::getRefLine()
+Line PHTEntry::getRefLine()
 {
 	return rLine;
 }
 
-void PHTEntry::setRefLine(ptr_Line line)
+void PHTEntry::setRefLine(Line line)
 {
 	rLine = line;
 }

@@ -117,7 +117,7 @@ private:
 	void scaleImage(double factor);
 	void adjustScrollBar(QScrollBar *scrollBar, double factor);
 
-	void displayLandmarks(Image *image, std::vector<ptr_Point> lms, RGB color);
+	void displayLandmarks(Image *image, std::vector<Point> lms, RGB color);
 };
 
 #endif /* IMAGEVIEWER_H_ */
