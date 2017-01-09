@@ -105,7 +105,7 @@ int angleOffset(double angle, AngleAccuracy angleAcc) {
 	return bin;
 }
 ShapeHistogram::ShapeHistogram() {
-	matrix = (ptr_IntMatrix) malloc(sizeof(Matrix<int>));
+	//matrix = (ptr_IntMatrix) malloc(sizeof(Matrix<int>));
 }
 ShapeHistogram::~ShapeHistogram() {
 }
@@ -120,7 +120,7 @@ ptr_IntMatrix ShapeHistogram::getMatrix() {
 }
 void ShapeHistogram::setMatrix(ptr_IntMatrix pghmatrix) {
 	//matrix = (Matrix<int> *) malloc(sizeof(Matrix<int>));
-	*matrix = *pghmatrix;
+	matrix = pghmatrix;
 }
 void ShapeHistogram::setMaxDistance(double maxDist) {
 	max_distance = maxDist;
