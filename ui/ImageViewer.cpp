@@ -57,10 +57,9 @@ using namespace std;
 
 #include "ImageViewer.h"
 
-void ImageViewer::createFileMenu()
-{
+void ImageViewer::createFileMenu() {
 	openAct = new QAction(QIcon("./resources/ico/open.png"), tr("&Open..."),
-		this);
+			this);
 	openAct->setShortcuts(QKeySequence::Open);
 	openAct->setStatusTip(tr("Open an existing file"));
 	connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
@@ -88,16 +87,15 @@ void ImageViewer::createFileMenu()
 	connect(exitAct, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
 
 }
-void ImageViewer::createViewMenu()
-{
+void ImageViewer::createViewMenu() {
 	zoomInAct = new QAction(QIcon("./resources/ico/1uparrow.png"),
-		tr("Zoom &In (25%)"), this);
+			tr("Zoom &In (25%)"), this);
 	zoomInAct->setShortcut(tr("Ctrl++"));
 	zoomInAct->setEnabled(false);
 	connect(zoomInAct, SIGNAL(triggered()), this, SLOT(zoomIn()));
 
 	zoomOutAct = new QAction(QIcon("./resources/ico/1downarrow.png"),
-		tr("Zoom &Out (25%)"), this);
+			tr("Zoom &Out (25%)"), this);
 	zoomOutAct->setShortcut(tr("Ctrl+-"));
 	zoomOutAct->setEnabled(false);
 	connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(zoomOut()));
@@ -118,24 +116,23 @@ void ImageViewer::createViewMenu()
 	displayMLandmarksAct->setCheckable(true);
 	displayMLandmarksAct->setChecked(false);
 	connect(displayMLandmarksAct, SIGNAL(triggered()), this,
-		SLOT(displayManualLandmarks()));
+			SLOT(displayManualLandmarks()));
 
-	displayALandmarksAct = new QAction(tr("&Display estimated landmarks"), this);
+	displayALandmarksAct = new QAction(tr("&Display estimated landmarks"),
+			this);
 	displayALandmarksAct->setEnabled(false);
 	displayALandmarksAct->setCheckable(true);
 	connect(displayALandmarksAct, SIGNAL(triggered()), this,
-		SLOT(displayAutoLandmarks()));
+			SLOT(displayAutoLandmarks()));
 
 }
-void ImageViewer::viewMenuUpdateActions()
-{
+void ImageViewer::viewMenuUpdateActions() {
 	zoomInAct->setEnabled(!fitToWindowAct->isChecked());
 	zoomOutAct->setEnabled(!fitToWindowAct->isChecked());
 	normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
 }
 
-void ImageViewer::scaleImage(double factor)
-{
+void ImageViewer::scaleImage(double factor) {
 	Q_ASSERT(imageLabel->pixmap());
 	scaleFactor *= factor;
 	imageLabel->resize(scaleFactor * imageLabel->pixmap()->size());
@@ -146,36 +143,33 @@ void ImageViewer::scaleImage(double factor)
 	zoomInAct->setEnabled(scaleFactor < 3.0);
 	zoomOutAct->setEnabled(scaleFactor > 0.333);
 }
-void ImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
-{
+void ImageViewer::adjustScrollBar(QScrollBar *scrollBar, double factor) {
 	scrollBar->setValue(
-		int(
-			factor * scrollBar->value()
-				+ ((factor - 1) * scrollBar->pageStep() / 2)));
+			int(
+					factor * scrollBar->value()
+							+ ((factor - 1) * scrollBar->pageStep() / 2)));
 }
 
-void ImageViewer::createHelpMenu()
-{
+void ImageViewer::createHelpMenu() {
 	aboutAct = new QAction(tr("&About MAELab"), this);
 	connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 }
-void ImageViewer::createSegmentationMenu()
-{
+void ImageViewer::createSegmentationMenu() {
 	binaryThresholdAct = new QAction(tr("&Binary threshold"), this);
 	binaryThresholdAct->setEnabled(false);
-	connect(binaryThresholdAct, SIGNAL(triggered()), this, SLOT(binThreshold()));
+	connect(binaryThresholdAct, SIGNAL(triggered()), this,
+			SLOT(binThreshold()));
 
 	cannyAct = new QAction(tr("&Canny"), this);
 	cannyAct->setEnabled(false);
 	connect(cannyAct, SIGNAL(triggered()), this, SLOT(cannyAlgorithm()));
 }
-void ImageViewer::createLandmarksMenu()
-{
+void ImageViewer::createLandmarksMenu() {
 	autoLandmarksAct = new QAction(tr("&Compute automatic landmarks"), this);
 	autoLandmarksAct->setEnabled(false);
 	autoLandmarksAct->setShortcut(tr("Ctrl+L"));
 	connect(autoLandmarksAct, SIGNAL(triggered()), this,
-		SLOT(extractLandmarks()));
+			SLOT(extractLandmarks()));
 
 	measureMBaryAct = new QAction(tr("&Measure manual centroid"), this);
 	measureMBaryAct->setEnabled(false);
@@ -185,33 +179,31 @@ void ImageViewer::createLandmarksMenu()
 	measureEBaryAct->setEnabled(false);
 	connect(measureEBaryAct, SIGNAL(triggered()), this, SLOT(measureEBary()));
 
-	dirAutoLandmarksAct = new QAction(tr("Compute automatic landmarks on folder"),
-		this);
+	dirAutoLandmarksAct = new QAction(
+			tr("Compute automatic landmarks on folder"), this);
 	dirAutoLandmarksAct->setEnabled(false);
 	connect(dirAutoLandmarksAct, SIGNAL(triggered()), this,
-		SLOT(dirAutoLandmarks()));
+			SLOT(dirAutoLandmarks()));
 
 	dirCentroidMeasureAct = new QAction(tr("Measure centroid on folder"), this);
 	dirCentroidMeasureAct->setEnabled(false);
 	connect(dirCentroidMeasureAct, SIGNAL(triggered()), this,
-		SLOT(dirCentroidMeasure()));
+			SLOT(dirCentroidMeasure()));
 
 	dirGenerateDataAct = new QAction(tr("Random generated the data"), this);
 	dirGenerateDataAct->setEnabled(false);
 	dirGenerateDataAct->setShortcut(tr("Ctrl+D"));
 	connect(dirGenerateDataAct, SIGNAL(triggered()), this,
-		SLOT(dirGenerateData()));
+			SLOT(dirGenerateData()));
 }
-void ImageViewer::createActions()
-{
+void ImageViewer::createActions() {
 	createFileMenu();
 	createViewMenu();
 	createHelpMenu();
 	createSegmentationMenu();
 	createLandmarksMenu();
 }
-void ImageViewer::createMenus()
-{
+void ImageViewer::createMenus() {
 	fileMenu = new QMenu(tr("&File"), this);
 	fileMenu->addAction(openAct);
 	fileMenu->addAction(saveAct);
@@ -243,7 +235,8 @@ void ImageViewer::createMenus()
 	dominantPointMenu->addAction(measureMBaryAct);
 	dominantPointMenu->addAction(measureEBaryAct);
 	dominantPointMenu->addSeparator();
-	QMenu* menuDirectory = dominantPointMenu->addMenu(tr("Working on directory"));
+	QMenu* menuDirectory = dominantPointMenu->addMenu(
+			tr("Working on directory"));
 	menuDirectory->addAction(dirAutoLandmarksAct);
 	menuDirectory->addAction(dirCentroidMeasureAct);
 	menuDirectory->addAction(dirGenerateDataAct);
@@ -255,8 +248,7 @@ void ImageViewer::createMenus()
 	menuBar()->addMenu(dominantPointMenu);
 	menuBar()->addMenu(helpMenu);
 }
-void ImageViewer::createToolBars()
-{
+void ImageViewer::createToolBars() {
 	fileToolBar = addToolBar(tr("File"));
 	fileToolBar->addAction(openAct);
 	fileToolBar->addAction(saveAct);
@@ -265,12 +257,10 @@ void ImageViewer::createToolBars()
 	viewToolBar->addAction(zoomInAct);
 	viewToolBar->addAction(zoomOutAct);
 }
-void ImageViewer::createStatusBar()
-{
+void ImageViewer::createStatusBar() {
 	statusBar()->showMessage(tr("Ready"));
 }
-void ImageViewer::activeFunction()
-{
+void ImageViewer::activeFunction() {
 	openAct->setEnabled(true);
 	saveAct->setEnabled(true);
 	saveAsAct->setEnabled(true);
@@ -295,15 +285,12 @@ void ImageViewer::activeFunction()
 	dirCentroidMeasureAct->setEnabled(true);
 	dirGenerateDataAct->setEnabled(true);
 
-
-
 	viewMenuUpdateActions();
 	if (!fitToWindowAct->isChecked())
 		imageLabel->adjustSize();
 }
 
-ImageViewer::ImageViewer()
-{
+ImageViewer::ImageViewer() {
 	imageLabel = new QLabel;
 	imageLabel->setBackgroundRole(QPalette::Base);
 	imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -327,12 +314,10 @@ ImageViewer::ImageViewer()
 
 }
 
-ImageViewer::~ImageViewer()
-{
+ImageViewer::~ImageViewer() {
 
 }
-void ImageViewer::loadImage(QString fn)
-{
+void ImageViewer::loadImage(QString fn) {
 
 	matImage = new Image(fn.toStdString());
 	qImage.load(fn);
@@ -347,8 +332,7 @@ void ImageViewer::loadImage(QString fn)
 	setWindowTitle(tr("Image Viewer - ") + fileName);
 	statusBar()->showMessage(tr("File loaded"), 2000);
 }
-void ImageViewer::loadImage(Image *_matImage, QImage _qImage, QString tt)
-{
+void ImageViewer::loadImage(Image *_matImage, QImage _qImage, QString tt) {
 	matImage = _matImage;
 	qImage = _qImage;
 	imageLabel->setPixmap(QPixmap::fromImage(qImage));
@@ -361,63 +345,51 @@ void ImageViewer::loadImage(Image *_matImage, QImage _qImage, QString tt)
 	statusBar()->showMessage(tr("Finished"), 2000);
 }
 
-void ImageViewer::displayLandmarks(Image *image, vector<Point> lms,
-	RGB color)
-{
-	Point lm,p;
-	for (int i = 0; i < lms.size(); i++)
-	{
+void ImageViewer::displayLandmarks(Image *image, vector<Point> lms, RGB color) {
+	Point lm, p;
+	for (size_t i = 0; i < lms.size(); i++) {
 		lm = lms.at(i);
 		cout << "\nManual landmark: " << lm.getX() << "\t" << lm.getY();
 		vector<Point> dPoints = drawingCircle(lm, 5, color);
-		for (int k = 0; k < dPoints.size(); k++)
-		{
+		for (size_t k = 0; k < dPoints.size(); k++) {
 			p = dPoints.at(k);
-			image->getRGBMatrix()->setAtPosition(p.getY(), p.getX(), p.getColor());
+			image->getRGBMatrix()->setAtPosition(p.getY(), p.getX(),
+					p.getColor());
 		}
 	}
 
 }
 // =========================== Slots =======================================
-void ImageViewer::about()
-{
+void ImageViewer::about() {
 	QMessageBox::about(this, tr("About MAELab"),
-		tr(
-			"<p><b>MAELab</b> is a software in Computer Vision. It provides the function to "
-				"segmentation and detection dominant points.</p>"));
+			tr(
+					"<p><b>MAELab</b> is a software in Computer Vision. It provides the function to "
+							"segmentation and detection dominant points.</p>"));
 }
-void ImageViewer::open()
-{
+void ImageViewer::open() {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-		QDir::currentPath());
-	if (!fileName.isEmpty())
-	{
+			QDir::currentPath());
+	if (!fileName.isEmpty()) {
 		QImage image(fileName);
-		if (image.isNull())
-		{
+		if (image.isNull()) {
 			QMessageBox::information(this, tr("MAELab"),
-				tr("Cannot load %1.").arg(fileName));
+					tr("Cannot load %1.").arg(fileName));
 			return;
 		}
-		if (!this->fileName.isEmpty())
-		{
+		if (!this->fileName.isEmpty()) {
 			ImageViewer* other = new ImageViewer;
 			other->loadImage(fileName);
 			other->move(x() + 40, y() + 40);
 			other->show();
-		}
-		else
-		{
+		} else {
 			this->loadImage(fileName);
 		}
 	}
 }
-void ImageViewer::save()
-{
+void ImageViewer::save() {
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save image"), ".",
-		tr("Image Files (*.jpg)"));
-	if (fileName.isEmpty())
-	{
+			tr("Image Files (*.jpg)"));
+	if (fileName.isEmpty()) {
 		cout << "\nCan not save the image !!";
 		return;
 	}
@@ -435,12 +407,10 @@ void ImageViewer::save()
 	statusBar()->showMessage(tr("File saved"), 2000);
 	return;
 }
-void ImageViewer::saveAs()
-{
+void ImageViewer::saveAs() {
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save image"), ".",
-		tr("Image Files (*.jpg)"));
-	if (fileName.isEmpty())
-	{
+			tr("Image Files (*.jpg)"));
+	if (fileName.isEmpty()) {
 		cout << "\nCan not save the image !!";
 		return;
 	}
@@ -453,39 +423,31 @@ void ImageViewer::saveAs()
 	statusBar()->showMessage(tr("File saved"), 2000);
 	return;
 }
-void ImageViewer::zoomIn()
-{
+void ImageViewer::zoomIn() {
 	scaleImage(1.25);
 }
-void ImageViewer::zoomOut()
-{
+void ImageViewer::zoomOut() {
 	scaleImage(0.8);
 }
-void ImageViewer::normalSize()
-{
+void ImageViewer::normalSize() {
 	imageLabel->adjustSize();
 	scaleFactor = 1.0;
 }
-void ImageViewer::fitToWindow()
-{
+void ImageViewer::fitToWindow() {
 
 	bool fitToWindow = fitToWindowAct->isChecked();
 	scrollArea->setWidgetResizable(fitToWindow);
-	if (!fitToWindow)
-	{
+	if (!fitToWindow) {
 		normalSize();
 	}
 	viewMenuUpdateActions();
 }
-void ImageViewer::displayManualLandmarks()
-{
+void ImageViewer::displayManualLandmarks() {
 	cout << "\n Display the manual landmarks.\n";
 
 	bool currentState = displayMLandmarksAct->isChecked();
-	if (currentState)
-	{
-		if (matImage->getListOfManualLandmarks().size() <= 0)
-		{
+	if (currentState) {
+		if (matImage->getListOfManualLandmarks().size() <= 0) {
 			QMessageBox msgbox;
 			msgbox.setText("Select the manual landmarks file.");
 			msgbox.exec();
@@ -502,19 +464,15 @@ void ImageViewer::displayManualLandmarks()
 		displayLandmarks(matImage, mLandmarks, color);
 		displayMLandmarksAct->setChecked(true);
 		measureMBaryAct->setEnabled(true);
-	}
-	else
-	{
+	} else {
 		Image *img = new Image(fileName.toStdString());
 		matImage->setRGBMatrix(img->getRGBMatrix());
 		displayMLandmarksAct->setChecked(false);
 	}
 
-	if (displayALandmarksAct->isChecked())
-	{
+	if (displayALandmarksAct->isChecked()) {
 		vector<Point> aLM = matImage->getListOfAutoLandmarks();
-		if (aLM.size() > 0)
-		{
+		if (aLM.size() > 0) {
 			RGB color;
 			color.R = 255;
 			color.G = 255;
@@ -525,44 +483,35 @@ void ImageViewer::displayManualLandmarks()
 	}
 
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-		"Display manual landmarks.");
+			"Display manual landmarks.");
 	this->show();
 	cout << "\nFinish.\n";
 }
-void ImageViewer::displayAutoLandmarks()
-{
+void ImageViewer::displayAutoLandmarks() {
 	vector<Point> autoLM = matImage->getListOfAutoLandmarks();
 	QMessageBox message;
-	if (autoLM.size() <= 0)
-	{
+	if (autoLM.size() <= 0) {
 		message.setText(
-			"Automatic landmarks do not exists. You need to compute them.");
+				"Automatic landmarks do not exists. You need to compute them.");
 		message.exec();
-	}
-	else
-	{
+	} else {
 		bool currentState = displayALandmarksAct->isChecked();
-		if (currentState)
-		{
+		if (currentState) {
 			RGB color;
 			color.R = 255;
 			color.G = 255;
 			color.B = 0;
 			displayLandmarks(matImage, autoLM, color);
 			displayALandmarksAct->setChecked(true);
-		}
-		else
-		{
+		} else {
 			Image *img = new Image(fileName.toStdString());
 			matImage->setRGBMatrix(img->getRGBMatrix());
 			displayALandmarksAct->setChecked(false);
 		}
 
-		if (displayMLandmarksAct->isChecked())
-		{
+		if (displayMLandmarksAct->isChecked()) {
 			vector<Point> mLM = matImage->getListOfManualLandmarks();
-			if (mLM.size() > 0)
-			{
+			if (mLM.size() > 0) {
 				RGB color;
 				color.R = 255;
 				color.G = 0;
@@ -572,12 +521,11 @@ void ImageViewer::displayAutoLandmarks()
 			}
 		}
 		this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-			"Display estimated landmarks.");
+				"Display estimated landmarks.");
 	}
 
 }
-void ImageViewer::binThreshold()
-{
+void ImageViewer::binThreshold() {
 	cout << "\nBinary thresholding...\n";
 	float tValue = matImage->getThresholdValue();
 	Segmentation tr; // = new Segmentation();
@@ -590,8 +538,7 @@ void ImageViewer::binThreshold()
 	other->show();
 
 }
-void ImageViewer::cannyAlgorithm()
-{
+void ImageViewer::cannyAlgorithm() {
 	cout << "\nCanny Algorithm...\n";
 	Segmentation tr;
 	tr.setRefImage(*matImage);
@@ -602,47 +549,42 @@ void ImageViewer::cannyAlgorithm()
 	color.G = color.B = 0;
 	Edge edgei;
 	Point pi;
-	for (size_t i = 0; i < edges.size(); i++)
-	{
+	int rows = matImage->getGrayMatrix()->getRows();
+	int cols = matImage->getGrayMatrix()->getCols();
+
+	for (size_t i = 0; i < edges.size(); i++) {
 		edgei = edges.at(i);
-		for (int k = 0; k < edgei.getPoints().size(); k++)
-		{
+		for (size_t k = 0; k < edgei.getPoints().size(); k++) {
 			pi = edgei.getPoints().at(k);
-			matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+			if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+					&& pi.getY() < rows) {
+				matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(),
+						color);
+			}
 		}
 	}
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-		"Canny result");
+			"Canny result");
 	other->move(x() - 40, y() - 40);
 	other->show();
 }
-void ImageViewer::extractLandmarks()
-{
+void ImageViewer::extractLandmarks() {
 	cout << "\n Automatic extraction the landmarks.\n";
 	QMessageBox msgbox;
+	msgbox.setText("Select the model image.");
+	msgbox.exec();
 
-	//msgbox.setText("Select the model image.");
-	//msgbox.exec();
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	cout << endl << fileName2.toStdString() << endl;
+	Image *modelImage = new Image(fileName2.toStdString());
 
-	/*QString fileName2 = QFileDialog::getOpenFileName(this);
-	 if (fileName2.isEmpty())
-	 return;
-	 cout << endl << fileName2.toStdString() << endl;
-
-	 Image *modelImage = new Image(fileName2.toStdString());*/
-	string modelPath = "/home/linh/Desktop/Morphometrics_Dataset/md/Md 002.JPG";
-	//string modelPath = "/home/linh/Desktop/Temps/md/images/Md 251.JPG";
-	Image *modelImage = new Image(modelPath);
-
-	//msgbox.setText("Select the landmark file of model image.");
-	//msgbox.exec();
-	string mlmPath = "/home/linh/Desktop/Morphometrics_Dataset/landmarks/Md/Md 002.TPS";
-	//string mlmPath = "/home/linh/Desktop/Temps/md/landmarks/Md 251.TPS";
-
-	/*QString reflmPath = QFileDialog::getOpenFileName(this);
-	 modelImage->readManualLandmarks(reflmPath.toStdString());*/
-	modelImage->readManualLandmarks(mlmPath);
+	msgbox.setText("Select the landmark file of model image.");
+	msgbox.exec();
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+	modelImage->readManualLandmarks(reflmPath.toStdString());
 
 	LandmarkDetection tr;
 	tr.setRefImage(*modelImage);
@@ -650,25 +592,28 @@ void ImageViewer::extractLandmarks()
 	Point ePoint;
 	double angleDiff;
 	vector<Point> lms = tr.landmarksAutoDectect(*matImage, Degree, 500, 400,
-		500, ePoint, angleDiff);
+			500, ePoint, angleDiff);
 	cout << "\nNumber of the landmarks: " << lms.size() << endl;
 	RGB color;
 	color.R = 255;
 	color.G = 255;
 	color.B = 0;
 
-	/*ptr_Point lm;
+	int rows = matImage->getGrayMatrix()->getRows();
+	int cols = matImage->getGrayMatrix()->getCols();
+	Point lm;
 	matImage->rotate(ePoint, angleDiff, 1);
-	for (int i = 0; i < lms.size(); i++)
-	{
+	for (size_t i = 0; i < lms.size(); i++) {
 		lm = lms.at(i);
-		vector<ptr_Point> dPoints = drawingCircle(lm, 5, color);
-		for (int k = 0; k < dPoints.size(); k++)
-		{
-			ptr_Point p = dPoints.at(k);
-			if (p)
-				matImage->getRGBMatrix()->setAtPosition(p->getY(), p->getX(),
-					p->getColor());
+		vector<Point> dPoints = drawingCircle(lm, 5, color);
+		Point p;
+		for (size_t k = 0; k < dPoints.size(); k++) {
+			p = dPoints.at(k);
+			if (p.getX() >= 0 && p.getX() < cols && p.getY() >= 0
+					&& p.getY() < rows) {
+				matImage->getRGBMatrix()->setAtPosition(p.getY(), p.getX(),
+						p.getColor());
+			}
 		}
 	}
 	matImage->setAutoLandmarks(lms);
@@ -676,54 +621,47 @@ void ImageViewer::extractLandmarks()
 	displayALandmarksAct->setChecked(true);
 	measureEBaryAct->setEnabled(true);
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-		"Landmarks result");
-	this->show();*/
+			"Landmarks result");
+	this->show();
 
 	msgbox.setText("Finish");
 	msgbox.exec();
 }
-void ImageViewer::measureMBary()
-{
+void ImageViewer::measureMBary() {
 	QMessageBox qmessage;
 	vector<Point> mLandmarks = matImage->getListOfManualLandmarks();
-	if (mLandmarks.size() > 0)
-	{
+	if (mLandmarks.size() > 0) {
 		Point ebary(0, 0);
 		double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
 		qmessage.setText(
-			"<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
-				+ QString::number(ebary.getY()) + ")</p>"
-					"<p>Centroid value: " + QString::number(mCentroid) + "</p");
-	}
-	else
-	{
+				"<p>Coordinate of bary point: (" + QString::number(ebary.getX())
+						+ ", " + QString::number(ebary.getY()) + ")</p>"
+								"<p>Centroid value: "
+						+ QString::number(mCentroid) + "</p");
+	} else {
 		qmessage.setText("The image has not the manual landmarks.");
 	}
 	qmessage.exec();
 }
-void ImageViewer::measureEBary()
-{
+void ImageViewer::measureEBary() {
 	QMessageBox qmessage;
 	vector<Point> mLandmarks = matImage->getListOfAutoLandmarks();
-	if (mLandmarks.size() > 0)
-	{
+	if (mLandmarks.size() > 0) {
 		Point ebary(0, 0);
 		double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
 		qmessage.setText(
-			"<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
-				+ QString::number(ebary.getY()) + ")</p>"
-					"<p>Centroid value: " + QString::number(mCentroid) + "</p");
-	}
-	else
-	{
+				"<p>Coordinate of bary point: (" + QString::number(ebary.getX())
+						+ ", " + QString::number(ebary.getY()) + ")</p>"
+								"<p>Centroid value: "
+						+ QString::number(mCentroid) + "</p");
+	} else {
 		qmessage.setText("The image has not the automatic landmarks.");
 	}
 	qmessage.exec();
 }
-void ImageViewer::dirAutoLandmarks()
-{
+void ImageViewer::dirAutoLandmarks() {
 	cout << "\n Automatic estimated landmarks on directory." << endl;
 	QMessageBox msgbox;
 
@@ -740,7 +678,7 @@ void ImageViewer::dirAutoLandmarks()
 	msgbox.exec();
 	QString savefolder = QFileDialog::getExistingDirectory(this);
 
-	vector<string> fileNames = readDirectory(folder.toStdString().c_str());
+	vector < string > fileNames = readDirectory(folder.toStdString().c_str());
 	Point pk;
 	vector<Point> esLandmarks;
 	Point ePoint(0, 0);
@@ -749,22 +687,19 @@ void ImageViewer::dirAutoLandmarks()
 	tr.setRefImage(*matImage);
 
 	string fileName;
-	for (size_t i = 0; i < fileNames.size(); i++)
-	{
+	for (size_t i = 0; i < fileNames.size(); i++) {
 		fileName = folder.toStdString() + "/" + fileNames.at(i);
 		cout << "\n" << fileName << endl;
 		Image sceneimage(fileName);
 
 		esLandmarks = tr.landmarksAutoDectect(sceneimage, Degree, 500, 400, 500,
-			ePoint, angleDiff);
-		if (savefolder != NULL || savefolder != "")
-		{
+				ePoint, angleDiff);
+		if (savefolder != NULL || savefolder != "") {
 			string saveFile = savefolder.toStdString() + "/" + fileNames.at(i)
-				+ ".TPS";
+					+ ".TPS";
 			ofstream inFile(saveFile.c_str());
 			inFile << "LM=" << esLandmarks.size() << "\n";
-			for (size_t k = 0; k < esLandmarks.size(); k++)
-			{
+			for (size_t k = 0; k < esLandmarks.size(); k++) {
 				pk = esLandmarks.at(k);
 				inFile << pk.getX() << "\t" << pk.getY() << "\n";
 			}
@@ -777,8 +712,7 @@ void ImageViewer::dirAutoLandmarks()
 	msgbox.exec();
 
 }
-void ImageViewer::dirCentroidMeasure()
-{
+void ImageViewer::dirCentroidMeasure() {
 	cout << "\n Compute centroid on directory." << endl;
 
 	QMessageBox qmessage;
@@ -788,30 +722,26 @@ void ImageViewer::dirCentroidMeasure()
 	QString lmfolder = QFileDialog::getExistingDirectory(this);
 
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), ".",
-		tr("Measure file (*.txt)"));
+			tr("Measure file (*.txt)"));
 
-	vector<string> fileNames = readDirectory(lmfolder.toStdString().c_str());
+	vector < string > fileNames = readDirectory(lmfolder.toStdString().c_str());
 	string saveFile;
 	ofstream inFile;
-	if (fileName != NULL || fileName != "")
-	{
+	if (fileName != NULL || fileName != "") {
 		string saveFile = fileName.toStdString();
 		inFile.open(saveFile.c_str(), std::ofstream::out);
 	}
-	for (size_t i = 0; i < fileNames.size(); i++)
-	{
+	for (size_t i = 0; i < fileNames.size(); i++) {
 		string filePath = lmfolder.toStdString() + "/" + fileNames.at(i);
 		matImage->readManualLandmarks(filePath);
 		vector<Point> mLandmarks = matImage->getListOfManualLandmarks();
-		if (mLandmarks.size() > 0)
-		{
+		if (mLandmarks.size() > 0) {
 			Point ebary(0, 0);
 			double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
-			if (fileName != NULL || fileName != "")
-			{
+			if (fileName != NULL || fileName != "") {
 				inFile << fileNames.at(i) << "\t" << ebary.getX() << "\t"
-					<< ebary.getY() << "\t" << mCentroid << "\n";
+						<< ebary.getY() << "\t" << mCentroid << "\n";
 
 			}
 		}
@@ -821,16 +751,15 @@ void ImageViewer::dirCentroidMeasure()
 	qmessage.setText("Finish.");
 	qmessage.exec();
 }
-void ImageViewer::dirGenerateData()
-{
+void ImageViewer::dirGenerateData() {
 	cout << "\n Automatic generate data on directory." << endl;
 	QMessageBox msgbox;
 
-	string imageFolder = "/home/linh/Desktop/Temps/md/images";
-	string lmFolder = "/home/linh/Desktop/Temps/md/landmarks";
-	string saveFolder = "/home/linh/Desktop/results/2017/md/random";
-	vector<string> images = readDirectory(imageFolder.c_str());
-	vector<string> lms = readDirectory(lmFolder.c_str());
+	string imageFolder = "data/sceneImages";
+	string lmFolder = "data/landmarks";
+	string saveFolder = "data/results";
+	vector < string > images = readDirectory(imageFolder.c_str());
+	vector < string > lms = readDirectory(lmFolder.c_str());
 	int nrandom = 0;
 	string model;
 	string sceneName;
@@ -841,18 +770,18 @@ void ImageViewer::dirGenerateData()
 	Point ePoint(0, 0);
 	double angleDiff = 0;
 	LandmarkDetection tr;
-	for (int i = 0; i < 21; i++)
-	{	// run on 20 images
+	for (int i = 0; i < 21; i++) { // run on 20 images
 		nrandom = random(0, (int) images.size());
 
 		string modelName = images.at(nrandom);
-		cout<<"\n Random and model: "<< nrandom <<"\t"<<modelName<<endl;
+		cout << "\n Random and model: " << nrandom << "\t" << modelName << endl;
 		model = imageFolder + "/" + images.at(nrandom);
 		lmFile = lmFolder + "/" + lms.at(nrandom);
 		matImage = new Image(model);
 		matImage->readManualLandmarks(lmFile);
 		tr.setRefImage(*matImage);
-		tr.landmarksOnDir(modelName,imageFolder,images,Degree,500,400,500,ePoint,angleDiff,saveFolder);
+		tr.landmarksOnDir(modelName, imageFolder, images, Degree, 500, 400, 500,
+				ePoint, angleDiff, saveFolder);
 	}
 
 	msgbox.setText("Finish");
