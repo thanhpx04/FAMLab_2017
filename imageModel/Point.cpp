@@ -17,7 +17,12 @@ Point::Point()
 	y = 0;
 	color.R = color.G = color.B = 0;
 }
-
+Point::Point(const Point &cpPoint)
+{
+	x = cpPoint.x;
+	y = cpPoint.y;
+	color = cpPoint.color;
+}
 Point::~Point()
 {
 	// TODO Auto-generated destructor stub

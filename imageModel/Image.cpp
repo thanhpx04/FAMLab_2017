@@ -76,7 +76,19 @@ Image::Image()
 	meanHistogram = 0;
 	thresholdValue = 0;
 }
-
+Image::Image(const Image &cpimage)
+{
+	fileName = cpimage.fileName;
+	listOfLines = cpimage.listOfLines;
+	manualLandmarks = cpimage.manualLandmarks;
+	autoLandmarks = cpimage.autoLandmarks;
+	imgMatrix = cpimage.imgMatrix;
+	grayMatrix = cpimage.grayMatrix;
+	grayHistogram = cpimage.grayHistogram;
+	medianHistogram = cpimage.medianHistogram;
+	meanHistogram = cpimage.meanHistogram;
+	thresholdValue =  cpimage.thresholdValue;
+}
 Image::~Image()
 {
 	// TODO Auto-generated destructor stub
@@ -173,17 +185,6 @@ vector<Line> Image::getApproximateLines(double minDistance)
 	cout << "\n Min distance: " << minDistance;
 	cout << "\n Total lines after segment the edge: " << totalLines.size();
 	listOfLines = totalLines;
-
-	/*ofstream ofl("lineValues.txt");
-
-	for (size_t k = 0; k < listOfLines.size(); k++)
-	{
-		ptr_Line line = listOfLines.at(k);
-		ofl<< line->getBegin()->getX()<<"\t"<<line->getBegin()->getY()<<"\n";
-		ofl<< line->getEnd()->getX()<<"\t"<<line->getEnd()->getY()<<"\n";
-
-	}
-	ofl.close();*/
 	return totalLines;
 }
 vector<Point> Image::readManualLandmarks(string fileName)

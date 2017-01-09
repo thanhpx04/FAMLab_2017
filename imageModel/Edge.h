@@ -14,9 +14,6 @@ class Edge
 private:
 	std::vector<Point> listOfPoints; // list of points in the edge
 	std::vector<Point> listOfBreakPoints; // list of break points in edge. Break point is connection point between two lines on edge.
-
-
-
 	void breakEdge(double);
 
 public:
@@ -35,6 +32,7 @@ public:
 		}
 	} yComparation;
 	Edge();
+	Edge(const Edge &cpedge);
 	virtual ~Edge();
 	Edge(std::vector<Point>);
 	bool checkPointInList(std::vector<Point>, Point);

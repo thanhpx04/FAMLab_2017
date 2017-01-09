@@ -21,6 +21,7 @@ class Point
     RGB color;
   public:
     Point();
+    Point(const Point &cpPoint);
     Point(int xCoor, int yCoor){x = xCoor; y = yCoor; color.R = color.G = color.B = 0;}
     Point(int xCoor, int yCoor,RGB clor){x = xCoor; y = yCoor; color.R =clor.R; color.G = clor.G; color.B = clor.B;}
     virtual ~Point();

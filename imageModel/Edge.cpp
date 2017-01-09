@@ -29,7 +29,10 @@ Edge::Edge() {
 	//listOfBreakPoints = NULL;
 
 }
-
+Edge::Edge(const Edge &cpedge) {
+	listOfPoints = cpedge.listOfPoints;
+	listOfBreakPoints = cpedge.listOfBreakPoints;
+}
 Edge::~Edge() {
 	// TODO Auto-generated destructor stub
 }

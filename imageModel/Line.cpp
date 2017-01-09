@@ -21,7 +21,7 @@ using namespace std;
 //=================================================== Constructor ===========================================
 Line::Line() {
 }
-Line::Line(const Line& otherLine) {
+Line::Line(const Line &otherLine) {
 	begin = otherLine.begin;
 	end = otherLine.end;
 	dx = otherLine.dx;

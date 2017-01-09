@@ -27,6 +27,7 @@ private:
 
 public:
 	Image();
+	Image(const Image &cpimage);
 	virtual ~Image();
 	Image(std::string);
 	void setFileName(std::string);
