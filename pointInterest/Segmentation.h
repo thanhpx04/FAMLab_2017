@@ -13,7 +13,7 @@ class Segmentation: public Treatments
 public:
 	Segmentation();
 	virtual ~Segmentation();
-	vector<Line> segment(int minDistance);
+	vector<Line> segment();
 	ptr_IntMatrix threshold(int tValue, int maxValue);
 	vector<Edge> canny();
 };

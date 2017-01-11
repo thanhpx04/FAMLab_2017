@@ -41,7 +41,7 @@ vector<Line> segment(ptr_Treatments treatment, Image image, int minDistance)
 	treatment = &sg;
 	treatment->setRefImage(image);
 
-	vector<Line> lines = sg.segment(minDistance);
+	vector<Line> lines = sg.segment();
 	return lines;
 }
 
