@@ -107,12 +107,13 @@ void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
 		string sceneName = sceneImages.at(i);
 		cout << "\n==============================================" << sceneName;
 		vector<Point> result;
+		angleDiff = 0;
 		sceneImage = new Image(folderScene + "/" + sceneName);
 		vector<Line> sLines = sceneImage->getListOfLines();
 
 		sLocalHist = sHistogram.constructPGH(sLines);
 		sHistogram.constructPGHMatrix(sLocalHist, acc, cols);
-		cout << "\nLocal histogram" << endl;
+
 		double bhatt = bhattacharyyaMetric(mHistogram, sHistogram);
 		cout << "\nBhattacharrya: " << bhatt << endl;
 		PHoughTransform mpht;
