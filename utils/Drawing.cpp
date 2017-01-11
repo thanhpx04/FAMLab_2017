@@ -15,8 +15,7 @@ using namespace std;
 #include "Drawing.h"
 
 // draw a line using Breshenham algorithm
-vector<Point> drawingLine(Line line, RGB color)
-{
+vector<Point> drawingLine(Line line, RGB color) {
 	Point begin = line.getBegin();
 	Point end = line.getEnd();
 	begin.setColor(color);
@@ -38,39 +37,27 @@ vector<Point> drawingLine(Line line, RGB color)
 	vector<Point> listOfPoints;
 	listOfPoints.push_back(Point(x, y, color));
 	// vertical line
-	if (begin.getX() == end.getX())
-	{
-		while (y != end.getY())
-		{
+	if (begin.getX() == end.getX()) {
+		while (y != end.getY()) {
 			y += y_unit;
 			listOfPoints.push_back(Point(x, y, color));
 		}
-	}
-	else
-	{ // horizontal line
-		if (begin.getY() == end.getY())
-		{
-			while (x != end.getX())
-			{
+	} else { // horizontal line
+		if (begin.getY() == end.getY()) {
+			while (x != end.getX()) {
 				x += x_unit;
 				listOfPoints.push_back(Point(x, y, color));
 			}
-		}
-		else
-		{
-			if (begin.getX() != end.getX() && begin.getY() != end.getY())
-			{
-				while (x != end.getX())
-				{
-					c2 = 2*c;
-					if(c2 > -dy)
-					{
-						c = c- dy;
-						x +=x_unit;
+		} else {
+			if (begin.getX() != end.getX() && begin.getY() != end.getY()) {
+				while (x != end.getX()) {
+					c2 = 2 * c;
+					if (c2 > -dy) {
+						c = c - dy;
+						x += x_unit;
 					}
-					if(c2 <dx)
-					{
-						c +=dx;
+					if (c2 < dx) {
+						c += dx;
 						y += y_unit;
 					}
 
@@ -82,8 +69,7 @@ vector<Point> drawingLine(Line line, RGB color)
 	return listOfPoints;
 }
 
-vector<Point> put8pixel(Point center, Point p, RGB color)
-{
+vector<Point> put8pixel(Point center, Point p, RGB color) {
 	int xc = center.getX();
 	int yc = center.getY();
 	int x = p.getX();
@@ -99,28 +85,35 @@ vector<Point> put8pixel(Point center, Point p, RGB color)
 	eightPoints.push_back(Point(-y + xc, -x + yc, color));
 	return eightPoints;
 }
-vector<Point> drawingCircle(Point center, int radius, RGB color)
-{
+vector<Point> drawingCircle(Point center, int radius, RGB color) {
 	int x = 0;
 	int y = radius;
 	int f = 1 - radius;
 	vector<Point> result;
 	vector<Point> drawPoints = put8pixel(center, Point(x, y), color);
 	result.insert(result.end(), drawPoints.begin(), drawPoints.end());
-	while (x < y)
-	{
-		if (f < 0)
-		{
+	while (x < y) {
+		if (f < 0) {
 			f += 2 * x + 3;
-		}
-		else
-		{
+		} else {
 			f += 2 * (x - y) + 5;
 			y--;
 		}
 		x++;
 		drawPoints = put8pixel(center, Point(x, y), color);
 		result.insert(result.end(), drawPoints.begin(), drawPoints.end());
+	}
+	return result;
+}
+
+vector<Point> fillCircle(Point center, int radius, RGB color) {
+	vector<Point> result;
+	for (int y = -radius; y <= radius; y++){
+		for (int x = -radius; x <= radius; x++){
+			if (x * x + y * y <= radius * radius){
+				result.push_back(Point(center.getX() + x, center.getY()+y,color));
+			}
+		}
 	}
 	return result;
 }

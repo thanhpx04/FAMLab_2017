@@ -10,5 +10,5 @@
 
 vector<Point> drawingLine(Line line, RGB color);
 vector<Point> drawingCircle(Point center,int radius, RGB color);
-
+vector<Point> fillCircle(Point center, int radius, RGB color) ;
 #endif /* DRAWING_H_ */
