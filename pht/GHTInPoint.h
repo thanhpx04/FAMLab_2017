@@ -24,16 +24,7 @@ struct RTable
 	Point center;
 	vector<REntry> entriesTable;
 };
-struct REntry2
-{
-	int gradient;
-	vector<double> distances;
-};
-struct RTable2
-{
-	Point center;
-	vector<REntry2> entries;
-};
+
 /*class GHTInPoint
 {
 private:
@@ -46,6 +37,5 @@ public:
 };*/
 RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center);
 void houghSpace(ptr_IntMatrix gradMatrix, RTable rentries);
-RTable2 rTableConstruct2(ptr_IntMatrix gradMatrix, Point center);
-void houghSpace2(ptr_IntMatrix gradMatrix, RTable2 rentries);
+void houghSpace2(ptr_IntMatrix gradMatrix, RTable rentries);
 #endif /* GHTINPOINT_H_ */

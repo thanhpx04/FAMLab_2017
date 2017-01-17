@@ -723,16 +723,16 @@ void ImageViewer::gHoughTransform()
 		(int) modelImage->getThresholdValue(),
 		3 * (int) modelImage->getThresholdValue(), mgradirection);
 	Point center(scols / 2, srows / 2);
-	RTable2 rentries = rTableConstruct2(mgradirection, center);
+	RTable rentries = rTableConstruct(mgradirection, center);
 
-	for (size_t i = 0; i < rentries.entries.size(); i++)
+	for (size_t i = 0; i < rentries.entriesTable.size(); i++)
 	{
-		REntry2 entry = rentries.entries.at(i);
+		REntry entry = rentries.entriesTable.at(i);
 		cout << "\n Total Polar entries of " << i << ": \t"
-			<< entry.distances.size();
+			<< entry.polarValues.size();
 	}
 
-	houghSpace2(gradirection, rentries);
+	houghSpace(gradirection, rentries);
 
 	delete mbinMatrix;
 	delete mcannyMatrix;
