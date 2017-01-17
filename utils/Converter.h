@@ -10,4 +10,5 @@
 
 int random(int min,int max);
 string getName(string fullPath,string split);
+int roundToDegree(double value);
 #endif /* CONVERTER_H_ */

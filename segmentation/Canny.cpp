@@ -21,6 +21,7 @@ using namespace std;
 #include "../imageModel/Edge.h"
 #include "../imageModel/Matrix.h"
 #include "../io/Reader.h"
+#include "../utils/Converter.h"
 
 ptr_DoubleMatrix angles;
 const float LIMIT_ANGLE_1 = 22.5;
@@ -370,6 +371,8 @@ ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage, int low, int high)
 	return edgeMatrix;
 }
 
+
+
 // ========================== Process to find the edges in image =============================================
 ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	int highThreshold)
@@ -378,6 +381,42 @@ ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress,
 		lowThreshold, highThreshold);
+	delete sobelFilter;
+	delete nonMaxSuppress;
+
+	return thresholdImage;
+}
+ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
+	int highThreshold, ptr_IntMatrix &gradDirection)
+{
+	ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
+	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
+	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress,
+		lowThreshold, highThreshold);
+
+	// viet them cho GPH tren pixel
+	int rows = binaryImage->getRows();
+	int cols = binaryImage->getCols();
+
+	double angle = 0;
+	int count = 0;
+	for (int r = 0; r < rows; r++) {
+		for (int c = 0; c < cols; c++) {
+			if(thresholdImage->getAtPosition(r,c) == 255)
+			{
+				angle = angles->getAtPosition(r,c);
+
+				if(angle < 0)
+				{
+					angle = 360 + angle;
+				}
+				gradDirection->setAtPosition(r,c,roundToDegree(angle));
+				count++;
+			}
+
+		}
+	}
+	cout<<"\nTotal canny points: "<< count;
 
 	delete sobelFilter;
 	delete nonMaxSuppress;

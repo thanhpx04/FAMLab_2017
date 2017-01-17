@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <cmath>
 using namespace std;
 
 #include "Converter.h"
@@ -25,4 +26,18 @@ string getName(string fullPath,string split)
 	int lIndex = fullPath.find_last_of(split);
 	string temp = fullPath.substr(lIndex+1,len - lIndex-1);
 	return temp.replace(3,1,"_");
+}
+int roundToDegree(double value)
+{
+    int deg = (int)value;
+    value = abs(value - deg);
+    int min = (int)(value * 60);
+    value = value - (double)min / 60;
+    int sec = (int)(value * 3600);
+    value = value - (double)sec / 3600;
+    if(sec >= 30)
+    	min += 1;
+    if(min >= 30)
+    	deg += 1;
+    return deg;
 }

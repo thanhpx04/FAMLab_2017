@@ -51,6 +51,7 @@ private slots:
 	void lineSegmentation();
 
 	void pHoughTransform();
+	void gHoughTransform();
 	void extractLandmarks();
 	void measureMBary();
 	void measureEBary();
@@ -97,6 +98,7 @@ private:
 	QAction *lineSegmentationAct;
 
 	QAction *phtAct;
+	QAction *phtPointsAct;
 	QAction *autoLandmarksAct;
 	QAction *measureMBaryAct;
 	QAction *measureEBaryAct;
