@@ -37,5 +37,4 @@ public:
 };*/
 RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center);
 void houghSpace(ptr_IntMatrix gradMatrix, RTable rentries);
-void houghSpace2(ptr_IntMatrix gradMatrix, RTable rentries);
 #endif /* GHTINPOINT_H_ */
