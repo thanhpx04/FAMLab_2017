@@ -189,6 +189,7 @@ vector<Line> Image::getApproximateLines(double minDistance)
 }
 vector<Point> Image::readManualLandmarks(string fileName)
 {
+	manualLandmarks.clear();
 	vector<Point> mLandmarks = readTPSFile(fileName.c_str());
 	int rows = grayMatrix->getRows();
 	Point temp;
@@ -328,6 +329,7 @@ vector<Edge> Image::cannyAlgorithm()
 	return listOfEdges;
 }
 
+// angle in degree
 ptr_DoubleMatrix Image::getRotationMatrix2D(Point center, double angle,
 	double scale)
 {

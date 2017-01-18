@@ -18,37 +18,20 @@ using namespace std;
 #include "../imageModel/Matrix.h"
 #include "GHTInPoint.h"
 
-/*GHTInPoint::GHTInPoint()
- {
- // TODO Auto-generated constructor stub
-
- }
-
- GHTInPoint::~GHTInPoint()
- {
- // TODO Auto-generated destructor stub
- }*/
 double angleVector(Point p1, Point p2, Point q1, Point q2)
 {
 	Point vp(p2.getX() - p1.getX(), p2.getY() - p1.getY());
 	Point vq(q2.getX() - q1.getX(), q2.getY() - q1.getY());
+
 	double lengthVP = sqrt(
-			(double) (vp.getX() * vp.getX())
-					+ (double) (vp.getY() * vp.getY()));
+		(double) (vp.getX() * vp.getX()) + (double) (vp.getY() * vp.getY()));
 	double lengthVQ = sqrt(
-			(double) (vq.getX() * vq.getX())
-					+ (double) (vq.getY() * vq.getY()));
+		(double) (vq.getX() * vq.getX()) + (double) (vq.getY() * vq.getY()));
 
 	double vpq = (double) (vp.getX() * vq.getX())
-			+ (double) (vp.getY() * vq.getY());
+		+ (double) (vp.getY() * vq.getY());
 
 	return acos(vpq / (lengthVP * lengthVQ));
-	/*double vpq2 = (double) (vp.getX() * vq.getY())
-	 - (double) (vp.getY() * vq.getX());
-	 double result = atan2(vpq2, vpq) * 180 / M_PI;
-	 if (result < 0)
-	 result = 360 + result;
-	 return result;*/
 }
 RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center)
 {
@@ -89,7 +72,7 @@ RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center)
 	return rtable;
 }
 
-void houghSpace(ptr_IntMatrix gradMatrix, RTable rentries)
+Point houghSpace(ptr_IntMatrix gradMatrix, RTable rentries)
 {
 	int rows = gradMatrix->getRows();
 	int cols = gradMatrix->getCols();
@@ -97,7 +80,7 @@ void houghSpace(ptr_IntMatrix gradMatrix, RTable rentries)
 
 	int gradient = 0;
 	REntry entry;
-	int maxValue = 0, maxDIndex = 0, maxAIndex = 0;
+	int maxValue = 0, maxXIndex = 0, maxYIndex = 0;
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
@@ -130,34 +113,73 @@ void houghSpace(ptr_IntMatrix gradMatrix, RTable rentries)
 								accValue += 1;
 								acc->setAtPosition(yindex, xindex, accValue);
 							}
-							//if (aValue > maxValue)
-							// {
-							// maxValue = aValue;
-							// maxDIndex = dindex;
-							// maxAIndex = aindex;
-							// }
+							if (accValue > maxValue && xindex > 0 && xindex < cols
+								&& yindex > 0 && yindex < rows)
+							{
+								maxValue = accValue;
+								maxXIndex = xindex;
+								maxYIndex = yindex;
+							}
 						}
 					}
 				}
 			}
 		}
 	}
-	for (int r = 0; r < rows; r++)
-	{
-		for (int c = 0; c < cols; c++)
-		{
-			if (acc->getAtPosition(r, c) >= maxValue)
-			{
-				maxValue = acc->getAtPosition(r, c);
-				maxDIndex = c;
-				maxAIndex = r;
-				//cout << "\n Index: " << r << "\t" << c;
-			}
-		}
-	}
+	/*for (int r = 0; r < rows; r++)
+	 {
+	 for (int c = 0; c < cols; c++)
+	 {
+	 if (acc->getAtPosition(r, c) >= maxValue)
+	 {
+	 maxValue = acc->getAtPosition(r, c);
+	 maxDIndex = c;
+	 maxAIndex = r;
+	 //cout << "\n Index: " << r << "\t" << c;
+	 }
+	 }
+	 }*/
 	cout << "\n center: ";
 	rentries.center.toString();
 	cout << "\nMax Value:" << maxValue;
-	cout << "\nMax X index:" << maxDIndex;
-	cout << "\nMax Y index:" << maxAIndex << endl;
+	cout << "\nMax X index:" << maxXIndex;
+	cout << "\nMax Y index:" << maxYIndex << endl;
+	return Point(maxXIndex, maxYIndex);
+}
+vector<Point> detectLandmarks(Point refPoint, Point ePoint,
+	vector<Point> mlandmarks, double &angle)
+{
+	int dx = abs(refPoint.getX() - ePoint.getX());
+	int dy = abs(refPoint.getY() - ePoint.getY());
+	//double diffangle = 0;
+	angle = 0;
+	if (dx > dy)
+	{
+		Point c(refPoint.getX() + 10, refPoint.getY());
+		angle = angleVector(refPoint, c, refPoint, ePoint);
+	}
+	else
+	{ // dy > dx
+		Point c(refPoint.getX(), refPoint.getY() - 10);
+		angle = angleVector(refPoint, c, refPoint, ePoint);
+	}
+	angle = angle * 180 / M_PI;
+	if (angle > 90)
+		angle = 180 - angle;
+	cout << "\nAngle difference: " << angle;
+
+	vector<Point> esLandmarks;
+	Point mlm;
+	int deltaX = 0, deltaY = 0, xn = 0, yn = 0;
+	for (size_t i = 0; i < mlandmarks.size(); i++)
+	{
+		mlm = mlandmarks.at(i);
+		deltaX = refPoint.getX() - mlm.getX();
+		deltaY = refPoint.getY() - mlm.getY();
+
+		xn = ePoint.getX() - deltaX;
+		yn = ePoint.getY() - deltaY;
+		esLandmarks.push_back(Point(xn, yn));
+	}
+	return esLandmarks;
 }

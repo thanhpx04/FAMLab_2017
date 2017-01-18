@@ -19,6 +19,8 @@ public:
 	void landmarksOnDir(string modelName,string folderScene,
 		vector<string> sceneImages, AngleAccuracy acc, int cols, int templSize,
 		int sceneSize, Point &ePoint, double &angleDiff,string saveFolder);
+	void landmarksOnDir2(string modelName, string folderScene,
+		vector<string> sceneImages, string saveFolder);
 };
 
 #endif /* LANDMARKDETECTION_H_ */

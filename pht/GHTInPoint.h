@@ -24,17 +24,8 @@ struct RTable
 	Point center;
 	vector<REntry> entriesTable;
 };
-
-/*class GHTInPoint
-{
-private:
-	Point center;
-	vector<REntry> entryTables;
-
-public:
-	GHTInPoint();
-	virtual ~GHTInPoint();
-};*/
 RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center);
-void houghSpace(ptr_IntMatrix gradMatrix, RTable rentries);
+Point houghSpace(ptr_IntMatrix gradMatrix, RTable rentries);
+vector<Point> detectLandmarks(Point refPoint, Point ePoint,
+	vector<Point> mlandmarks,double &angle);
 #endif /* GHTINPOINT_H_ */

@@ -104,9 +104,13 @@ double measureCentroidPoint(vector<Point> landmarks, Point &ebary)
 	for (size_t j = 0; j < lmSize; j++)
 	{
 		lm = landmarks.at(j);
-		Line line(lm, ebary);
-		totalDistance += (line.getLength() * line.getLength());
+		//ptr_Line line = new Line(ebary,lm);
+		double distance = distancePoints(ebary,landmarks.at(j));
+		//cout<<"\nDistance: \t"<<distance;
+		totalDistance += (distance * distance);
+
 	}
+	//cout<<"\n"<<sqrt(totalDistance);
 	return sqrt(totalDistance);
 }
 

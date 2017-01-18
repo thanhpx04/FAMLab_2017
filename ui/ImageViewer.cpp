@@ -725,15 +725,61 @@ void ImageViewer::gHoughTransform()
 	Point center(scols / 2, srows / 2);
 	RTable rentries = rTableConstruct(mgradirection, center);
 
-	for (size_t i = 0; i < rentries.entriesTable.size(); i++)
+	Point ePoint = houghSpace(gradirection, rentries);
+	double angle = 0;
+	vector<Point> eslm = detectLandmarks(center, ePoint,
+		modelImage->getListOfManualLandmarks(),angle);
+	cout << "\nNumber of landmarks: " << eslm.size() << endl;
+
+	RGB color;
+	color.R = 255;
+	color.G = 0;
+	color.B = 0;
+
+	vector<Point> dPoints;
+	dPoints = fillCircle(center, 5, color);
+	Point p1;
+	for (size_t k = 0; k < dPoints.size(); k++)
 	{
-		REntry entry = rentries.entriesTable.at(i);
-		cout << "\n Total Polar entries of " << i << ": \t"
-			<< entry.polarValues.size();
+		p1 = dPoints.at(k);
+		if (p1.getX() >= 0 && p1.getX() < cols && p1.getY() >= 0 && p1.getY() < rows)
+		{
+			matImage->getRGBMatrix()->setAtPosition(p1.getY(), p1.getX(), p1.getColor());
+		}
 	}
-
-	houghSpace(gradirection, rentries);
-
+	color.G = 255;
+	color.R = 0;
+	dPoints = fillCircle(ePoint, 5, color);
+	for (size_t k = 0; k < dPoints.size(); k++)
+	{
+		p1 = dPoints.at(k);
+		if (p1.getX() >= 0 && p1.getX() < cols && p1.getY() >= 0 && p1.getY() < rows)
+		{
+			matImage->getRGBMatrix()->setAtPosition(p1.getY(), p1.getX(), p1.getColor());
+		}
+	}
+	Point lm;
+	color.R = 255;
+	matImage->rotate(center, angle/2, 1);
+	for (size_t i = 0; i < eslm.size(); i++)
+	{
+		lm = eslm.at(i);
+		cout << "\n Landmarks: " << i + 1 << ": " << lm.getX() << "\t" << lm.getY();
+		vector<Point> dPoints = fillCircle(lm, 5, color);
+		Point p;
+		for (size_t k = 0; k < dPoints.size(); k++)
+		{
+			p = dPoints.at(k);
+			if (p.getX() >= 0 && p.getX() < cols && p.getY() >= 0 && p.getY() < rows)
+			{
+				matImage->getRGBMatrix()->setAtPosition(p.getY(), p.getX(),
+					p.getColor());
+			}
+		}
+	}
+	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
+		"Landmarks result");
+	this->show();
 	delete mbinMatrix;
 	delete mcannyMatrix;
 	delete mgradirection;
@@ -985,11 +1031,15 @@ void ImageViewer::dirCentroidMeasure()
 	for (size_t i = 0; i < fileNames.size(); i++)
 	{
 		string filePath = lmfolder.toStdString() + "/" + fileNames.at(i);
-		vector<Point> mLandmarks = readTPSFile(filePath.c_str());
+		//vector<Point> mLandmarks = readTPSFile(filePath.c_str());
+
+		//matImage->setMLandmarks(filePath);
+		vector<Point> mLandmarks = matImage->readManualLandmarks(filePath);
 		if (mLandmarks.size() > 0)
 		{
 			Point ebary(0, 0);
-			double mCentroid = measureCentroidPoint(mLandmarks, ebary);
+			double mCentroid = 0;
+			mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
 			if (fileName != NULL || fileName != "")
 			{
@@ -1007,12 +1057,53 @@ void ImageViewer::dirCentroidMeasure()
 
 			}
 		}
+		mLandmarks.clear();
 	}
 	inFile.close();
 
 	qmessage.setText("Finish.");
 	qmessage.exec();
 }
+// generation landmarks with PHT on lines
+/*void ImageViewer::dirGenerateData()
+ {
+ cout << "\n Automatic generate data on directory." << endl;
+ QMessageBox msgbox;
+
+ string imageFolder = "/home/linh/Desktop/Temps/md/images";
+ string lmFolder = "/home/linh/Desktop/Temps/md/landmarks";
+ string saveFolder = "/home/linh/Desktop/results/2017/md/random";
+ vector<string> images = readDirectory(imageFolder.c_str());
+ vector<string> lms = readDirectory(lmFolder.c_str());
+ int nrandom = 0;
+ string model;
+ string sceneName;
+ string lmFile;
+
+ Point pk;
+ vector<Point> esLandmarks;
+ Point ePoint(0, 0);
+ double angleDiff = 0;
+ LandmarkDetection tr;
+ for (int i = 0; i < 21; i++)
+ { // run on 20 images
+ nrandom = random(0, (int) images.size());
+
+ string modelName = images.at(nrandom);
+ cout << "\n Random and model: " << nrandom << "\t" << modelName << endl;
+ model = imageFolder + "/" + images.at(nrandom);
+ lmFile = lmFolder + "/" + lms.at(nrandom);
+ matImage = new Image(model);
+ matImage->readManualLandmarks(lmFile);
+ tr.setRefImage(*matImage);
+ tr.landmarksOnDir(modelName, imageFolder, images, Degree, 500, 400, 500,
+ ePoint, angleDiff, saveFolder);
+ }
+
+ msgbox.setText("Finish");
+ msgbox.exec();
+ }*/
+// GHT with points
 void ImageViewer::dirGenerateData()
 {
 	cout << "\n Automatic generate data on directory." << endl;
@@ -1020,7 +1111,7 @@ void ImageViewer::dirGenerateData()
 
 	string imageFolder = "/home/linh/Desktop/Temps/md/images";
 	string lmFolder = "/home/linh/Desktop/Temps/md/landmarks";
-	string saveFolder = "/home/linh/Desktop/results/2017/md/random";
+	string saveFolder = "/home/linh/Desktop/results/2017/md/withpoints";
 	vector<string> images = readDirectory(imageFolder.c_str());
 	vector<string> lms = readDirectory(lmFolder.c_str());
 	int nrandom = 0;
@@ -1031,22 +1122,21 @@ void ImageViewer::dirGenerateData()
 	Point pk;
 	vector<Point> esLandmarks;
 	Point ePoint(0, 0);
-	double angleDiff = 0;
 	LandmarkDetection tr;
-	for (int i = 0; i < 21; i++)
-	{ // run on 20 images
-		nrandom = random(0, (int) images.size());
+	//for (int i = 0; i < 21; i++)
+	//{ // run on 20 images
+	//nrandom = random(0, (int) images.size());
+	nrandom = 26; // use Md 028 as ref
+	string modelName = images.at(nrandom);
+	cout << "\n Random and model: " << nrandom << "\t" << modelName << endl;
+	model = imageFolder + "/" + images.at(nrandom);
+	lmFile = lmFolder + "/" + lms.at(nrandom);
+	matImage = new Image(model);
+	matImage->readManualLandmarks(lmFile);
+	tr.setRefImage(*matImage);
+	tr.landmarksOnDir2(modelName, imageFolder, images, saveFolder);
 
-		string modelName = images.at(nrandom);
-		cout << "\n Random and model: " << nrandom << "\t" << modelName << endl;
-		model = imageFolder + "/" + images.at(nrandom);
-		lmFile = lmFolder + "/" + lms.at(nrandom);
-		matImage = new Image(model);
-		matImage->readManualLandmarks(lmFile);
-		tr.setRefImage(*matImage);
-		tr.landmarksOnDir(modelName, imageFolder, images, Degree, 500, 400, 500,
-			ePoint, angleDiff, saveFolder);
-	}
+	//}
 
 	msgbox.setText("Finish");
 	msgbox.exec();

@@ -42,4 +42,6 @@ class Line
     	double distance2, int width, int height);
 };
 typedef Line* ptr_Line;
+
+double distancePoints(Point p1, Point p2);
 #endif /* LINE_H_ */
