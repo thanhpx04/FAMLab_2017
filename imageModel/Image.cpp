@@ -91,7 +91,12 @@ Image::Image(const Image &cpimage)
 }
 Image::~Image()
 {
-	// TODO Auto-generated destructor stub
+	listOfLines.clear();
+	manualLandmarks.clear();
+	autoLandmarks.clear();
+	delete grayMatrix;
+	delete imgMatrix;
+	delete grayHistogram;
 }
 Image::Image(std::string filePath)
 {

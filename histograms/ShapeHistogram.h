@@ -60,7 +60,7 @@ public:
 
 	vector<LocalHistogram> constructPGH(vector<Line> listOfLines);
 	ptr_IntMatrix constructPGHMatrix(vector<LocalHistogram> localHists,
-		AngleAccuracy angleAcc, int cols);
+			AngleAccuracy angleAcc, int cols);
 };
 
 #endif /* LOCALHISTOGRAM_H_ */

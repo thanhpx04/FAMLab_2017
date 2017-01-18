@@ -34,7 +34,8 @@ Edge::Edge(const Edge &cpedge) {
 	listOfBreakPoints = cpedge.listOfBreakPoints;
 }
 Edge::~Edge() {
-	// TODO Auto-generated destructor stub
+	listOfPoints.clear();
+	listOfBreakPoints.clear();
 }
 
 Edge::Edge(std::vector<Point> points) {
