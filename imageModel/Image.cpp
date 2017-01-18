@@ -91,12 +91,12 @@ Image::Image(const Image &cpimage)
 }
 Image::~Image()
 {
-	listOfLines.clear();
+	/*listOfLines.clear();
 	manualLandmarks.clear();
 	autoLandmarks.clear();
 	delete grayMatrix;
 	delete imgMatrix;
-	delete grayHistogram;
+	delete grayHistogram;*/
 }
 Image::Image(std::string filePath)
 {

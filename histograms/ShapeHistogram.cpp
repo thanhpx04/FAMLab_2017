@@ -118,8 +118,8 @@ ShapeHistogram::ShapeHistogram()
 }
 ShapeHistogram::~ShapeHistogram()
 {
-	delete matrix;
-	listLocalHistogram.clear();
+	//delete matrix;
+	//listLocalHistogram.clear();
 }
 double ShapeHistogram::getEntries()
 {

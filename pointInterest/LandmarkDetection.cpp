@@ -178,7 +178,6 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 	Point center(cols / 2, rows / 2);
 	RTable rentries = rTableConstruct(mgradirection, center);
 
-
 	for (size_t i = 0; i < sceneImages.size(); i++)
 	{
 		Image *sceneImage;
@@ -197,7 +196,7 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 		Point ePoint = houghSpace(sgradirection, rentries);
 		double angle = 0;
 		vector<Point> eslm = detectLandmarks(center, ePoint,
-			modelImage.getListOfManualLandmarks(),angle);
+			modelImage.getListOfManualLandmarks(), angle);
 
 		cout << "\n Number of landmarks (pht): " << eslm.size();
 
@@ -212,11 +211,12 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 		}
 		inFile << "IMAGE=" << saveFile << "\n";
 		inFile.close();
-		delete sceneImage;
+
 		delete sbinMatrix;
 		delete sgradirection;
 		delete scannyMatrix;
 		eslm.clear();
+		delete sceneImage;
 	}
 	delete mbinMatrix;
 	delete mgradirection;

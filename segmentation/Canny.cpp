@@ -128,8 +128,7 @@ ptr_IntMatrix gxSobelConvolution(ptr_IntMatrix inputMatrix)
 				for (int y = 0; y < size; y++)
 				{
 					double gValue =
-						(i + x < 0 || j + y < 0 || i + x >= rows
-							|| j + y >= cols) ?
+						(i + x < 0 || j + y < 0 || i + x >= rows || j + y >= cols) ?
 							getBorderValue(inputMatrix, i + x, j + y) :
 							(double) inputMatrix->getAtPosition(i + x, j + y);
 					sumx += xfilter[x][y] * gValue;
@@ -176,8 +175,7 @@ ptr_IntMatrix gySobelConvolution(ptr_IntMatrix inputMatrix)
 				for (int y = 0; y < size; y++)
 				{
 					double gValue =
-						(i + x < 0 || j + y < 0 || i + x >= rows
-							|| j + y >= cols) ?
+						(i + x < 0 || j + y < 0 || i + x >= rows || j + y >= cols) ?
 							getBorderValue(inputMatrix, i + x, j + y) :
 							(double) inputMatrix->getAtPosition(i + x, j + y);
 					sumy += yfilter[x][y] * gValue;
@@ -242,13 +240,11 @@ ptr_IntMatrix nonMaxSuppression(ptr_IntMatrix sobelImage)
 			if (((-LIMIT_ANGLE_1 < tangent) && (tangent <= LIMIT_ANGLE_1))
 				|| (LIMIT_ANGLE_4 < tangent) || (tangent <= -LIMIT_ANGLE_4))
 			{
-				int x =
-					(j + 1 >= cols) ? 0 : sobelImage->getAtPosition(i, j + 1);
+				int x = (j + 1 >= cols) ? 0 : sobelImage->getAtPosition(i, j + 1);
 				int y = (j - 1 < 0) ? 0 : sobelImage->getAtPosition(i, j - 1);
 				if ((sobelImage->getAtPosition(i, j) > y)
 					&& (sobelImage->getAtPosition(i, j) >= x))
-					nonMaxSupped->setAtPosition(i, j,
-						sobelImage->getAtPosition(i, j));
+					nonMaxSupped->setAtPosition(i, j, sobelImage->getAtPosition(i, j));
 
 			}
 			else
@@ -258,25 +254,19 @@ ptr_IntMatrix nonMaxSuppression(ptr_IntMatrix sobelImage)
 					|| ((LIMIT_ANGLE_2 < tangent) && (tangent <= LIMIT_ANGLE_3)))
 				{
 
-					int x =
-						(i + 1 >= rows) ?
-							0 : sobelImage->getAtPosition(i + 1, j);
-					int y =
-						(i - 1 < 0) ? 0 : sobelImage->getAtPosition(i - 1, j);
+					int x = (i + 1 >= rows) ? 0 : sobelImage->getAtPosition(i + 1, j);
+					int y = (i - 1 < 0) ? 0 : sobelImage->getAtPosition(i - 1, j);
 
 					if ((sobelImage->getAtPosition(i, j) > y)
 						&& (sobelImage->getAtPosition(i, j) >= x))
-						nonMaxSupped->setAtPosition(i, j,
-							sobelImage->getAtPosition(i, j));
+						nonMaxSupped->setAtPosition(i, j, sobelImage->getAtPosition(i, j));
 
 				}
 				else
 				{
 					//-45 Degree Edge
-					if (((-LIMIT_ANGLE_2 < tangent)
-						&& (tangent <= -LIMIT_ANGLE_1))
-						|| ((LIMIT_ANGLE_3 < tangent)
-							&& (tangent <= LIMIT_ANGLE_4)))
+					if (((-LIMIT_ANGLE_2 < tangent) && (tangent <= -LIMIT_ANGLE_1))
+						|| ((LIMIT_ANGLE_3 < tangent) && (tangent <= LIMIT_ANGLE_4)))
 					{
 
 						int x =
@@ -295,10 +285,8 @@ ptr_IntMatrix nonMaxSuppression(ptr_IntMatrix sobelImage)
 					{
 
 						//45 Degree Edge
-						if (((-LIMIT_ANGLE_4 < tangent)
-							&& (tangent <= -LIMIT_ANGLE_3))
-							|| ((LIMIT_ANGLE_1 < tangent)
-								&& (tangent <= LIMIT_ANGLE_2)))
+						if (((-LIMIT_ANGLE_4 < tangent) && (tangent <= -LIMIT_ANGLE_3))
+							|| ((LIMIT_ANGLE_1 < tangent) && (tangent <= LIMIT_ANGLE_2)))
 						{
 
 							int x =
@@ -371,16 +359,14 @@ ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage, int low, int high)
 	return edgeMatrix;
 }
 
-
-
 // ========================== Process to find the edges in image =============================================
 ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	int highThreshold)
 {
 	ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
-	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress,
-		lowThreshold, highThreshold);
+	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
+		highThreshold);
 	delete sobelFilter;
 	delete nonMaxSuppress;
 
@@ -391,32 +377,35 @@ ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
 {
 	ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
-	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress,
-		lowThreshold, highThreshold);
+	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
+		highThreshold);
 
 	// viet them cho GPH tren pixel
 	int rows = binaryImage->getRows();
 	int cols = binaryImage->getCols();
 
+	//gradDirection = new Matrix<int>(rows, cols, -1);
 	double angle = 0;
 	int count = 0;
-	for (int r = 0; r < rows; r++) {
-		for (int c = 0; c < cols; c++) {
-			if(thresholdImage->getAtPosition(r,c) == 255)
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			if (thresholdImage->getAtPosition(r, c) == 255)
 			{
-				angle = angles->getAtPosition(r,c);
+				angle = angles->getAtPosition(r, c);
 
-				if(angle < 0)
+				if (angle < 0)
 				{
 					angle = 360 + angle;
 				}
-				gradDirection->setAtPosition(r,c,roundToDegree(angle));
+				gradDirection->setAtPosition(r, c, roundToDegree(angle));
 				count++;
 			}
 
 		}
 	}
-	cout<<"\nTotal canny points: "<< count;
+	cout << "\nTotal canny points: " << count;
 
 	delete sobelFilter;
 	delete nonMaxSuppress;

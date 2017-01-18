@@ -28,7 +28,7 @@ public:
 
 	void operator=(const Matrix<T> &tMatrix);
 	virtual ~Matrix() {
-		data.clear();
+		//data.clear();
 	}
 	int getRows() {
 		return rows;
