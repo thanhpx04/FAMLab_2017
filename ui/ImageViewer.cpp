@@ -783,13 +783,37 @@ void ImageViewer::gHoughTransform()
 		modelImage->getListOfManualLandmarks(), angle);
 	cout << "\nNumber of landmarks: " << eslm.size() << endl;
 
+	if (ePoint.getX() < center.getX() && ePoint.getY() < center.getY())
+		angle = -angle;
+	if (ePoint.getX() > center.getX() && ePoint.getY() > center.getY())
+		angle = -angle;
+	if (ePoint.getX() < center.getX() && ePoint.getY() > center.getY())
+		angle = -angle;
+
+
+	Point sBary = centroidPoint(gradirection);
+	Point mBary(0,0);
+	measureCentroidPoint(eslm,mBary);
+
+	// ==================== tinh angle
+	Point x(sBary.getX(),mBary.getY());
+	Line l1(mBary,x);
+	Line l2(mBary,sBary);
+	double cosalpha = l1.getLength()/l2.getLength();
+	cout<<"\nAlpha = "<<cosalpha<<"\t"<<acos(cosalpha)* 180/M_PI;
+	angle = acos(cosalpha)* 180/M_PI;
+	if(sBary.getY() < mBary.getY())
+		angle = -angle;
+
+	// ==============================
+	//matImage->rotate(center, angle, 1);
 	RGB color;
 	color.R = 255;
 	color.G = 0;
 	color.B = 0;
 
 	vector<Point> dPoints;
-	dPoints = fillCircle(center, 5, color);
+	dPoints = fillCircle(mBary, 5, color);
 	Point p1;
 	for (size_t k = 0; k < dPoints.size(); k++)
 	{
@@ -803,7 +827,7 @@ void ImageViewer::gHoughTransform()
 	}
 	color.G = 255;
 	color.R = 0;
-	dPoints = fillCircle(ePoint, 5, color);
+	dPoints = fillCircle(sBary, 5, color);
 	for (size_t k = 0; k < dPoints.size(); k++)
 	{
 		p1 = dPoints.at(k);
@@ -816,7 +840,6 @@ void ImageViewer::gHoughTransform()
 	}
 	Point lm;
 	color.R = 255;
-	matImage->rotate(center, angle / 2, 1);
 	for (size_t i = 0; i < eslm.size(); i++)
 	{
 		lm = eslm.at(i);

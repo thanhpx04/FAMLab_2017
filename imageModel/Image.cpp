@@ -338,8 +338,9 @@ vector<Edge> Image::cannyAlgorithm()
 ptr_DoubleMatrix Image::getRotationMatrix2D(Point center, double angle,
 	double scale)
 {
-	if (angle > 0)
-		angle = -angle;
+	cout << "\n"<<angle;
+	//if (angle > 0)
+	//	angle = -angle;
 
 	double alpha = cos(angle * M_PI / 180) * scale;
 	double beta = sin(angle * M_PI / 180) * scale;

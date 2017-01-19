@@ -126,19 +126,6 @@ Point houghSpace(ptr_IntMatrix gradMatrix, RTable rentries)
 			}
 		}
 	}
-	/*for (int r = 0; r < rows; r++)
-	 {
-	 for (int c = 0; c < cols; c++)
-	 {
-	 if (acc->getAtPosition(r, c) >= maxValue)
-	 {
-	 maxValue = acc->getAtPosition(r, c);
-	 maxDIndex = c;
-	 maxAIndex = r;
-	 //cout << "\n Index: " << r << "\t" << c;
-	 }
-	 }
-	 }*/
 	cout << "\n center: ";
 	rentries.center.toString();
 	cout << "\nMax Value:" << maxValue;
@@ -146,6 +133,7 @@ Point houghSpace(ptr_IntMatrix gradMatrix, RTable rentries)
 	cout << "\nMax Y index:" << maxYIndex << endl;
 	return Point(maxXIndex, maxYIndex);
 }
+
 vector<Point> detectLandmarks(Point refPoint, Point ePoint,
 	vector<Point> mlandmarks, double &angle)
 {
@@ -182,4 +170,26 @@ vector<Point> detectLandmarks(Point refPoint, Point ePoint,
 		esLandmarks.push_back(Point(xn, yn));
 	}
 	return esLandmarks;
+}
+
+Point centroidPoint(ptr_IntMatrix gradMatrix)
+{
+	int gd = 0;
+	int rows = gradMatrix->getRows();
+	int cols = gradMatrix->getCols();
+	int totalX = 0, totalY = 0, count = 0;
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			gd = gradMatrix->getAtPosition(r, c);
+			if (gd != -1)
+			{
+				totalX += c;
+				totalY += r;
+				count++;
+			}
+		}
+	}
+	return Point(totalX/count,totalY/count);
 }

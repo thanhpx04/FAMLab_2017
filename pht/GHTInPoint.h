@@ -28,4 +28,5 @@ RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center);
 Point houghSpace(ptr_IntMatrix gradMatrix, RTable rentries);
 vector<Point> detectLandmarks(Point refPoint, Point ePoint,
 	vector<Point> mlandmarks,double &angle);
+Point centroidPoint(ptr_IntMatrix gradMatrix);
 #endif /* GHTINPOINT_H_ */
