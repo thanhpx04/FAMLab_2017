@@ -194,9 +194,9 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 			3 * (int) sceneImage->getThresholdValue(), sgradirection);
 
 		Point ePoint = houghSpace(sgradirection, rentries);
-		double angle = 0;
+		//double angle = 0;
 		vector<Point> eslm = detectLandmarks(center, ePoint,
-			modelImage.getListOfManualLandmarks(), angle);
+			modelImage.getListOfManualLandmarks());
 
 		cout << "\n Number of landmarks (pht): " << eslm.size();
 

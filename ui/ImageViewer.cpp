@@ -775,45 +775,73 @@ void ImageViewer::gHoughTransform()
 		(int) modelImage->getThresholdValue(),
 		3 * (int) modelImage->getThresholdValue(), mgradirection);
 	Point center(scols / 2, srows / 2);
+
 	RTable rentries = rTableConstruct(mgradirection, center);
 
-	Point ePoint = houghSpace(gradirection, rentries);
-	double angle = 0;
-	vector<Point> eslm = detectLandmarks(center, ePoint,
-		modelImage->getListOfManualLandmarks(), angle);
+	Point sPoint = houghSpace(gradirection, rentries);
+	vector<Point> eslm = detectLandmarks(center, sPoint,
+		modelImage->getListOfManualLandmarks());
 	cout << "\nNumber of landmarks: " << eslm.size() << endl;
 
-	if (ePoint.getX() < center.getX() && ePoint.getY() < center.getY())
-		angle = -angle;
-	if (ePoint.getX() > center.getX() && ePoint.getY() > center.getY())
-		angle = -angle;
-	if (ePoint.getX() < center.getX() && ePoint.getY() > center.getY())
-		angle = -angle;
-
-
-	Point sBary = centroidPoint(gradirection);
-	Point mBary(0,0);
-	measureCentroidPoint(eslm,mBary);
-
-	// ==================== tinh angle
-	Point x(sBary.getX(),mBary.getY());
-	Line l1(mBary,x);
-	Line l2(mBary,sBary);
-	double cosalpha = l1.getLength()/l2.getLength();
-	cout<<"\nAlpha = "<<cosalpha<<"\t"<<acos(cosalpha)* 180/M_PI;
-	angle = acos(cosalpha)* 180/M_PI;
-	if(sBary.getY() < mBary.getY())
-		angle = -angle;
-
 	// ==============================
-	//matImage->rotate(center, angle, 1);
+	//matImage->rotate(center, angle/2, 1);
 	RGB color;
 	color.R = 255;
 	color.G = 0;
 	color.B = 0;
 
+	// draw centroid point and principal axis
+
+	Point ePoint, mPoint;
+	Line sLine = principalAxis(gradirection, ePoint);
+	Line mLine = principalAxis(mgradirection, mPoint);
+	double angle1 = sLine.angleLines(mLine);
+	cout << "\nAngle 1: " << angle1 << endl;
+
+	int diffX = mPoint.getX() - mLine.getEnd().getX();
+	int diffY = mPoint.getY() - mLine.getEnd().getY();
+	Point m2Point(ePoint.getX() - diffX, ePoint.getY() - diffY);
+	double angle2 = angleVector(ePoint, sLine.getEnd(), ePoint, m2Point);
+	angle2 *= 180 / M_PI;
+	if (angle2 < 90)
+	{
+		if (m2Point.getX() > sLine.getEnd().getX())
+			angle2 = -angle1;
+		else
+			angle2 = angle1;
+	}
+	else
+	{
+		if (m2Point.getX() < sLine.getEnd().getX())
+		{
+			angle2 = -angle1;
+		}
+		else
+			angle2 = angle1;
+	}
+	cout << "\nAngle 2: " << angle2 << endl;
+
+	//matImage->rotate(ePoint, -angle2, 1);
+
+	// find the new position of model in scene and drawing
+	// draw model on scene
+	for (int r = 0; r < rows; ++r)
+	{
+		for (int c = 0; c < cols; ++c)
+		{
+			if (mcannyMatrix->getAtPosition(r, c) != 0)
+			{
+				int diffx = mPoint.getX() - c;
+				int diffy = mPoint.getY() - r;
+				matImage->getRGBMatrix()->setAtPosition(ePoint.getY() - diffy,
+					ePoint.getX() - diffx, color);
+			}
+		}
+	}
+
+	// drawing...
 	vector<Point> dPoints;
-	dPoints = fillCircle(mBary, 5, color);
+	dPoints = fillCircle(ePoint, 5, color);
 	Point p1;
 	for (size_t k = 0; k < dPoints.size(); k++)
 	{
@@ -825,9 +853,7 @@ void ImageViewer::gHoughTransform()
 				p1.getColor());
 		}
 	}
-	color.G = 255;
-	color.R = 0;
-	dPoints = fillCircle(sBary, 5, color);
+	dPoints = drawingLine(sLine, color);
 	for (size_t k = 0; k < dPoints.size(); k++)
 	{
 		p1 = dPoints.at(k);
@@ -838,6 +864,57 @@ void ImageViewer::gHoughTransform()
 				p1.getColor());
 		}
 	}
+	color.R = 0;
+	color.G = 255;
+	dPoints = fillCircle(mPoint, 5, color);
+	for (size_t k = 0; k < dPoints.size(); k++)
+	{
+		p1 = dPoints.at(k);
+		if (p1.getX() >= 0 && p1.getX() < cols && p1.getY() >= 0
+			&& p1.getY() < rows)
+		{
+			matImage->getRGBMatrix()->setAtPosition(p1.getY(), p1.getX(),
+				p1.getColor());
+		}
+	}
+	dPoints = drawingLine(mLine, color);
+	for (size_t k = 0; k < dPoints.size(); k++)
+	{
+		p1 = dPoints.at(k);
+		if (p1.getX() >= 0 && p1.getX() < cols && p1.getY() >= 0
+			&& p1.getY() < rows)
+		{
+			matImage->getRGBMatrix()->setAtPosition(p1.getY(), p1.getX(),
+				p1.getColor());
+		}
+	}
+
+	/*vector<Point> dPoints;
+	 dPoints = fillCircle(mBary, 5, color);
+	 Point p1;
+	 for (size_t k = 0; k < dPoints.size(); k++)
+	 {
+	 p1 = dPoints.at(k);
+	 if (p1.getX() >= 0 && p1.getX() < cols && p1.getY() >= 0
+	 && p1.getY() < rows)
+	 {
+	 matImage->getRGBMatrix()->setAtPosition(p1.getY(), p1.getX(),
+	 p1.getColor());
+	 }
+	 }
+	 color.G = 255;
+	 color.R = 0;
+	 dPoints = fillCircle(sBary, 5, color);
+	 for (size_t k = 0; k < dPoints.size(); k++)
+	 {
+	 p1 = dPoints.at(k);
+	 if (p1.getX() >= 0 && p1.getX() < cols && p1.getY() >= 0
+	 && p1.getY() < rows)
+	 {
+	 matImage->getRGBMatrix()->setAtPosition(p1.getY(), p1.getX(),
+	 p1.getColor());
+	 }
+	 }*/
 	Point lm;
 	color.R = 255;
 	for (size_t i = 0; i < eslm.size(); i++)

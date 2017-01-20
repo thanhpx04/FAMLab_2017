@@ -9,6 +9,7 @@
 #include <cmath>
 #include <fstream>
 #include <stdio.h>
+#include <float.h>
 #include <string.h>
 using namespace std;
 
@@ -46,7 +47,7 @@ RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center)
 
 	int gd;
 	REntry rentry;
-	ofstream off("rtable.txt");
+	//ofstream off("rtable.txt");
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
@@ -64,11 +65,11 @@ RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center)
 
 				(rtable.entriesTable.at((gd))).gradient = gd;
 				(rtable.entriesTable.at((gd))).polarValues.push_back(pv);
-				off << "\n" << pv.angle << "\t" << pv.distance;
+				//off << "\n" << pv.angle << "\t" << pv.distance;
 			}
 		}
 	}
-	off.close();
+	//off.close();
 	return rtable;
 }
 
@@ -134,28 +135,64 @@ Point houghSpace(ptr_IntMatrix gradMatrix, RTable rentries)
 	return Point(maxXIndex, maxYIndex);
 }
 
-vector<Point> detectLandmarks(Point refPoint, Point ePoint,
-	vector<Point> mlandmarks, double &angle)
+double avgDistance(vector<Point> listPoints, Line axis)
 {
-	int dx = abs(refPoint.getX() - ePoint.getX());
-	int dy = abs(refPoint.getY() - ePoint.getY());
-	//double diffangle = 0;
-	angle = 0;
-	if (dx > dy)
+	double totalDist = 0;
+	size_t nPoints = listPoints.size();
+	for (int j = 0; j < nPoints; j++)
 	{
-		Point c(refPoint.getX() + 10, refPoint.getY());
-		angle = angleVector(refPoint, c, refPoint, ePoint);
+		Point pj = listPoints.at(j);
+		double distance = axis.perpendicularDistance(pj);
+		totalDist += distance;
 	}
-	else
-	{ // dy > dx
-		Point c(refPoint.getX(), refPoint.getY() - 10);
-		angle = angleVector(refPoint, c, refPoint, ePoint);
-	}
-	angle = angle * 180 / M_PI;
-	if (angle > 90)
-		angle = 180 - angle;
-	cout << "\nAngle difference: " << angle;
+	return totalDist/(int)nPoints;
+}
 
+Line principalAxis(ptr_IntMatrix gradMatrix, Point &cPoint)
+{
+	int rows = gradMatrix->getRows();
+	int cols = gradMatrix->getCols();
+	int totalX = 0, totalY = 0, count = 0;
+	// get list of points
+	vector<Point> listOfPoints;
+	for (int r = 0; r < rows; ++r)
+	{
+		for (int c = 0; c < cols; ++c)
+		{
+			if (gradMatrix->getAtPosition(r, c) != -1)
+			{
+				listOfPoints.push_back(Point(c, r));
+				totalX += c;
+				totalY += r;
+				count++;
+			}
+		}
+	}
+	// compute the centroid point
+	cPoint.setX(totalX / count);
+	cPoint.setY(totalY / count);
+
+	Point sPoint;
+	double minAvgDist = DBL_MAX;
+	size_t nPoints = listOfPoints.size();
+	for (size_t i = 0; i < nPoints; ++i)
+	{
+		Point pi = listOfPoints.at(i);
+		Line l(cPoint, pi);
+		double avgDist = avgDistance(listOfPoints, l);
+		if (avgDist < minAvgDist)
+		{
+			minAvgDist =avgDist;
+			sPoint.setX(pi.getX());
+			sPoint.setY(pi.getY());
+		}
+	}
+
+	return Line(cPoint, sPoint);
+}
+vector<Point> detectLandmarks(Point refPoint, Point ePoint,
+	vector<Point> mlandmarks)
+{
 	vector<Point> esLandmarks;
 	Point mlm;
 	int deltaX = 0, deltaY = 0, xn = 0, yn = 0;
@@ -191,5 +228,5 @@ Point centroidPoint(ptr_IntMatrix gradMatrix)
 			}
 		}
 	}
-	return Point(totalX/count,totalY/count);
+	return Point(totalX / count, totalY / count);
 }
