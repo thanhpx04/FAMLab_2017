@@ -795,33 +795,17 @@ void ImageViewer::gHoughTransform()
 	Point ePoint, mPoint;
 	Line sLine = principalAxis(gradirection, ePoint);
 	Line mLine = principalAxis(mgradirection, mPoint);
-	double angle1 = sLine.angleLines(mLine);
-	cout << "\nAngle 1: " << angle1 << endl;
+	double angle = sLine.angleLines(mLine);
+	cout << "\nAngle 1: " << angle<< endl;
 
 	int diffX = mPoint.getX() - mLine.getEnd().getX();
 	int diffY = mPoint.getY() - mLine.getEnd().getY();
 	Point m2Point(ePoint.getX() - diffX, ePoint.getY() - diffY);
-	double angle2 = angleVector(ePoint, sLine.getEnd(), ePoint, m2Point);
-	angle2 *= 180 / M_PI;
-	if (angle2 < 90)
-	{
-		if (m2Point.getX() > sLine.getEnd().getX())
-			angle2 = -angle1;
-		else
-			angle2 = angle1;
-	}
-	else
-	{
-		if (m2Point.getX() < sLine.getEnd().getX())
-		{
-			angle2 = -angle1;
-		}
-		else
-			angle2 = angle1;
-	}
-	cout << "\nAngle 2: " << angle2 << endl;
+	if(mPoint.getX() > ePoint.getX())
+		angle = -angle; // nguoc lai neu quay model
+		cout << "\nAngle 2: " << angle << endl;
 
-	//matImage->rotate(ePoint, -angle2, 1);
+	matImage->rotate(ePoint, angle, 1);
 
 	// find the new position of model in scene and drawing
 	// draw model on scene
