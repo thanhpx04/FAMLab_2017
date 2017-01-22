@@ -57,10 +57,13 @@ ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix)
 		{
 
 			grayMatrix->setAtPosition(h, w,
-				round(
-					((double) rgbMatrix->getAtPosition(h, w).R * RED_COEFFICIENT)
-						+ ((double) rgbMatrix->getAtPosition(h, w).G * GREEN_COEFFICIENT)
-						+ ((double) rgbMatrix->getAtPosition(h, w).B * BLUE_COEFFICIENT)));
+					round(
+							((double) rgbMatrix->getAtPosition(h, w).R
+									* RED_COEFFICIENT)
+									+ ((double) rgbMatrix->getAtPosition(h, w).G
+											* GREEN_COEFFICIENT)
+									+ ((double) rgbMatrix->getAtPosition(h, w).B
+											* BLUE_COEFFICIENT)));
 		}
 	}
 
@@ -87,16 +90,16 @@ Image::Image(const Image &cpimage)
 	grayHistogram = cpimage.grayHistogram;
 	medianHistogram = cpimage.medianHistogram;
 	meanHistogram = cpimage.meanHistogram;
-	thresholdValue =  cpimage.thresholdValue;
+	thresholdValue = cpimage.thresholdValue;
 }
 Image::~Image()
 {
 	/*listOfLines.clear();
-	manualLandmarks.clear();
-	autoLandmarks.clear();
-	delete grayMatrix;
-	delete imgMatrix;
-	delete grayHistogram;*/
+	 manualLandmarks.clear();
+	 autoLandmarks.clear();
+	 delete grayMatrix;
+	 delete imgMatrix;
+	 delete grayHistogram;*/
 }
 Image::Image(std::string filePath)
 {
@@ -275,7 +278,7 @@ void Image::calThresholdValue()
 	if (medianHistogram == 0 || meanHistogram == 0)
 		calcGrayHistogram();
 	int limit1 =
-		meanHistogram > medianHistogram ? medianHistogram : meanHistogram;
+			meanHistogram > medianHistogram ? medianHistogram : meanHistogram;
 	limit1 = (limit1 >= 120) ? (limit1 - DECREASE_25) : (limit1 - DECREASE_5);
 	int imax1 = -1, max1 = -1;
 	for (int index = 0; index < limit1; index++)
@@ -288,7 +291,7 @@ void Image::calThresholdValue()
 		}
 	}
 	int limit2 =
-		meanHistogram > medianHistogram ? meanHistogram : medianHistogram;
+			meanHistogram > medianHistogram ? meanHistogram : medianHistogram;
 	int imin = -1, min = max1;
 	for (int k = imax1; k < limit2; k++)
 	{
@@ -320,10 +323,10 @@ vector<Edge> Image::cannyAlgorithm()
 		calThresholdValue();
 
 	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, (int) thresholdValue,
-		MAX_GRAY_VALUE);
+			MAX_GRAY_VALUE);
 
 	ptr_IntMatrix cannyMatrix = cannyProcess(binMatrix, (int) thresholdValue,
-		3 * (int) thresholdValue);
+			3 * (int) thresholdValue);
 
 	vector<Edge> listOfEdges;
 	listOfEdges = suzuki(cannyMatrix);
@@ -335,102 +338,108 @@ vector<Edge> Image::cannyAlgorithm()
 }
 
 // angle in degree
-ptr_DoubleMatrix Image::getRotationMatrix2D(Point center, double angle,
-	double scale)
+/*ptr_DoubleMatrix Image::getRotationMatrix2D(Point center, double angle,
+ double scale)
+ {
+ cout << "\n"<<angle;
+ //if (angle > 0)
+ //	angle = -angle;
+
+ double alpha = cos(angle * M_PI / 180) * scale;
+ double beta = sin(angle * M_PI / 180) * scale;
+
+ ptr_DoubleMatrix rotateM = new Matrix<double>(2, 3, 0);
+
+ rotateM->setAtPosition(0, 0, alpha);
+ rotateM->setAtPosition(0, 1, beta);
+ rotateM->setAtPosition(0, 2,
+ (1 - alpha) * center.getX() - beta * center.getY());
+ rotateM->setAtPosition(1, 0, -beta);
+ rotateM->setAtPosition(1, 1, alpha);
+ rotateM->setAtPosition(1, 2,
+ beta * center.getX() + (1 - alpha) * center.getY());
+
+ return rotateM;
+ }*/
+
+void Image::rotate(Point center, double angle, double scale)
 {
-	cout << "\n"<<angle;
-	//if (angle > 0)
-	//	angle = -angle;
-
-	double alpha = cos(angle * M_PI / 180) * scale;
-	double beta = sin(angle * M_PI / 180) * scale;
-
-	ptr_DoubleMatrix rotateM = new Matrix<double>(2, 3, 0);
-
-	rotateM->setAtPosition(0, 0, alpha);
-	rotateM->setAtPosition(0, 1, beta);
-	rotateM->setAtPosition(0, 2,
-		(1 - alpha) * center.getX() - beta * center.getY());
-	rotateM->setAtPosition(1, 0, -beta);
-	rotateM->setAtPosition(1, 1, alpha);
-	rotateM->setAtPosition(1, 2,
-		beta * center.getX() + (1 - alpha) * center.getY());
-
-	return rotateM;
-}
-
-ptr_IntMatrix Image::rotate(Point center, double angle, double scale)
-{
-	ptr_DoubleMatrix rotationMatrix = getRotationMatrix2D(center, angle, scale);
-	ptr_IntMatrix source = grayMatrix;
-
-	int rows = source->getRows();
-	int cols = source->getCols();
-
-	double a00 = rotationMatrix->getAtPosition(0, 0);
-	double a01 = rotationMatrix->getAtPosition(0, 1);
-	double b00 = rotationMatrix->getAtPosition(0, 2);
-	double a10 = rotationMatrix->getAtPosition(1, 0);
-	double a11 = rotationMatrix->getAtPosition(1, 1);
-	double b10 = rotationMatrix->getAtPosition(1, 2);
-	ptr_RGBMatrix rgbSource = imgMatrix;
+	/*ptr_DoubleMatrix rotationMatrix = getRotationMatrix2D(center, angle, scale);
+	ptr_IntMatrix source = grayMatrix;*/
 	RGB color;
-	color.R = color.G = color.B = 0;
-	ptr_RGBMatrix rgbDest = new Matrix<RGB>(rows, cols, color);
-	ptr_IntMatrix result = new Matrix<int>(rows, cols, 0);
-	for (int row = 0; row < rows; row++)
-	{
-		for (int col = 0; col < cols; col++)
-		{
-			int value = source->getAtPosition(row, col);
-			color = rgbSource->getAtPosition(row, col);
+	color.R = color.B = color.G = 0;
+	Matrix<int> gray = grayMatrix->rotation(center, angle, scale,0);
+	Matrix<RGB> rgb = imgMatrix->rotation(center, angle, scale,color);
 
-			int xnew = round(a00 * col + a01 * row + b00);
-			int ynew = round(a10 * col + a11 * row + b10);
+	*grayMatrix = gray;
+	*imgMatrix = rgb;
 
-			if (xnew >= 0 && xnew < cols && ynew >= 0 && ynew < rows)
-			{
-				result->setAtPosition(ynew, xnew, value);
-				rgbDest->setAtPosition(ynew, xnew, color);
-			}
-		}
-	}
-	for (int row = 0; row < rows; row++)
-	{
-		for (int col = 1; col < cols - 1; col++)
-		{
-			int value = result->getAtPosition(row, col);
-			int leftValue = result->getAtPosition(row, col - 1);
-			int rightValue = result->getAtPosition(row, col + 1);
-			if (value == 0 && leftValue > 0 && rightValue >= 0)
-			{
-				result->setAtPosition(row, col, (leftValue + rightValue) / 2);
-			}
+	/*int rows = source->getRows();
+	 int cols = source->getCols();
 
-			RGB color = rgbDest->getAtPosition(row, col);
-			RGB leftColor = rgbDest->getAtPosition(row, col - 1);
-			RGB rightColor = rgbDest->getAtPosition(row, col + 1);
-			if (color.R == 0 && color.G == 0 && color.B == 0
-				&& (leftColor.R != 0 || leftColor.G != 0 || leftColor.B != 0)
-				&& (rightColor.R != 0 || rightColor.G != 0 || rightColor.B != 0))
-			{
-				RGB newColor;
-				newColor.R = (leftColor.R + rightColor.R) / 2;
-				newColor.G = (leftColor.G + rightColor.G) / 2;
-				newColor.B = (leftColor.B + rightColor.B) / 2;
-				rgbDest->setAtPosition(row, col, newColor);
-			}
-		}
-	}
-	imgMatrix = rgbDest;
-	grayMatrix = result;
+	 double a00 = rotationMatrix->getAtPosition(0, 0);
+	 double a01 = rotationMatrix->getAtPosition(0, 1);
+	 double b00 = rotationMatrix->getAtPosition(0, 2);
+	 double a10 = rotationMatrix->getAtPosition(1, 0);
+	 double a11 = rotationMatrix->getAtPosition(1, 1);
+	 double b10 = rotationMatrix->getAtPosition(1, 2);
+	 ptr_RGBMatrix rgbSource = imgMatrix;
+	 RGB color;
+	 color.R = color.G = color.B = 0;
+	 ptr_RGBMatrix rgbDest = new Matrix<RGB>(rows, cols, color);
+	 ptr_IntMatrix result = new Matrix<int>(rows, cols, 0);
+	 for (int row = 0; row < rows; row++)
+	 {
+	 for (int col = 0; col < cols; col++)
+	 {
+	 int value = source->getAtPosition(row, col);
+	 color = rgbSource->getAtPosition(row, col);
+
+	 int xnew = round(a00 * col + a01 * row + b00);
+	 int ynew = round(a10 * col + a11 * row + b10);
+
+	 if (xnew >= 0 && xnew < cols && ynew >= 0 && ynew < rows)
+	 {
+	 result->setAtPosition(ynew, xnew, value);
+	 rgbDest->setAtPosition(ynew, xnew, color);
+	 }
+	 }
+	 }
+	 for (int row = 0; row < rows; row++)
+	 {
+	 for (int col = 1; col < cols - 1; col++)
+	 {
+	 int value = result->getAtPosition(row, col);
+	 int leftValue = result->getAtPosition(row, col - 1);
+	 int rightValue = result->getAtPosition(row, col + 1);
+	 if (value == 0 && leftValue > 0 && rightValue >= 0)
+	 {
+	 result->setAtPosition(row, col, (leftValue + rightValue) / 2);
+	 }
+
+	 RGB color = rgbDest->getAtPosition(row, col);
+	 RGB leftColor = rgbDest->getAtPosition(row, col - 1);
+	 RGB rightColor = rgbDest->getAtPosition(row, col + 1);
+	 if (color.R == 0 && color.G == 0 && color.B == 0
+	 && (leftColor.R != 0 || leftColor.G != 0 || leftColor.B != 0)
+	 && (rightColor.R != 0 || rightColor.G != 0 || rightColor.B != 0))
+	 {
+	 RGB newColor;
+	 newColor.R = (leftColor.R + rightColor.R) / 2;
+	 newColor.G = (leftColor.G + rightColor.G) / 2;
+	 newColor.B = (leftColor.B + rightColor.B) / 2;
+	 rgbDest->setAtPosition(row, col, newColor);
+	 }
+	 }
+	 }
+	 imgMatrix = rgbDest;
+	 grayMatrix = result;*/
 
 	//delete rotationMatrix;
 	//delete source;
 	//delete rgbSource;
 	//delete rgbDest;
-
-	return result;
+	//return result;
 }
 
 //================================================ End private methods =====================================================

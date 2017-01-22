@@ -48,9 +48,9 @@ public:
 	vector<Line> getApproximateLines(double minDistance);
 	vector<Point> readManualLandmarks(string fileName);
 
-	ptr_DoubleMatrix getRotationMatrix2D(Point center, double angle,
-		double scale);
-	ptr_IntMatrix rotate(Point center, double angle, double scale);
+	/*ptr_DoubleMatrix getRotationMatrix2D(Point center, double angle,
+		double scale);*/
+	void rotate(Point center, double angle, double scale);
 };
 typedef Image* ptr_Image;
 #endif /* IMAGE_H_ */

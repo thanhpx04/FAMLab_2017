@@ -97,6 +97,77 @@ void Matrix<T>::operator=(const Matrix<T> &tMatrix)
 	Init();
 	data = tMatrix.data;
 }
+// get rotation matrix with angle (in degree) and scale
+ptr_DoubleMatrix getRotationMatrix2D(Point center, double angle, double scale)
+{
+	double alpha = cos(angle * M_PI / 180) * scale;
+	double beta = sin(angle * M_PI / 180) * scale;
+
+	ptr_DoubleMatrix rotateM = new Matrix<double>(2, 3, 0);
+
+	rotateM->setAtPosition(0, 0, alpha);
+	rotateM->setAtPosition(0, 1, beta);
+	rotateM->setAtPosition(0, 2,
+			(1 - alpha) * center.getX() - beta * center.getY());
+	rotateM->setAtPosition(1, 0, -beta);
+	rotateM->setAtPosition(1, 1, alpha);
+	rotateM->setAtPosition(1, 2,
+			beta * center.getX() + (1 - alpha) * center.getY());
+
+	return rotateM;
+}
+void rotateAPoint(int x, int y, Point center, double angle, double scale,
+		int &xnew, int &ynew)
+{
+	xnew = 0;
+	ynew = 0;
+	ptr_DoubleMatrix rotationMatrix = getRotationMatrix2D(center, angle, scale);
+
+	double a00 = rotationMatrix->getAtPosition(0, 0);
+	double a01 = rotationMatrix->getAtPosition(0, 1);
+	double b00 = rotationMatrix->getAtPosition(0, 2);
+	double a10 = rotationMatrix->getAtPosition(1, 0);
+	double a11 = rotationMatrix->getAtPosition(1, 1);
+	double b10 = rotationMatrix->getAtPosition(1, 2);
+	xnew = round(a00 * x + a01 * y + b00);
+	ynew = round(a10 * x + a11 * y + b10);
+}
+template<typename T>
+Matrix<T> Matrix<T>::rotation(Point center, double angle, double scale,
+		T defaultValue)
+{
+	Matrix<T> result(rows, cols);
+	result.InitWithValue(defaultValue);
+	for (int row = 0; row < rows; row++)
+	{
+		for (int col = 0; col < cols; col++)
+		{
+			T value = data[row][col];
+
+			int xnew = 0; //round(a00 * col + a01 * row + b00);
+			int ynew = 0; //round(a10 * col + a11 * row + b10);
+			rotateAPoint(col, row, center, angle, scale, xnew, ynew);
+			if (xnew >= 0 && xnew < cols && ynew >= 0 && ynew < rows)
+			{
+				result.data[ynew][xnew] = value;
+			}
+		}
+	}
+	for (int row = 0; row < rows; row++)
+	{
+		for (int col = 1; col < cols - 1; col++)
+		{
+			T value = result.getAtPosition(row, col);
+			T leftValue = result.getAtPosition(row, col - 1);
+			T rightValue = result.getAtPosition(row, col + 1);
+			if (value == 0 && leftValue > 0 && rightValue >= 0)
+			{
+				result.data[row][col] = (leftValue + rightValue) / 2;
+			}
+		}
+	}
+	return result;
+}
 template class Matrix<int> ;
 template class Matrix<double> ;
 template class Matrix<RGB> ;

@@ -128,7 +128,8 @@ vector<Point> verifyLandmarks(Image mImage, Image sImage,
 {
 
 	ptr_IntMatrix mMatrix = mImage.getGrayMatrix();
-	ptr_IntMatrix sRotateImg = sImage.rotate(ePoint, angleDiff, 1);
+	sImage.rotate(ePoint, angleDiff, 1);
+	ptr_IntMatrix sRotateImg = sImage.getGrayMatrix();
 	int width = mMatrix->getCols();
 	int height = mMatrix->getRows();
 

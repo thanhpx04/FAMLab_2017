@@ -8,9 +8,11 @@
 
 #ifndef MATRIX_H_
 #define MATRIX_H_
-
+void rotateAPoint(int x, int y, Point center, double angle, double scale,
+		int &xnew, int &ynew);
 template<typename T>
-class Matrix {
+class Matrix
+{
 private:
 	std::vector<std::vector<T> > data; // store the data
 	int rows; // number of rows
@@ -27,32 +29,41 @@ public:
 	Matrix(const Matrix<T> &tMatrix);
 
 	void operator=(const Matrix<T> &tMatrix);
-	virtual ~Matrix() {
+	virtual ~Matrix()
+	{
 		//data.clear();
 	}
-	int getRows() {
+	int getRows()
+	{
 		return rows;
 	}
-	int getCols() {
+	int getCols()
+	{
 		return cols;
 	}
-	void setRows(int nrows) {
+	void setRows(int nrows)
+	{
 		rows = nrows;
 	}
-	void setCols(int ncols) {
+	void setCols(int ncols)
+	{
 		cols = ncols;
 	}
-	std::vector<std::vector<T> > getData() {
+	std::vector<std::vector<T> > getData()
+	{
 		return data;
 	}
 
-	void setData(std::vector<std::vector<T> > iData) {
+	void setData(std::vector<std::vector<T> > iData)
+	{
 		data = iData;
 	}
 
 	T getAtPosition(int, int);
 	void setAtPosition(int, int, T);
 	void printMatrix();
+	Matrix<T> rotation(Point center, double angle, double scale,
+			T defaultValue);
 };
 typedef Matrix<int>* ptr_IntMatrix;
 typedef Matrix<double>* ptr_DoubleMatrix;

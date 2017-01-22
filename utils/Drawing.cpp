@@ -11,11 +11,13 @@
 using namespace std;
 #include "../imageModel/Point.h"
 #include "../imageModel/Line.h"
+#include "../imageModel/Matrix.h"
 
 #include "Drawing.h"
 
 // draw a line using Breshenham algorithm
-vector<Point> drawingLine(Line line, RGB color) {
+vector<Point> detectLine(Line line, RGB color)
+{
 	Point begin = line.getBegin();
 	Point end = line.getEnd();
 	begin.setColor(color);
@@ -37,26 +39,38 @@ vector<Point> drawingLine(Line line, RGB color) {
 	vector<Point> listOfPoints;
 	listOfPoints.push_back(Point(x, y, color));
 	// vertical line
-	if (begin.getX() == end.getX()) {
-		while (y != end.getY()) {
+	if (begin.getX() == end.getX())
+	{
+		while (y != end.getY())
+		{
 			y += y_unit;
 			listOfPoints.push_back(Point(x, y, color));
 		}
-	} else { // horizontal line
-		if (begin.getY() == end.getY()) {
-			while (x != end.getX()) {
+	}
+	else
+	{ // horizontal line
+		if (begin.getY() == end.getY())
+		{
+			while (x != end.getX())
+			{
 				x += x_unit;
 				listOfPoints.push_back(Point(x, y, color));
 			}
-		} else {
-			if (begin.getX() != end.getX() && begin.getY() != end.getY()) {
-				while (x != end.getX()) {
+		}
+		else
+		{
+			if (begin.getX() != end.getX() && begin.getY() != end.getY())
+			{
+				while (x != end.getX())
+				{
 					c2 = 2 * c;
-					if (c2 > -dy) {
+					if (c2 > -dy)
+					{
 						c = c - dy;
 						x += x_unit;
 					}
-					if (c2 < dx) {
+					if (c2 < dx)
+					{
 						c += dx;
 						y += y_unit;
 					}
@@ -69,7 +83,8 @@ vector<Point> drawingLine(Line line, RGB color) {
 	return listOfPoints;
 }
 
-vector<Point> put8pixel(Point center, Point p, RGB color) {
+vector<Point> put8pixel(Point center, Point p, RGB color)
+{
 	int xc = center.getX();
 	int yc = center.getY();
 	int x = p.getX();
@@ -85,17 +100,22 @@ vector<Point> put8pixel(Point center, Point p, RGB color) {
 	eightPoints.push_back(Point(-y + xc, -x + yc, color));
 	return eightPoints;
 }
-vector<Point> drawingCircle(Point center, int radius, RGB color) {
+vector<Point> detectCircle(Point center, int radius, RGB color)
+{
 	int x = 0;
 	int y = radius;
 	int f = 1 - radius;
 	vector<Point> result;
 	vector<Point> drawPoints = put8pixel(center, Point(x, y), color);
 	result.insert(result.end(), drawPoints.begin(), drawPoints.end());
-	while (x < y) {
-		if (f < 0) {
+	while (x < y)
+	{
+		if (f < 0)
+		{
 			f += 2 * x + 3;
-		} else {
+		}
+		else
+		{
 			f += 2 * (x - y) + 5;
 			y--;
 		}
@@ -106,14 +126,67 @@ vector<Point> drawingCircle(Point center, int radius, RGB color) {
 	return result;
 }
 
-vector<Point> fillCircle(Point center, int radius, RGB color) {
+vector<Point> detectFillCircle(Point center, int radius, RGB color)
+{
 	vector<Point> result;
-	for (int y = -radius; y <= radius; y++){
-		for (int x = -radius; x <= radius; x++){
-			if (x * x + y * y <= radius * radius){
-				result.push_back(Point(center.getX() + x, center.getY()+y,color));
+	for (int y = -radius; y <= radius; y++)
+	{
+		for (int x = -radius; x <= radius; x++)
+		{
+			if (x * x + y * y <= radius * radius)
+			{
+				result.push_back(
+						Point(center.getX() + x, center.getY() + y, color));
 			}
 		}
 	}
 	return result;
+}
+void drawingCircle(Matrix<RGB> &mat, Point center, int radius, RGB color)
+{
+	vector<Point> dpoints = detectCircle(center, radius, color);
+	int rows = mat.getRows();
+	int cols = mat.getCols();
+	Point p1;
+	for (size_t k = 0; k < dpoints.size(); k++)
+	{
+		p1 = dpoints.at(k);
+		if (p1.getX() >= 0 && p1.getX() < cols && p1.getY() >= 0
+				&& p1.getY() < rows)
+		{
+			mat.setAtPosition(p1.getY(), p1.getX(), p1.getColor());
+		}
+	}
+}
+void fillCircle(Matrix<RGB> &mat, Point center, int radius, RGB color)
+{
+	vector<Point> dpoints = detectFillCircle(center, radius, color);
+	int rows = mat.getRows();
+	int cols = mat.getCols();
+	Point p1;
+	for (size_t k = 0; k < dpoints.size(); k++)
+	{
+		p1 = dpoints.at(k);
+		if (p1.getX() >= 0 && p1.getX() < cols && p1.getY() >= 0
+				&& p1.getY() < rows)
+		{
+			mat.setAtPosition(p1.getY(), p1.getX(), p1.getColor());
+		}
+	}
+}
+void drawingLine(Matrix<RGB> &mat, Line line, RGB color)
+{
+	vector<Point> dpoints = detectLine(line, color);
+	int rows = mat.getRows();
+	int cols = mat.getCols();
+	Point p1;
+	for (size_t k = 0; k < dpoints.size(); k++)
+	{
+		p1 = dpoints.at(k);
+		if (p1.getX() >= 0 && p1.getX() < cols && p1.getY() >= 0
+				&& p1.getY() < rows)
+		{
+			mat.setAtPosition(p1.getY(), p1.getX(), p1.getColor());
+		}
+	}
 }
