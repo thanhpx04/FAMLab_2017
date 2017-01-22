@@ -442,18 +442,18 @@ void ImageViewer::displayLandmarks(Image *image, vector<Point> lms, RGB color)
 	{
 		lm = lms.at(i);
 		cout << "\nManual landmark: " << lm.getX() << "\t" << lm.getY();
-		drawingCircle(*(image->getRGBMatrix()),lm,5,color);
+		drawingCircle(*(image->getRGBMatrix()), lm, 5, color);
 		/*vector<Point> dPoints = drawingCircle(lm, 5, color);
-		for (size_t k = 0; k < dPoints.size(); k++)
-		{
-			p = dPoints.at(k);
-			if (p.getX() >= 0 && p.getX() < cols && p.getY() >= 0
-					&& p.getY() < rows)
-			{
-				image->getRGBMatrix()->setAtPosition(p.getY(), p.getX(),
-						p.getColor());
-			}
-		}*/
+		 for (size_t k = 0; k < dPoints.size(); k++)
+		 {
+		 p = dPoints.at(k);
+		 if (p.getX() >= 0 && p.getX() < cols && p.getY() >= 0
+		 && p.getY() < rows)
+		 {
+		 image->getRGBMatrix()->setAtPosition(p.getY(), p.getX(),
+		 p.getColor());
+		 }
+		 }*/
 	}
 
 }
@@ -720,18 +720,18 @@ void ImageViewer::lineSegmentation()
 	//listOfLines.push_back(line1);
 	Line linei;
 	/*vector<Point> pOnLine;
-	Point pi;*/
+	 Point pi;*/
 	for (size_t i = 0; i < listOfLines.size(); i++)
 	{
 		linei = listOfLines.at(i);
-		drawingLine(*(matImage->getRGBMatrix()),linei,color);
+		drawingLine(*(matImage->getRGBMatrix()), linei, color);
 		/*pOnLine = drawingLine(linei, color);
-		for (size_t k = 0; k < pOnLine.size(); k++)
-		{
-			pi = pOnLine.at(k);
-			matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(),
-					color);
-		}*/
+		 for (size_t k = 0; k < pOnLine.size(); k++)
+		 {
+		 pi = pOnLine.at(k);
+		 matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(),
+		 color);
+		 }*/
 	}
 	//pOnLine.clear();
 
@@ -748,16 +748,6 @@ void ImageViewer::gHoughTransform()
 	cout << "\n Generalizing hough transform." << endl;
 	QMessageBox msgbox;
 
-	// extract list of points of scene model by using canny
-	ptr_IntMatrix binMatrix = binaryThreshold(matImage->getGrayMatrix(),
-			(int) matImage->getThresholdValue(), 255);
-	int srows = binMatrix->getRows();
-	int scols = binMatrix->getCols();
-	ptr_IntMatrix gradirection = new Matrix<int>(srows, scols, -1);
-	ptr_IntMatrix cannyMatrix = cannyProcess2(binMatrix,
-			(int) matImage->getThresholdValue(),
-			3 * (int) matImage->getThresholdValue(), gradirection);
-
 	// extract list of points of model image by using canny
 	msgbox.setText("Select the model image.");
 	msgbox.exec();
@@ -771,146 +761,35 @@ void ImageViewer::gHoughTransform()
 	msgbox.exec();
 	QString reflmPath = QFileDialog::getOpenFileName(this);
 	modelImage->readManualLandmarks(reflmPath.toStdString());
-	ptr_IntMatrix mbinMatrix = binaryThreshold(modelImage->getGrayMatrix(),
-			(int) modelImage->getThresholdValue(), 255);
-	int rows = mbinMatrix->getRows();
-	int cols = mbinMatrix->getCols();
-	ptr_IntMatrix mgradirection = new Matrix<int>(rows, cols, -1);
-	ptr_IntMatrix mcannyMatrix = cannyProcess2(mbinMatrix,
-			(int) modelImage->getThresholdValue(),
-			3 * (int) modelImage->getThresholdValue(), mgradirection);
 
-	// Landmarks are estimated by using GHT
-	Point center(scols / 2, srows / 2);
-	RTable rentries = rTableConstruct(mgradirection, center);
-	Point sPoint = houghSpace(gradirection, rentries);
-	vector<Point> eslm = detectLandmarks(center, sPoint,
-			modelImage->getListOfManualLandmarks());
-	cout << "\nNumber of landmarks: " << eslm.size() << endl;
+	/*ProHoughTransform tr;
+	tr.setRefImage(*modelImage);
 
-	// compute the centroid point of model image and scene image
-	// and compute the difference angle
 	Point ePoint, mPoint;
-	Line sLine = principalAxis(gradirection, ePoint);
-	Line mLine = principalAxis(mgradirection, mPoint);
-	double angle = sLine.angleLines(mLine);
-	cout << "\nAngle 1: " << angle << endl;
+	double angleDiff;
+	vector<Point> estLandmarks = tr.generalTransform(*matImage, angleDiff,
+			ePoint, mPoint);*/
+
+	LandmarkDetection lmDetect;
+	lmDetect.setRefImage(*modelImage);
+	vector < Point > estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 100, 300);
+	cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
+
+	//matImage->rotate(ePoint, angleDiff, 1);
+	//int dx = mPoint.getX() - ePoint.getX();
+	//int dy = mPoint.getY() - ePoint.getY();
 	RGB color;
-	color.R = 255;
+	color.R = 0;
 	color.G = 0;
 	color.B = 0;
-	// compute the distance between model centroid point and reference point in model image,
-	// estimate the model centroid point in scene image
-	int drcx = center.getX() - mPoint.getX();
-	int drcy = center.getY() - mPoint.getY();
-	Point mInScene(sPoint.getX() - drcx, sPoint.getY() - drcy);
-	ptr_IntMatrix modelInScene = new Matrix<int>(rows, cols, 0);
-	for (int r = 0; r < rows; ++r)
-	{
-		for (int c = 0; c < cols; ++c)
-		{
-			if (mcannyMatrix->getAtPosition(r, c) != 0)
-			{
-				int diffx = mPoint.getX() - c;
-				int diffy = mPoint.getY() - r;
-				int ynew = mInScene.getY() - diffy;
-				int xnew = mInScene.getX() - diffx;
-				if (xnew >= 0 && xnew < cols && ynew >= 0 && ynew < rows)
-				{
-					modelInScene->setAtPosition(ynew, xnew,
-							mcannyMatrix->getAtPosition(r, c));
-				}
-			}
-		}
-	}
-	delete mcannyMatrix;
 
-	// compute the rotation direction and rotate model image in scene
-	// tinh huong quay
-	int kx = mPoint.getX() - mLine.getEnd().getX();
-	int ky = mPoint.getY() - mLine.getEnd().getY();
-	Line mLine2(mInScene, Point(mInScene.getX() - kx, mInScene.getY() - ky));
-	Point inPoint = sLine.intersection(mLine2);
-	double anglek = angleVector(inPoint, ePoint, inPoint, mInScene);
-	if (anglek < 90)
-	{ // keep rotation
-		if (mInScene.getX() > ePoint.getX())
-		{
-			anglek = -anglek;
-		}
-	}
-	else
-	{ // inverse rotation
-		if (mInScene.getX() < ePoint.getX())
-		{
-			anglek = -anglek;
-		}
-	}
-	cout << "\n Angle 3: " << anglek * 180 / M_PI << endl;
-	Matrix<int> modelRotated = modelInScene->rotation(mInScene,
-			anglek * 180 / M_PI, 1, 0);
-	// rotate the list of estimated landmarks
-	Point li;
-	vector<Point> listphtLM;
-	for (size_t i = 0; i < eslm.size(); i++)
-	{
-		li = eslm.at(i);
-		int xnew = 0, ynew = 0;
-		rotateAPoint(li.getX(), li.getY(), mInScene, anglek * 180 / M_PI, 1,
-				xnew, ynew);
-		listphtLM.push_back(Point(xnew, ynew));
-	}
-	//delete modelInScene;
-	// move model image to the same centroid with scene image
-	ptr_IntMatrix modelTranslated = new Matrix<int>(rows, cols, 0);
-	int dcx = mInScene.getX() - ePoint.getX();
-	int dcy = mInScene.getY() - ePoint.getY();
-	for (int r = 0; r < rows; r++)
-	{
-		for (int c = 0; c < cols; c++)
-		{
-			if (modelRotated.getAtPosition(r, c) != 0)
-			{
-				int xnew = c - dcx;
-				int ynew = r - dcy;
-				modelTranslated->setAtPosition(ynew, xnew,
-						modelRotated.getAtPosition(r, c));
-			}
-		}
-	}
-	// translate the list of landmarks
-	vector<Point> estLandmarks;
-	for (size_t i = 0; i < listphtLM.size(); ++i) {
-		li = listphtLM.at(i);
-		estLandmarks.push_back(Point(li.getX() - dcx,li.getY()- dcy));
-	}
-
-	for (int r = 0; r < rows; ++r)
-	{
-		for (int c = 0; c < cols; ++c)
-		{
-			if (modelTranslated->getAtPosition(r, c) != 0)
-			{
-
-				matImage->getRGBMatrix()->setAtPosition(r, c, color);
-			}
-		}
-	}
-
+	//*(matImage->getRGBMatrix()) = matImage->getRGBMatrix()->translate(dx, dy, color);
+	color.R = 255;
 	// drawing...
 
-	fillCircle(*(matImage->getRGBMatrix()),ePoint,5,color);
-	drawingLine(*(matImage->getRGBMatrix()),sLine,color);
-	// draw the intersection point
-	color.B = 255;
-	fillCircle(*(matImage->getRGBMatrix()),inPoint,5,color);
-
-	color.R = color.B = 0;
+	//fillCircle(*(matImage->getRGBMatrix()), ePoint, 5, color);
 	color.G = 255;
-	fillCircle(*(matImage->getRGBMatrix()),mInScene,5,color);
-
-	cout << "\n Angle 2: " << mLine2.angleLines(sLine) << endl;
-	drawingLine(*(matImage->getRGBMatrix()),mLine2,color);
+	//fillCircle(*(matImage->getRGBMatrix()), mPoint, 5, color);
 
 	// draw the landmarks
 	Point lm;
@@ -918,18 +797,12 @@ void ImageViewer::gHoughTransform()
 	{
 		lm = estLandmarks.at(i);
 		cout << "\n Landmarks " << i + 1 << ": " << lm.getX() << "\t"
-				<< lm.getY()<<endl;
-		fillCircle(*(matImage->getRGBMatrix()),lm,5,color);
+				<< lm.getY() << endl;
+		fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
 	}
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 			"Landmarks result");
 	this->show();
-	delete mbinMatrix;
-	delete mcannyMatrix;
-	delete mgradirection;
-	delete binMatrix;
-	delete cannyMatrix;
-	delete gradirection;
 	msgbox.setText("Finish.");
 	msgbox.exec();
 
@@ -971,20 +844,20 @@ void ImageViewer::pHoughTransform()
 	for (size_t i = 0; i < lms.size(); i++)
 	{
 		lm = lms.at(i);
-		fillCircle(*(matImage->getRGBMatrix()),lm,5,color);
+		fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
 		/*vector<Point> dPoints = fillCircle(lm, 5, color);
-		Point p;
-		for (size_t k = 0; k < dPoints.size(); k++)
-		{
-			p = dPoints.at(k);
+		 Point p;
+		 for (size_t k = 0; k < dPoints.size(); k++)
+		 {
+		 p = dPoints.at(k);
 
-			if (p.getX() >= 0 && p.getX() < cols && p.getY() >= 0
-					&& p.getY() < rows)
-			{
-				matImage->getRGBMatrix()->setAtPosition(p.getY(), p.getX(),
-						p.getColor());
-			}
-		}*/
+		 if (p.getX() >= 0 && p.getX() < cols && p.getY() >= 0
+		 && p.getY() < rows)
+		 {
+		 matImage->getRGBMatrix()->setAtPosition(p.getY(), p.getX(),
+		 p.getColor());
+		 }
+		 }*/
 	}
 	matImage->setAutoLandmarks(lms);
 	displayALandmarksAct->setEnabled(true);
@@ -1036,19 +909,19 @@ void ImageViewer::extractLandmarks()
 	for (size_t i = 0; i < lms.size(); i++)
 	{
 		lm = lms.at(i);
-		drawingCircle(*(matImage->getRGBMatrix()),lm,5,color);
+		drawingCircle(*(matImage->getRGBMatrix()), lm, 5, color);
 		/*vector<Point> dPoints = drawingCircle(lm, 5, color);
-		Point p;
-		for (size_t k = 0; k < dPoints.size(); k++)
-		{
-			p = dPoints.at(k);
-			if (p.getX() >= 0 && p.getX() < cols && p.getY() >= 0
-					&& p.getY() < rows)
-			{
-				matImage->getRGBMatrix()->setAtPosition(p.getY(), p.getX(),
-						p.getColor());
-			}
-		}*/
+		 Point p;
+		 for (size_t k = 0; k < dPoints.size(); k++)
+		 {
+		 p = dPoints.at(k);
+		 if (p.getX() >= 0 && p.getX() < cols && p.getY() >= 0
+		 && p.getY() < rows)
+		 {
+		 matImage->getRGBMatrix()->setAtPosition(p.getY(), p.getX(),
+		 p.getColor());
+		 }
+		 }*/
 	}
 	matImage->setAutoLandmarks(lms);
 	displayALandmarksAct->setEnabled(true);

@@ -98,7 +98,7 @@ Point houghSpace(ptr_IntMatrix gradMatrix, RTable rentries)
 						//PolarValue pvalue;
 						double avalue = 0, dvalue = 0;
 						int xindex = 0, yindex = 0, accValue = 0;
-						for (int k = 0; k < polarValues.size(); k++)
+						for (size_t k = 0; k < polarValues.size(); k++)
 						{
 							PolarValue pvalue = polarValues.at(k);
 							avalue = pvalue.angle;
@@ -139,7 +139,7 @@ double avgDistance(vector<Point> listPoints, Line axis)
 {
 	double totalDist = 0;
 	size_t nPoints = listPoints.size();
-	for (int j = 0; j < nPoints; j++)
+	for (size_t j = 0; j < nPoints; j++)
 	{
 		Point pj = listPoints.at(j);
 		double distance = axis.perpendicularDistance(pj);

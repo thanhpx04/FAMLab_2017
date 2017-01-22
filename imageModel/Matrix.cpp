@@ -168,6 +168,27 @@ Matrix<T> Matrix<T>::rotation(Point center, double angle, double scale,
 	}
 	return result;
 }
+template<typename T>
+Matrix<T> Matrix<T>::translate(int dx, int dy, T defaultValue)
+{
+	Matrix<T> result(rows, cols);
+	result.InitWithValue(defaultValue);
+	for (int row = 0; row < rows; row++)
+	{
+		for (int col = 0; col < cols; col++)
+		{
+			T value = data[row][col];
+
+			int xnew = col + dx;
+			int ynew = row + dy;
+			if (xnew >= 0 && xnew < cols && ynew >= 0 && ynew < rows)
+			{
+				result.data[ynew][xnew] = value;
+			}
+		}
+	}
+	return result;
+}
 template class Matrix<int> ;
 template class Matrix<double> ;
 template class Matrix<RGB> ;

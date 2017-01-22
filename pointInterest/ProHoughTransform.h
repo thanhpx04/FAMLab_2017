@@ -26,6 +26,9 @@ public:
 	PHoughTransform constructPHT();
 	vector<Point> estimateLandmarks(Image sImage,
 		double &angleDiff, Point &ePoint);
+
+	vector<Point> generalTransform(Image sImage, double &angle, Point &ePoint,
+			Point &mPoint);
 };
 
 #endif /* PROHOUGHTRANSFORM_H_ */

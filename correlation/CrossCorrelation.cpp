@@ -34,7 +34,7 @@ CrossCorrelation::~CrossCorrelation()
 }
 
 ptr_IntMatrix createTemplate(ptr_IntMatrix inputImage, Point centerPoint,
-	int tsize, Point &location, Point &distance)
+		int tsize, Point &location, Point &distance)
 {
 	int hsize = tsize / 2;
 	int cx = centerPoint.getX(); //col
@@ -49,8 +49,7 @@ ptr_IntMatrix createTemplate(ptr_IntMatrix inputImage, Point centerPoint,
 	location.setX(lx);
 	location.setY(ly);
 	distance.setX(cx - lx);
-	distance.setY(cy-ly);
-
+	distance.setY(cy - ly);
 
 	int rx = (cx + hsize) >= cols ? cols - 1 : (cx + hsize);
 	int ry = (cy + hsize) >= rows ? rows - 1 : (cy + hsize);
@@ -64,7 +63,11 @@ ptr_IntMatrix createTemplate(ptr_IntMatrix inputImage, Point centerPoint,
 		for (int col = lx; col < rx; col++)
 		{
 			j++;
-			result->setAtPosition(i, j, inputImage->getAtPosition(row, col));
+			if (i >= 0 && i < ry - ly && j >= 0 && j < rx - lx)
+			{
+				result->setAtPosition(i, j,
+						inputImage->getAtPosition(row, col));
+			}
 		}
 	}
 	return result;
@@ -123,12 +126,12 @@ Point matCrossCorrelation(ptr_IntMatrix templ, ptr_IntMatrix image)
 }
 
 vector<Point> verifyLandmarks(Image mImage, Image sImage,
-	vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
-	int sceneSize, double angleDiff, Point ePoint)
+		vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
+		int sceneSize, double angleDiff, Point ePoint)
 {
 
 	ptr_IntMatrix mMatrix = mImage.getGrayMatrix();
-	sImage.rotate(ePoint, angleDiff, 1);
+	//sImage.rotate(ePoint, angleDiff, 1);
 	ptr_IntMatrix sRotateImg = sImage.getGrayMatrix();
 	int width = mMatrix->getCols();
 	int height = mMatrix->getRows();
@@ -142,13 +145,13 @@ vector<Point> verifyLandmarks(Image mImage, Image sImage,
 	Point iDistance(0, 0);
 	ptr_IntMatrix templ;
 	ptr_IntMatrix sceneM;
-	Point maxLoc(0,0);
+	Point maxLoc(0, 0);
 	for (size_t i = 0; i < esLandmarks.size(); i++)
 	{
 		epi = esLandmarks.at(i);
 		mpi = manualLM.at(i);
 		if (epi.getX() > 0 && epi.getY() > 0 && epi.getX() < width
-			&& epi.getY() < height)
+				&& epi.getY() < height)
 		{
 			tLocation.setX(0);
 			tLocation.setY(0);
@@ -161,8 +164,10 @@ vector<Point> verifyLandmarks(Image mImage, Image sImage,
 			maxLoc.setX(0);
 			maxLoc.setY(0);
 
-			templ = createTemplate(mMatrix, mpi, templSize, tLocation, tDistance);
-			sceneM = createTemplate(sRotateImg, epi, sceneSize, iLocation, iDistance);
+			templ = createTemplate(mMatrix, mpi, templSize, tLocation,
+					tDistance);
+			sceneM = createTemplate(sRotateImg, epi, sceneSize, iLocation,
+					iDistance);
 
 			maxLoc = matCrossCorrelation(templ, sceneM);
 			int lmx = iLocation.getX() + maxLoc.getX() + tDistance.getX();
@@ -171,16 +176,6 @@ vector<Point> verifyLandmarks(Image mImage, Image sImage,
 		}
 
 	}
-	// free memory
-	/*delete templ;
-	delete sceneM;
-	delete tLocation;
-	delete tDistance;
-	delete iLocation;
-	delete iDistance;
-	delete maxLoc;
-	delete epi;
-	delete mpi;*/
 
 	Point p;
 	for (size_t k = 0; k < mcResult.size(); k++)
@@ -190,5 +185,65 @@ vector<Point> verifyLandmarks(Image mImage, Image sImage,
 
 	}
 
+	return mcResult;
+}
+vector<Point> verifyLandmarks2(Image mImage, Image sImage,
+		vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
+		int sceneSize)
+{
+	int width = mImage.getGrayMatrix()->getCols();
+	int height = mImage.getGrayMatrix()->getRows();
+	ptr_IntMatrix mMatrix = new Matrix<int>(height,width,0);
+	*mMatrix = *(mImage.getGrayMatrix());
+	ptr_IntMatrix sMatrix = new Matrix<int>(height,width,0);
+	*sMatrix = *(sImage.getGrayMatrix());
+
+	std::vector<Point> mcResult;
+	Point epi;
+	Point mpi;
+	Point tLocation(0, 0);
+	Point tDistance(0, 0);
+	Point iLocation(0, 0);
+	Point iDistance(0, 0);
+	ptr_IntMatrix templ;
+	ptr_IntMatrix sceneM;
+	Point maxLoc(0, 0);
+	size_t limit = 0;
+	if (manualLM.size() < esLandmarks.size())
+		limit = manualLM.size();
+	else
+		limit = esLandmarks.size();
+	for (size_t i = 0; i < limit; i++)
+	{
+		epi = esLandmarks.at(i);
+		mpi = manualLM.at(i);
+		if (epi.getX() >= 0 && epi.getY() >= 0 && epi.getX() < width
+				&& epi.getY() < height)
+		{
+			tLocation.setX(0);
+			tLocation.setY(0);
+			tDistance.setX(0);
+			tDistance.setY(0);
+			iLocation.setX(0);
+			iLocation.setY(0);
+			iDistance.setX(0);
+			iDistance.setY(0);
+			maxLoc.setX(0);
+			maxLoc.setY(0);
+
+			templ = createTemplate(mMatrix, mpi, templSize, tLocation,
+					tDistance);
+			sceneM = createTemplate(sMatrix, epi, sceneSize, iLocation,
+					iDistance);
+
+			maxLoc = matCrossCorrelation(templ, sceneM);
+			int lmx = iLocation.getX() + maxLoc.getX() + tDistance.getX();
+			int lmy = iLocation.getY() + maxLoc.getY() + tDistance.getY();
+			mcResult.push_back(Point(lmx, lmy));
+		}
+
+	}
+	delete mMatrix;
+	delete sMatrix;
 	return mcResult;
 }

@@ -10,7 +10,9 @@
 vector<Point> verifyLandmarks(Image mImage, Image sImage,
 		vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
 		int sceneSize, double angleDiff, Point ePoint);
-
+vector<Point> verifyLandmarks2(Image mImage, Image sImage,
+	vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
+	int sceneSize);
 class CrossCorrelation
 {
 public:

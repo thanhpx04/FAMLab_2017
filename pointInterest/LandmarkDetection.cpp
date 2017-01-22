@@ -48,8 +48,8 @@ LandmarkDetection::~LandmarkDetection()
 }
 
 vector<Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
-	AngleAccuracy acc, int cols, int templSize, int sceneSize, Point &ePoint,
-	double &angleDiff)
+		AngleAccuracy acc, int cols, int templSize, int sceneSize,
+		Point &ePoint, double &angleDiff)
 {
 	vector<Point> result;
 	Image modelImage = Treatments::refImage;
@@ -75,15 +75,15 @@ vector<Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 	mpht.setRefPoint(Point(width / 2, height / 2));
 
 	vector<PHTEntry> entriesTable = mpht.constructPHTTable(mLines);
-	vector<Point> phtEsLM = phtLandmarks(entriesTable, mpht.getRefPoint(), sLines,
-		width, height, manualLMs, angleDiff, ePoint);
+	vector<Point> phtEsLM = phtLandmarks(entriesTable, mpht.getRefPoint(),
+			sLines, width, height, manualLMs, angleDiff, ePoint);
 
 	cout << "\n Number of landmarks (pht): " << phtEsLM.size();
 	cout << "\nAngle difference: " << angleDiff << endl;
 	if (phtEsLM.size() > 0)
 	{
 		result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
-			templSize, sceneSize, angleDiff, ePoint);
+				templSize, sceneSize, angleDiff, ePoint);
 		//result = phtEsLM;
 
 	}
@@ -94,9 +94,33 @@ vector<Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 	return result;
 }
 
+vector<Point> LandmarkDetection::landmarksAutoDectect2(Image &sceneImage,
+		int templSize, int sceneSize)
+{
+	Image modelImage = Treatments::refImage;
+	vector<Point> manualLMs = modelImage.getListOfManualLandmarks();
+	ProHoughTransform proHT;
+	proHT.setRefImage(modelImage);
+	double angle = 0;
+	Point ePoint, mPoint;
+	vector<Point> phtEsLM = proHT.generalTransform(sceneImage, angle, ePoint,
+			mPoint);
+	vector<Point> result;
+	sceneImage.rotate(ePoint, angle, 1);
+
+	if (phtEsLM.size() > 0)
+	{
+		cout << "\nAngle difference: " << angle << endl;
+		result = verifyLandmarks2(modelImage, sceneImage, manualLMs, phtEsLM,
+				templSize, sceneSize);
+	}
+	phtEsLM.clear();
+	return result;
+}
+
 void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
-	vector<string> sceneImages, AngleAccuracy acc, int cols, int templSize,
-	int sceneSize, Point &ePoint, double &angleDiff, string saveFolder)
+		vector<string> sceneImages, AngleAccuracy acc, int cols, int templSize,
+		int sceneSize, Point &ePoint, double &angleDiff, string saveFolder)
 {
 
 	Image modelImage = Treatments::refImage;
@@ -131,21 +155,22 @@ void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
 
 		vector<PHTEntry> entriesTable = mpht.constructPHTTable(mLines);
 		vector<Point> phtEsLM = phtLandmarks(entriesTable, mpht.getRefPoint(),
-			sLines, width, height, manualLMs, angleDiff, ePoint);
+				sLines, width, height, manualLMs, angleDiff, ePoint);
 
 		cout << "\n Number of landmarks (pht): " << phtEsLM.size();
 		cout << "\nAngle difference: " << angleDiff << endl;
 
 		if (phtEsLM.size() > 0)
 		{
-			result = verifyLandmarks(modelImage, *sceneImage, manualLMs, phtEsLM,
-				templSize, sceneSize, angleDiff, ePoint);
+			result = verifyLandmarks(modelImage, *sceneImage, manualLMs,
+					phtEsLM, templSize, sceneSize, angleDiff, ePoint);
 
 		}
 		entriesTable.clear();
 		phtEsLM.clear();
 
-		string saveFile = saveFolder + "/" + modelName + "_" + sceneName + ".TPS";
+		string saveFile = saveFolder + "/" + modelName + "_" + sceneName
+				+ ".TPS";
 		ofstream inFile(saveFile.c_str());
 		inFile << "LM=" << result.size() << "\n";
 		Point pk;
@@ -161,23 +186,12 @@ void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
 
 }
 void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
-	vector<string> sceneImages, string saveFolder)
+		vector<string> sceneImages, string saveFolder)
 {
 
 	Image modelImage = Treatments::refImage;
 	vector<Point> manualLMs = modelImage.getListOfManualLandmarks();
 	int rows = modelImage.getGrayMatrix()->getRows();
-	int cols = modelImage.getGrayMatrix()->getCols();
-
-	ptr_IntMatrix mbinMatrix = binaryThreshold(modelImage.getGrayMatrix(),
-		(int) modelImage.getThresholdValue(), 255);
-	ptr_IntMatrix mgradirection = new Matrix<int>(rows, cols, -1);
-	ptr_IntMatrix mcannyMatrix = cannyProcess2(mbinMatrix,
-		(int) modelImage.getThresholdValue(),
-		3 * (int) modelImage.getThresholdValue(), mgradirection);
-	Point center(cols / 2, rows / 2);
-	RTable rentries = rTableConstruct(mgradirection, center);
-
 	for (size_t i = 0; i < sceneImages.size(); i++)
 	{
 		Image *sceneImage;
@@ -186,39 +200,25 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 
 		sceneImage = new Image(folderScene + "/" + sceneName);
 
-		ptr_IntMatrix sbinMatrix = binaryThreshold(sceneImage->getGrayMatrix(),
-			(int) sceneImage->getThresholdValue(), 255);
-		ptr_IntMatrix sgradirection = new Matrix<int>(rows, cols, -1);
-		ptr_IntMatrix scannyMatrix = cannyProcess2(sbinMatrix,
-			(int) sceneImage->getThresholdValue(),
-			3 * (int) sceneImage->getThresholdValue(), sgradirection);
+		vector < Point > estLandmarks = landmarksAutoDectect2(*sceneImage, 100, 300);
 
-		Point ePoint = houghSpace(sgradirection, rentries);
-		//double angle = 0;
-		vector<Point> eslm = detectLandmarks(center, ePoint,
-			modelImage.getListOfManualLandmarks());
+		cout << "\n Number of landmarks (pht): " << estLandmarks.size();
 
-		cout << "\n Number of landmarks (pht): " << eslm.size();
-
-		string saveFile = saveFolder + "/" + modelName + "_" + sceneName + ".TPS";
+		string saveFile = saveFolder + "/" + modelName + "_" + sceneName
+				+ ".TPS";
 		ofstream inFile(saveFile.c_str());
-		inFile << "LM=" << eslm.size() << "\n";
+		inFile << "LM=" << estLandmarks.size() << "\n";
 		Point pk;
-		for (size_t k = 0; k < eslm.size(); k++)
+		for (size_t k = 0; k < estLandmarks.size(); k++)
 		{
-			pk = eslm.at(k);
+			pk = estLandmarks.at(k);
 			inFile << pk.getX() << " " << rows - pk.getY() << "\n";
 		}
 		inFile << "IMAGE=" << saveFile << "\n";
 		inFile.close();
 
-		delete sbinMatrix;
-		delete sgradirection;
-		delete scannyMatrix;
-		eslm.clear();
+		estLandmarks.clear();
 		delete sceneImage;
 	}
-	delete mbinMatrix;
-	delete mgradirection;
-	delete mcannyMatrix;
+
 }

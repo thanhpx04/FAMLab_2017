@@ -64,6 +64,7 @@ public:
 	void printMatrix();
 	Matrix<T> rotation(Point center, double angle, double scale,
 			T defaultValue);
+	Matrix<T> translate(int dx, int dy, T defaultValue);
 };
 typedef Matrix<int>* ptr_IntMatrix;
 typedef Matrix<double>* ptr_DoubleMatrix;
