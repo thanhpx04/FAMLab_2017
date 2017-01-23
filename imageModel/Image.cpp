@@ -57,13 +57,10 @@ ptr_IntMatrix convertRGBToGray(ptr_RGBMatrix rgbMatrix)
 		{
 
 			grayMatrix->setAtPosition(h, w,
-					round(
-							((double) rgbMatrix->getAtPosition(h, w).R
-									* RED_COEFFICIENT)
-									+ ((double) rgbMatrix->getAtPosition(h, w).G
-											* GREEN_COEFFICIENT)
-									+ ((double) rgbMatrix->getAtPosition(h, w).B
-											* BLUE_COEFFICIENT)));
+				round(
+					((double) rgbMatrix->getAtPosition(h, w).R * RED_COEFFICIENT)
+						+ ((double) rgbMatrix->getAtPosition(h, w).G * GREEN_COEFFICIENT)
+						+ ((double) rgbMatrix->getAtPosition(h, w).B * BLUE_COEFFICIENT)));
 		}
 	}
 
@@ -95,11 +92,11 @@ Image::Image(const Image &cpimage)
 Image::~Image()
 {
 	/*listOfLines.clear();
-	 manualLandmarks.clear();
-	 autoLandmarks.clear();
-	 delete grayMatrix;
-	 delete imgMatrix;
-	 delete grayHistogram;*/
+	manualLandmarks.clear();
+	autoLandmarks.clear();
+	delete grayMatrix;
+	delete imgMatrix;
+	delete grayHistogram;*/
 }
 Image::Image(std::string filePath)
 {
@@ -112,6 +109,7 @@ Image::Image(std::string filePath)
 	grayMatrix = convertRGBToGray(imgMatrix);
 	calcGrayHistogram();
 	calThresholdValue();
+
 	cout << endl << "Threshold value: " << thresholdValue;
 }
 
@@ -278,7 +276,7 @@ void Image::calThresholdValue()
 	if (medianHistogram == 0 || meanHistogram == 0)
 		calcGrayHistogram();
 	int limit1 =
-			meanHistogram > medianHistogram ? medianHistogram : meanHistogram;
+		meanHistogram > medianHistogram ? medianHistogram : meanHistogram;
 	limit1 = (limit1 >= 120) ? (limit1 - DECREASE_25) : (limit1 - DECREASE_5);
 	int imax1 = -1, max1 = -1;
 	for (int index = 0; index < limit1; index++)
@@ -291,7 +289,7 @@ void Image::calThresholdValue()
 		}
 	}
 	int limit2 =
-			meanHistogram > medianHistogram ? meanHistogram : medianHistogram;
+		meanHistogram > medianHistogram ? meanHistogram : medianHistogram;
 	int imin = -1, min = max1;
 	for (int k = imax1; k < limit2; k++)
 	{
@@ -323,10 +321,10 @@ vector<Edge> Image::cannyAlgorithm()
 		calThresholdValue();
 
 	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, (int) thresholdValue,
-			MAX_GRAY_VALUE);
+		MAX_GRAY_VALUE);
 
 	ptr_IntMatrix cannyMatrix = cannyProcess(binMatrix, (int) thresholdValue,
-			3 * (int) thresholdValue);
+		3 * (int) thresholdValue);
 
 	vector<Edge> listOfEdges;
 	listOfEdges = suzuki(cannyMatrix);
@@ -365,14 +363,14 @@ vector<Edge> Image::cannyAlgorithm()
 void Image::rotate(Point center, double angle, double scale)
 {
 	/*ptr_DoubleMatrix rotationMatrix = getRotationMatrix2D(center, angle, scale);
-	ptr_IntMatrix source = grayMatrix;*/
+	 ptr_IntMatrix source = grayMatrix;*/
 	RGB color;
 	color.R = color.B = color.G = 0;
-	Matrix<int> gray = grayMatrix->rotation(center, angle, scale,0);
-	Matrix<RGB> rgb = imgMatrix->rotation(center, angle, scale,color);
+	grayMatrix->rotation(center, angle, scale, 0);
+	imgMatrix->rotation(center, angle, scale, color);
 
-	*grayMatrix = gray;
-	*imgMatrix = rgb;
+	//*grayMatrix = gray;
+	//*imgMatrix = rgb;
 
 	/*int rows = source->getRows();
 	 int cols = source->getCols();

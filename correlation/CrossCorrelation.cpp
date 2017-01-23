@@ -231,15 +231,17 @@ vector<Point> verifyLandmarks2(Image mImage, Image sImage,
 			maxLoc.setX(0);
 			maxLoc.setY(0);
 
-			templ = createTemplate(mMatrix, mpi, templSize, tLocation,
-					tDistance);
-			sceneM = createTemplate(sMatrix, epi, sceneSize, iLocation,
-					iDistance);
+			templ = new Matrix<int>(*createTemplate(mMatrix, mpi, templSize, tLocation,
+					tDistance));
+			sceneM = new Matrix<int>(*createTemplate(sMatrix, epi, sceneSize, iLocation,
+					iDistance));
 
 			maxLoc = matCrossCorrelation(templ, sceneM);
 			int lmx = iLocation.getX() + maxLoc.getX() + tDistance.getX();
 			int lmy = iLocation.getY() + maxLoc.getY() + tDistance.getY();
 			mcResult.push_back(Point(lmx, lmy));
+			delete templ;
+			delete sceneM;
 		}
 
 	}

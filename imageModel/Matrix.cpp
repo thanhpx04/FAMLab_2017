@@ -94,7 +94,7 @@ void Matrix<T>::operator=(const Matrix<T> &tMatrix)
 {
 	rows = tMatrix.rows;
 	cols = tMatrix.cols;
-	Init();
+	//Init();
 	data = tMatrix.data;
 }
 // get rotation matrix with angle (in degree) and scale
@@ -131,9 +131,10 @@ void rotateAPoint(int x, int y, Point center, double angle, double scale,
 	double b10 = rotationMatrix->getAtPosition(1, 2);
 	xnew = round(a00 * x + a01 * y + b00);
 	ynew = round(a10 * x + a11 * y + b10);
+	delete rotationMatrix;
 }
 template<typename T>
-Matrix<T> Matrix<T>::rotation(Point center, double angle, double scale,
+void Matrix<T>::rotation(Point center, double angle, double scale,
 		T defaultValue)
 {
 	Matrix<T> result(rows, cols);
@@ -166,7 +167,8 @@ Matrix<T> Matrix<T>::rotation(Point center, double angle, double scale,
 			}
 		}
 	}
-	return result;
+	data = result.data;
+	//return result;
 }
 template<typename T>
 Matrix<T> Matrix<T>::translate(int dx, int dy, T defaultValue)

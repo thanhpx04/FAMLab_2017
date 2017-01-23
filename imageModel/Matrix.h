@@ -29,9 +29,11 @@ public:
 	Matrix(const Matrix<T> &tMatrix);
 
 	void operator=(const Matrix<T> &tMatrix);
-	virtual ~Matrix()
+	~Matrix()
 	{
-		//data.clear();
+		/*rows = 0;
+		cols = 0;
+		data.clear();*/
 	}
 	int getRows()
 	{
@@ -62,7 +64,7 @@ public:
 	T getAtPosition(int, int);
 	void setAtPosition(int, int, T);
 	void printMatrix();
-	Matrix<T> rotation(Point center, double angle, double scale,
+	void rotation(Point center, double angle, double scale,
 			T defaultValue);
 	Matrix<T> translate(int dx, int dy, T defaultValue);
 };
