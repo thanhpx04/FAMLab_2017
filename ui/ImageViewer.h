@@ -21,7 +21,7 @@ class ImageViewer: public QMainWindow
 Q_OBJECT
 public:
 	ImageViewer();
-	virtual ~ImageViewer();
+	~ImageViewer();
 
 	QString fileName;
 	QImage qImage;

@@ -205,7 +205,7 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 	Point center(cols / 2, rows / 2);
 	RTable rentries = rTableConstruct(mgradirection, center);
 
-	for (size_t i = 0; i < sceneImages.size(); i++)
+	for (size_t i = 191; i < sceneImages.size(); i++)
 	{
 		Image *sceneImage;
 		string sceneName = sceneImages.at(i);

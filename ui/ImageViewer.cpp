@@ -351,13 +351,13 @@ ImageViewer::ImageViewer()
 
 ImageViewer::~ImageViewer()
 {
+	cout<<"\nRealse memory"<<endl;
 	delete matImage;
 	delete parameterAction;
 	delete parameterDialog;
 
 	delete imageLabel;
 	delete scrollArea;
-	double scaleFactor;
 
 	// menu
 	delete fileMenu;
@@ -399,7 +399,7 @@ ImageViewer::~ImageViewer()
 	delete dirAutoLandmarksAct;
 	delete dirCentroidMeasureAct;
 	delete dirGenerateDataAct;
-}
+};
 void ImageViewer::loadImage(QString fn)
 {
 
@@ -765,7 +765,7 @@ void ImageViewer::gHoughTransform()
 	double angleDiff;
 	vector<Point> estLandmarks = tr.generalTransform(*matImage, angleDiff, ePoint,
 		mPoint);
-
+	cout<<"\nAbc"<<endl;
 	/*LandmarkDetection lmDetect;
 	 lmDetect.setRefImage(*modelImage);
 	 vector < Point > estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 100, 300);
@@ -776,7 +776,7 @@ void ImageViewer::gHoughTransform()
 	color.B = 0;
 	color.R = 255;
 	// drawing...
-	matImage->getRGBMatrix()->rotation(ePoint,angleDiff,1,color);
+	//matImage->getRGBMatrix()->rotation(ePoint,angleDiff,1,color);
 	fillCircle(*(matImage->getRGBMatrix()), ePoint, 5, color);
 	color.G = 255;
 	color.R = 0;
@@ -795,6 +795,7 @@ void ImageViewer::gHoughTransform()
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 		"Landmarks result");
 	this->show();
+
 	msgbox.setText("Finish.");
 	msgbox.exec();
 
@@ -1125,7 +1126,7 @@ void ImageViewer::dirGenerateData()
 
 	string imageFolder = "/home/linh/Desktop/Temps/md/images";
 	string lmFolder = "/home/linh/Desktop/Temps/md/landmarks";
-	string saveFolder = "/home/linh/Desktop/results/2017/md/withpoints/model28";
+	string saveFolder = "/home/linh/Desktop/results/2017/md/withpoints/model71";
 	vector<string> images = readDirectory(imageFolder.c_str());
 	vector<string> lms = readDirectory(lmFolder.c_str());
 	int nrandom = 0;
@@ -1140,7 +1141,7 @@ void ImageViewer::dirGenerateData()
 	//for (int i = 0; i < 21; i++)
 	//{ // run on 20 images
 	//nrandom = random(0, (int) images.size());
-	nrandom = 26; // use Md 028 as ref
+	nrandom = 69; // use Md 028 as ref
 	string modelName = images.at(nrandom);
 	cout << "\n Random and model: " << nrandom << "\t" << modelName << endl;
 	model = imageFolder + "/" + images.at(nrandom);

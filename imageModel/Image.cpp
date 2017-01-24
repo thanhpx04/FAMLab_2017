@@ -97,7 +97,7 @@ Image::~Image()
 	delete grayMatrix;
 	delete imgMatrix;
 	delete grayHistogram;*/
-}
+};
 Image::Image(std::string filePath)
 {
 	medianHistogram = 0;
@@ -107,9 +107,10 @@ Image::Image(std::string filePath)
 	fileName = filePath;
 	imgMatrix = readJPGToRGB(filePath.c_str());
 	grayMatrix = convertRGBToGray(imgMatrix);
-	calcGrayHistogram();
-	calThresholdValue();
 
+	calcGrayHistogram();
+
+	calThresholdValue();
 	cout << endl << "Threshold value: " << thresholdValue;
 }
 
