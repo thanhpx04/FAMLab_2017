@@ -1126,7 +1126,7 @@ void ImageViewer::dirGenerateData()
 
 	string imageFolder = "/home/linh/Desktop/Temps/md/images";
 	string lmFolder = "/home/linh/Desktop/Temps/md/landmarks";
-	string saveFolder = "/home/linh/Desktop/results/2017/md/withpoints/model71";
+	string saveFolder = "/home/linh/Desktop/results/2017/md/withpoints/model11";
 	vector<string> images = readDirectory(imageFolder.c_str());
 	vector<string> lms = readDirectory(lmFolder.c_str());
 	int nrandom = 0;
@@ -1141,7 +1141,7 @@ void ImageViewer::dirGenerateData()
 	//for (int i = 0; i < 21; i++)
 	//{ // run on 20 images
 	//nrandom = random(0, (int) images.size());
-	nrandom = 69; // use Md 028 as ref
+	nrandom = 9; // use Md 028 as ref
 	string modelName = images.at(nrandom);
 	cout << "\n Random and model: " << nrandom << "\t" << modelName << endl;
 	model = imageFolder + "/" + images.at(nrandom);
