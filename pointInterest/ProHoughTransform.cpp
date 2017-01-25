@@ -364,18 +364,18 @@ vector<Point> ProHoughTransform::generalTransform(Image sImage, double &angle,
 	ptr_IntMatrix mMatrix = new Matrix<int>(rows, cols, 0);
 	*mMatrix = *(Treatments::refImage.getGrayMatrix());
 	int mThresholdValue = (int) Treatments::refImage.getThresholdValue();
-	ptr_IntMatrix mbinMatrix = binaryThreshold(mMatrix, mThresholdValue, 255);
+	ptr_IntMatrix mbinMatrix = new Matrix<int>(*binaryThreshold(mMatrix, mThresholdValue, 255));
 	ptr_IntMatrix mgradirection = new Matrix<int>(rows, cols, -1);
-	ptr_IntMatrix mcannyMatrix = cannyProcess2(mbinMatrix, mThresholdValue,
-		3 * mThresholdValue, mgradirection);
+	ptr_IntMatrix mcannyMatrix = new Matrix<int>(*cannyProcess2(mbinMatrix, mThresholdValue,
+		3 * mThresholdValue, mgradirection));
 	vector<Point> mLandmarks = Treatments::refImage.getListOfManualLandmarks();
 
 	int sThresholdValue = sImage.getThresholdValue();
-	ptr_IntMatrix sbinMatrix = binaryThreshold(sImage.getGrayMatrix(),
-		sThresholdValue, 255);
+	ptr_IntMatrix sbinMatrix = new Matrix<int>(*binaryThreshold(sImage.getGrayMatrix(),
+		sThresholdValue, 255));
 	ptr_IntMatrix gradirection = new Matrix<int>(rows, cols, -1);
-	ptr_IntMatrix cannyMatrix = cannyProcess2(sbinMatrix, sThresholdValue,
-		3 * sThresholdValue, gradirection);
+	ptr_IntMatrix cannyMatrix = new Matrix<int>(*cannyProcess2(sbinMatrix, sThresholdValue,
+		3 * sThresholdValue, gradirection));
 
 	// Landmarks are estimated by using GHT
 	Point center(cols / 2, rows / 2);
@@ -430,7 +430,7 @@ vector<Point> ProHoughTransform::generalTransform(Image sImage, double &angle,
 		eslm.at(i).setX(pi.getX() - dx);
 		eslm.at(i).setY(pi.getY() - dy);
 	}
-	mPoint = ePoint;
+	mPoint = sLine.getEnd();
 	delete mMatrix;
 	delete mgradirection;
 	delete mcannyMatrix;
