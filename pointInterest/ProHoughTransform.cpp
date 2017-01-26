@@ -366,16 +366,18 @@ vector<Point> ProHoughTransform::generalTransform(Image sImage, double &angle,
 	int mThresholdValue = (int) Treatments::refImage.getThresholdValue();
 	ptr_IntMatrix mbinMatrix = new Matrix<int>(*binaryThreshold(mMatrix, mThresholdValue, 255));
 	ptr_IntMatrix mgradirection = new Matrix<int>(rows, cols, -1);
+	vector<Point> medgePoints;
 	ptr_IntMatrix mcannyMatrix = new Matrix<int>(*cannyProcess2(mbinMatrix, mThresholdValue,
-		3 * mThresholdValue, mgradirection));
+		3 * mThresholdValue, mgradirection,medgePoints));
 	vector<Point> mLandmarks = Treatments::refImage.getListOfManualLandmarks();
 
 	int sThresholdValue = sImage.getThresholdValue();
 	ptr_IntMatrix sbinMatrix = new Matrix<int>(*binaryThreshold(sImage.getGrayMatrix(),
 		sThresholdValue, 255));
 	ptr_IntMatrix gradirection = new Matrix<int>(rows, cols, -1);
+	vector<Point> sedgePoints;
 	ptr_IntMatrix cannyMatrix = new Matrix<int>(*cannyProcess2(sbinMatrix, sThresholdValue,
-		3 * sThresholdValue, gradirection));
+		3 * sThresholdValue, gradirection,sedgePoints));
 
 	// Landmarks are estimated by using GHT
 	Point center(cols / 2, rows / 2);

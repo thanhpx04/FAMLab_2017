@@ -7,7 +7,7 @@
 
 #ifndef EDGE_H_
 #define EDGE_H_
-
+bool checkPointInList(std::vector<Point>, Point);
 class Edge
 {
 
@@ -35,7 +35,7 @@ public:
 	Edge(const Edge &cpedge);
 	virtual ~Edge();
 	Edge(std::vector<Point>);
-	bool checkPointInList(std::vector<Point>, Point);
+
 	std::vector<Point> getPoints();
 	void setPoints(std::vector<Point>);
 	std::vector<Point> segment(double);

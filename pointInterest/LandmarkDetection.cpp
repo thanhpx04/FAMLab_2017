@@ -198,8 +198,9 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 	int mThresholdValue = (int) Treatments::refImage.getThresholdValue();
 	ptr_IntMatrix mbinMatrix = binaryThreshold(mMatrix, mThresholdValue, 255);
 	ptr_IntMatrix mgradirection = new Matrix<int>(rows, cols, -1);
+	vector<Point> medgePoints;
 	ptr_IntMatrix mcannyMatrix = cannyProcess2(mbinMatrix, mThresholdValue,
-		3 * mThresholdValue, mgradirection);
+		3 * mThresholdValue, mgradirection,medgePoints);
 	vector<Point> manualLMs = modelImage.getListOfManualLandmarks();
 	// Construct the R-table
 	Point center(cols / 2, rows / 2);
@@ -217,9 +218,10 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 		ptr_IntMatrix sbinMatrix = new Matrix<int>(
 			*(binaryThreshold(sceneImage->getGrayMatrix(), sThresholdValue, 255)));
 		ptr_IntMatrix gradirection = new Matrix<int>(rows, cols, -1);
+		vector<Point> sedgePoints;
 		ptr_IntMatrix cannyMatrix = new Matrix<int>(
 			*(cannyProcess2(sbinMatrix, sThresholdValue, 3 * sThresholdValue,
-				gradirection)));
+				gradirection,sedgePoints)));
 
 		Point sPoint = houghSpace(gradirection, rentries);
 		vector<Point> eslm = detectLandmarks(center, sPoint, manualLMs);

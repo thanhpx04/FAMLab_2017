@@ -373,7 +373,7 @@ ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	return thresholdImage;
 }
 ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
-	int highThreshold, ptr_IntMatrix &gradDirection)
+	int highThreshold, ptr_IntMatrix &gradDirection, vector<Point> &lPoints)
 {
 	ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
@@ -383,7 +383,7 @@ ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
 	// viet them cho GPH tren pixel
 	int rows = binaryImage->getRows();
 	int cols = binaryImage->getCols();
-
+	lPoints.clear();
 	//gradDirection = new Matrix<int>(rows, cols, -1);
 	double angle = 0;
 	int count = 0;
@@ -393,6 +393,7 @@ ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
 		{
 			if (thresholdImage->getAtPosition(r, c) == 255)
 			{
+				lPoints.push_back(Point(c,r));
 				angle = angles->getAtPosition(r, c);
 
 				if (angle < 0)

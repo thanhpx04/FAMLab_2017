@@ -199,11 +199,11 @@ vector<Point> detectLandmarks(Point refPoint, Point ePoint,
 	for (size_t i = 0; i < mlandmarks.size(); i++)
 	{
 		mlm = mlandmarks.at(i);
-		deltaX = refPoint.getX() - mlm.getX();
-		deltaY = refPoint.getY() - mlm.getY();
+		deltaX = ePoint.getX() - refPoint.getX();
+		deltaY = ePoint.getY() - refPoint.getY();
 
-		xn = ePoint.getX() - deltaX;
-		yn = ePoint.getY() - deltaY;
+		xn = mlm.getX() + deltaX;
+		yn = mlm.getY() + deltaY;
 		esLandmarks.push_back(Point(xn, yn));
 	}
 	return esLandmarks;

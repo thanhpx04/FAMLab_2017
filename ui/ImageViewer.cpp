@@ -54,6 +54,7 @@ using namespace std;
 #include "../utils/ImageConvert.h"
 #include "../utils/Drawing.h"
 #include "../utils/Converter.h"
+#include "../correlation/CrossCorrelation.h"
 
 #include "../MAELab.h"
 
@@ -774,18 +775,20 @@ void ImageViewer::gHoughTransform()
 	ptr_IntMatrix mbinMatrix = new Matrix<int>(
 		*binaryThreshold(mMatrix, mThresholdValue, 255));
 	ptr_IntMatrix mgradirection = new Matrix<int>(rows, cols, -1);
+	vector<Point> medgePoints;
 	ptr_IntMatrix mcannyMatrix = new Matrix<int>(
 		*cannyProcess2(mbinMatrix, mThresholdValue, 3 * mThresholdValue,
-			mgradirection));
+			mgradirection, medgePoints));
 	vector<Point> mLandmarks = modelImage->getListOfManualLandmarks();
 
 	int sThresholdValue = matImage->getThresholdValue();
 	ptr_IntMatrix sbinMatrix = new Matrix<int>(
 		*binaryThreshold(matImage->getGrayMatrix(), sThresholdValue, 255));
 	ptr_IntMatrix gradirection = new Matrix<int>(rows, cols, -1);
+	vector<Point> sedgePoints;
 	ptr_IntMatrix cannyMatrix = new Matrix<int>(
 		*cannyProcess2(sbinMatrix, sThresholdValue, 3 * sThresholdValue,
-			gradirection));
+			gradirection, sedgePoints));
 
 	// Landmarks are estimated by using GHT
 	Point center(cols / 2, rows / 2);
@@ -797,7 +800,10 @@ void ImageViewer::gHoughTransform()
 	Point mTemp;
 	Line sLine = principalAxis(gradirection, ePoint);
 	Line mLine = principalAxis(mgradirection, mTemp);
-
+	int dxold = sPoint.getX() - center.getX();
+	int dyold = sPoint.getY() - center.getY();
+	mTemp.setX(mTemp.getX() + dxold);
+	mTemp.setY(mTemp.getY() + dyold);
 	//==================================================================
 	/*LandmarkDetection lmDetect;
 	 lmDetect.setRefImage(*modelImage);
@@ -811,19 +817,19 @@ void ImageViewer::gHoughTransform()
 	// drawing...
 	//matImage->getRGBMatrix()->rotation(ePoint,angleDiff,1,color);
 	fillCircle(*(matImage->getRGBMatrix()), ePoint, 5, color);
-	drawingLine(*(matImage->getRGBMatrix()), sLine, color);
+	//drawingLine(*(matImage->getRGBMatrix()), sLine, color);
 	double a = sLine.getEquation().at(0);
 	double b = sLine.getEquation().at(1);
 	double cp = a * ePoint.getY() - b * ePoint.getX();
 	int x = 0;
 	int y = (cp + b * x) / a;
 	Line l2(ePoint, Point(x, y));
-	drawingLine(*(matImage->getRGBMatrix()), l2, color);
+	//drawingLine(*(matImage->getRGBMatrix()), l2, color);
 
 	color.G = 255;
 	color.R = 0;
 	fillCircle(*(matImage->getRGBMatrix()), mTemp, 5, color);
-	//drawingLine(*(matImage->getRGBMatrix()), mLine, color);
+	drawingLine(*(matImage->getRGBMatrix()), mLine, color);
 
 	a = mLine.getEquation().at(0);
 	b = mLine.getEquation().at(1);
@@ -832,61 +838,82 @@ void ImageViewer::gHoughTransform()
 	y = (cp + b * x) / a;
 
 	Line l3(mTemp, Point(x, y));
-	//drawingLine(*(matImage->getRGBMatrix()), l3, color);
+	drawingLine(*(matImage->getRGBMatrix()), l3, color);
 
-	color.R = 255;
+	color.G = 0;
 	// draw the landmarks
-	int dx = ePoint.getX() - mTemp.getX();
-	int dy = ePoint.getY() - mTemp.getY();
+	int dx = mTemp.getX() - ePoint.getX();
+	int dy = mTemp.getY() - ePoint.getY();
 
-	Line l4(ePoint,
-		Point(mLine.getEnd().getX() + dx, mLine.getEnd().getY() + dy));// mline in scene
+	Line l4(mTemp, Point(sLine.getEnd().getX() + dx, sLine.getEnd().getY() + dy));// move sLine to mTemp in scene
 	drawingLine(*(matImage->getRGBMatrix()), l4, color);
-	Point pk(x+dx,y+dy);
-	Line l5(ePoint, pk);
+	Point pk(l2.getEnd().getX() + dx, l2.getEnd().getY() + dy);
+	Line l5(mTemp, pk);
 	drawingLine(*(matImage->getRGBMatrix()), l5, color);
-	angleDiff = sLine.angleLines(l4);
+	angleDiff = mLine.angleLines(l4);
 	cout << "\n Angle 4: "
 		<< angleVector(ePoint, sLine.getEnd(), ePoint, l4.getEnd()) * 180 / M_PI
 		<< endl;
 	int xpk = 0, ypk = 0;
-	rotateAPoint(pk.getX(),pk.getY(),ePoint,angleDiff,1,xpk,ypk);
-	Point pk1(xpk,ypk);
+	rotateAPoint(pk.getX(), pk.getY(), mTemp, angleDiff, 1, xpk, ypk);
+	Point pk1(xpk, ypk);
 	xpk = ypk = 0;
-	rotateAPoint(pk.getX(),pk.getY(),ePoint,-angleDiff,1,xpk,ypk);
-	Point pk2(xpk,ypk);
-	double angled1 = l2.angleLines(Line(ePoint,pk1));
-	double angled2 = l2.angleLines(Line(ePoint,pk2));
-	if(angled2 < angled1)
+	rotateAPoint(pk.getX(), pk.getY(), mTemp, -angleDiff, 1, xpk, ypk);
+	Point pk2(xpk, ypk);
+	double angled1 = l2.angleLines(Line(ePoint, pk1));
+	double angled2 = l2.angleLines(Line(ePoint, pk2));
+	if (angled2 < angled1 && angleDiff <= 90)
+		angleDiff = -angleDiff;
+	if (angled2 > angled1 && angleDiff >= 90)
 		angleDiff = -angleDiff;
 
-
-	cout << "\n Angle 4: "<<angleDiff<<endl;
+	cout << "\n Angle 4: " << angleDiff << endl;
 	Point lm;
+	ptr_IntMatrix cannyNew = new Matrix<int>(rows, cols, 0);
+	sedgePoints.clear();
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
 		{
-			if (mcannyMatrix->getAtPosition(r, c) == 255)
+			if (cannyMatrix->getAtPosition(r, c) == 255)
 			{
-				int xnew = 0;
-				int ynew = 0;
-				rotateAPoint(c + dx, r + dy, ePoint, angleDiff, 1, xnew, ynew);
+				int xnew = c + dx;
+				int ynew = r + dy;
+				rotateAPoint(c + dx, r + dy, mTemp, angleDiff, 1, xnew, ynew);
 				if (xnew >= 0 && ynew >= 0 && ynew < rows && xnew < cols)
 				{
 					matImage->getRGBMatrix()->setAtPosition(ynew, xnew, color);
+					cannyNew->setAtPosition(ynew, xnew, 255);
+					sedgePoints.push_back(Point(xnew, ynew));
 				}
+
 			}
 		}
 	}
+	vector<Point> eslmarks = verifyLandmarks3(mcannyMatrix, cannyNew, mLandmarks,
+	 eslm, 100, 300, sedgePoints);
 
-	/*for (size_t i = 0; i < estLandmarks.size(); i++)
-	 {
-	 lm = estLandmarks.at(i);
-	 cout << "\n Landmarks " << i + 1 << ": " << lm.getX() << "\t" << lm.getY()
-	 << endl;
-	 fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
-	 }*/
+	Point leftC,rC,dC;
+	createTemplate2(cannyNew,eslm.at(0),300,leftC,rC,dC);
+
+	color.B = 255;
+	fillCircle(*(matImage->getRGBMatrix()),leftC,5,color);
+	fillCircle(*(matImage->getRGBMatrix()),rC,5,color);
+	color.G = 255;
+	for (size_t i = 0; i < eslmarks.size(); i++)
+	{
+		lm = eslmarks.at(i);
+		cout << "\n Landmarks " << i + 1 << ": " << lm.getX() << "\t" << lm.getY()
+			<< endl;
+		fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
+	}
+	Point ebary;
+	double mCentroid = measureCentroidPoint(eslmarks, ebary);
+	msgbox.setText(
+		"<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
+			+ QString::number(ebary.getY()) + ")</p>"
+				"<p>Centroid value: " + QString::number(mCentroid) + "</p");
+	msgbox.exec();
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 		"Landmarks result");
 	this->show();
@@ -1217,7 +1244,7 @@ void ImageViewer::dirGenerateData()
 	//{ // run on 20 images
 	//nrandom = random(0, (int) images.size());
 	nrandom = 9; // use Md 028 as ref
-	string modelName = "Md 011.JPG";//images.at(nrandom);
+	string modelName = "Md 011.JPG"; //images.at(nrandom);
 	cout << "\n Random and model: " << nrandom << "\t" << modelName << endl;
 	//model = imageFolder + "/" + images.at(nrandom);
 	model = "/home/linh/Desktop/Temps/md/images/Md 011.JPG";

@@ -58,7 +58,7 @@ void Edge::setPoints(std::vector<Point> points) {
  * Check a point is exist in list of Break Point or not.
  *
  */
-bool Edge::checkPointInList(std::vector<Point> listPoints, Point point) {
+bool checkPointInList(std::vector<Point> listPoints, Point point) {
 	Point p;
 	for (size_t i = 0; i < listPoints.size(); i++) {
 		p = listPoints.at(i);
