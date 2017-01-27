@@ -34,6 +34,7 @@ public:
 	std::string getFileName();
 	void setMLandmarks(string);
 	void setRGBMatrix(ptr_RGBMatrix);
+	void setGrayMatrix(Matrix<int>);
 	void setAutoLandmarks(vector<Point>);
 	ptr_IntMatrix getGrayMatrix();
 	ptr_RGBMatrix getRGBMatrix();

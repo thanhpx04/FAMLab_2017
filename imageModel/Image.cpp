@@ -134,6 +134,10 @@ void Image::setRGBMatrix(ptr_RGBMatrix rgbMatrix)
 {
 	imgMatrix = rgbMatrix;
 }
+void Image::setGrayMatrix(Matrix<int> graymatrix)
+{
+	*grayMatrix = graymatrix;
+}
 void Image::setAutoLandmarks(vector<Point> eLandmarks)
 {
 	autoLandmarks = eLandmarks;
