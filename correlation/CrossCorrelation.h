@@ -10,7 +10,7 @@
 vector<Point> verifyLandmarks(Image mImage, Image sImage,
 		vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
 		int sceneSize, double angleDiff, Point ePoint);
-vector<Point> verifyLandmarks2(Image mImage, Image sImage,
+vector<Point> verifyLandmarks2(ptr_IntMatrix mImage, ptr_IntMatrix sImage,
 	vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
 	int sceneSize);
 ptr_IntMatrix createTemplate2(ptr_IntMatrix inputImage, Point centerPoint,

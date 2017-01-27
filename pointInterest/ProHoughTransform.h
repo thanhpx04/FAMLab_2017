@@ -28,7 +28,7 @@ public:
 		double &angleDiff, Point &ePoint);
 
 	vector<Point> generalTransform(Image sImage, double &angle, Point &ePoint,
-			Point &mPoint);
+			Point &mPoint, ptr_IntMatrix &newScene);
 };
 
 #endif /* PROHOUGHTRANSFORM_H_ */

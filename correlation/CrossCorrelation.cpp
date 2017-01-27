@@ -73,45 +73,6 @@ ptr_IntMatrix createTemplate(ptr_IntMatrix inputImage, Point centerPoint,
 
 }
 
-ptr_IntMatrix createTemplate2(ptr_IntMatrix inputImage, Point centerPoint,
-	int tsize, Point &tlCorn, Point &brCorner, Point &distance)
-{
-	int hsize = tsize / 2;
-	int cx = centerPoint.getX(); //col
-	int cy = centerPoint.getY(); // row
-	if (cx < 0 || cy < 0)
-		return inputImage;
-	int rows = inputImage->getRows();
-	int cols = inputImage->getCols();
-
-	int lx = (cx - hsize) < 0 ? 0 : (cx - hsize);
-	int ly = (cy - hsize) < 0 ? 0 : (cy - hsize);
-	tlCorn.setX(lx);
-	tlCorn.setY(ly);
-	distance.setX(cx - lx);
-	distance.setY(cy - ly);
-	int rx = (cx + hsize) >= cols ? cols - 1 : (cx + hsize);
-	int ry = (cy + hsize) >= rows ? rows - 1 : (cy + hsize);
-	brCorner.setX(rx);
-	brCorner.setY(ry);
-	ptr_IntMatrix result = new Matrix<int>(ry - ly, rx - lx);
-	int i = -1, j = -1;
-	for (int row = ly; row < ry; row++)
-	{
-		i++;
-		j = -1;
-		for (int col = lx; col < rx; col++)
-		{
-			j++;
-			if (i >= 0 && i < ry - ly && j >= 0 && j < rx - lx)
-			{
-				result->setAtPosition(i, j, inputImage->getAtPosition(row, col));
-			}
-		}
-	}
-	return result;
-
-}
 
 Point matCrossCorrelation(ptr_IntMatrix templ, ptr_IntMatrix image)
 {
@@ -165,63 +126,7 @@ Point matCrossCorrelation(ptr_IntMatrix templ, ptr_IntMatrix image)
 	return location;
 }
 
-Point matCrossCorrelation2(ptr_IntMatrix templ, ptr_IntMatrix image,
-	vector<Point> edgePoints,Point iLocation)
-{
-	int width = image->getCols() - templ->getCols() + 1;
-	int height = image->getRows() - templ->getRows() + 1;
 
-	int imgrows = image->getRows();
-	int imgcols = image->getCols();
-	int tmprows = templ->getRows();
-	int tmpcols = templ->getCols();
-	Point location(0, 0);
-
-	if (width > 0 && height > 0)
-	{
-		double maxCoeff = 0;
-		for (int row = 0; row <= imgrows; row++)
-		{
-			for (int col = 0; col <= imgcols; col++)
-			{
-				if (checkPointInList(edgePoints, Point(iLocation.getX() + col,iLocation.getY() + row)))
-				{
-					double acoeff = 0, bcoeff1 = 0, bcoeff2 = 0;
-					for (int r = 0; r < tmprows; r++)
-					{
-						for (int c = 0; c < tmpcols; c++)
-						{
-							double te = templ->getAtPosition(r, c);
-							double im = 0;
-							if (row + r < imgrows && col + c < imgcols)
-								im = image->getAtPosition(row + r, col + c);
-
-							acoeff += (te * im);
-							bcoeff1 += (te * te);
-							bcoeff2 += (im * im);
-						}
-					}
-					double coeff=0;
-					if (bcoeff1 == 0 || bcoeff2 == 0)
-					{
-						coeff = 0;
-					}
-					else
-					{
-						coeff = acoeff / sqrt(bcoeff1 * bcoeff2);
-					}
-					if (coeff > maxCoeff)
-					{
-						maxCoeff = coeff;
-						location.setX(col);
-						location.setY(row);
-					}
-				}
-			}
-		}
-	}
-	return location;
-}
 
 vector<Point> verifyLandmarks(Image mImage, Image sImage,
 	vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
@@ -283,16 +188,16 @@ vector<Point> verifyLandmarks(Image mImage, Image sImage,
 
 	return mcResult;
 }
-vector<Point> verifyLandmarks2(Image mImage, Image sImage,
+vector<Point> verifyLandmarks2(ptr_IntMatrix mImage, ptr_IntMatrix sImage,
 	vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
 	int sceneSize)
 {
-	int width = mImage.getGrayMatrix()->getCols();
-	int height = mImage.getGrayMatrix()->getRows();
+	int width = mImage->getCols();
+	int height = mImage->getRows();
 	ptr_IntMatrix mMatrix = new Matrix<int>(height, width, 0);
-	*mMatrix = *(mImage.getGrayMatrix());
+	*mMatrix = *(mImage);
 	ptr_IntMatrix sMatrix = new Matrix<int>(height, width, 0);
-	*sMatrix = *(sImage.getGrayMatrix());
+	*sMatrix = *(sImage);
 
 	std::vector<Point> mcResult;
 	Point epi;
@@ -345,6 +250,48 @@ vector<Point> verifyLandmarks2(Image mImage, Image sImage,
 	delete sMatrix;
 	return mcResult;
 }
+
+// ============================================ Test new way ===============================================================
+/*
+ptr_IntMatrix createTemplate2(ptr_IntMatrix inputImage, Point centerPoint,
+	int tsize, Point &tlCorn, Point &brCorner, Point &distance)
+{
+	int hsize = tsize / 2;
+	int cx = centerPoint.getX(); //col
+	int cy = centerPoint.getY(); // row
+	if (cx < 0 || cy < 0)
+		return inputImage;
+	int rows = inputImage->getRows();
+	int cols = inputImage->getCols();
+
+	int lx = (cx - hsize) < 0 ? 0 : (cx - hsize);
+	int ly = (cy - hsize) < 0 ? 0 : (cy - hsize);
+	tlCorn.setX(lx);
+	tlCorn.setY(ly);
+	distance.setX(cx - lx);
+	distance.setY(cy - ly);
+	int rx = (cx + hsize) >= cols ? cols - 1 : (cx + hsize);
+	int ry = (cy + hsize) >= rows ? rows - 1 : (cy + hsize);
+	brCorner.setX(rx);
+	brCorner.setY(ry);
+	ptr_IntMatrix result = new Matrix<int>(ry - ly, rx - lx);
+	int i = -1, j = -1;
+	for (int row = ly; row < ry; row++)
+	{
+		i++;
+		j = -1;
+		for (int col = lx; col < rx; col++)
+		{
+			j++;
+			if (i >= 0 && i < ry - ly && j >= 0 && j < rx - lx)
+			{
+				result->setAtPosition(i, j, inputImage->getAtPosition(row, col));
+			}
+		}
+	}
+	return result;
+
+}
 vector<Point> getPoints(vector<Point> points, Point lCorner, Point rCorner)
 {
 	vector<Point> ls;
@@ -358,6 +305,64 @@ vector<Point> getPoints(vector<Point> points, Point lCorner, Point rCorner)
 
 	}
 	return ls;
+}
+
+Point matCrossCorrelation2(ptr_IntMatrix templ, ptr_IntMatrix image,
+	vector<Point> edgePoints,Point iLocation)
+{
+	int width = image->getCols() - templ->getCols() + 1;
+	int height = image->getRows() - templ->getRows() + 1;
+
+	int imgrows = image->getRows();
+	int imgcols = image->getCols();
+	int tmprows = templ->getRows();
+	int tmpcols = templ->getCols();
+	Point location(0, 0);
+
+	if (width > 0 && height > 0)
+	{
+		double maxCoeff = 0;
+		for (int row = 0; row <= imgrows; row++)
+		{
+			for (int col = 0; col <= imgcols; col++)
+			{
+				if (checkPointInList(edgePoints, Point(iLocation.getX() + col,iLocation.getY() + row)))
+				{
+					double acoeff = 0, bcoeff1 = 0, bcoeff2 = 0;
+					for (int r = 0; r < tmprows; r++)
+					{
+						for (int c = 0; c < tmpcols; c++)
+						{
+							double te = templ->getAtPosition(r, c);
+							double im = 0;
+							if (row + r < imgrows && col + c < imgcols)
+								im = image->getAtPosition(row + r, col + c);
+
+							acoeff += (te * im);
+							bcoeff1 += (te * te);
+							bcoeff2 += (im * im);
+						}
+					}
+					double coeff=0;
+					if (bcoeff1 == 0 || bcoeff2 == 0)
+					{
+						coeff = 0;
+					}
+					else
+					{
+						coeff = acoeff / sqrt(bcoeff1 * bcoeff2);
+					}
+					if (coeff > maxCoeff)
+					{
+						maxCoeff = coeff;
+						location.setX(col);
+						location.setY(row);
+					}
+				}
+			}
+		}
+	}
+	return location;
 }
 vector<Point> verifyLandmarks3(ptr_IntMatrix mImage, ptr_IntMatrix sImage,
 	vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
@@ -435,4 +440,4 @@ vector<Point> verifyLandmarks3(ptr_IntMatrix mImage, ptr_IntMatrix sImage,
 	delete mMatrix;
 	delete sMatrix;
 	return mcResult;
-}
+}*/
