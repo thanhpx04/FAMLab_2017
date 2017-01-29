@@ -27,7 +27,7 @@ public:
 	vector<Point> estimateLandmarks(Image sImage,
 		double &angleDiff, Point &ePoint);
 
-	vector<Point> generalTransform(Image &sImage, double &angle, Point &ePoint,
+	vector<Point> generalTransform(Image &sImage, double &angle,Point &translation, Point &ePoint,
 			Point &mPoint, ptr_IntMatrix &newScene);
 };
 

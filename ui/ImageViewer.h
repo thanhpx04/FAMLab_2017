@@ -50,7 +50,7 @@ private slots:
 	void cannyAlgorithm();
 	void lineSegmentation();
 
-	void pHoughTransform();
+	//void pHoughTransform();
 	void gHoughTransform();
 	void extractLandmarks();
 	void measureMBary();
@@ -97,7 +97,7 @@ private:
 	QAction *cannyAct;
 	QAction *lineSegmentationAct;
 
-	QAction *phtAct;
+	//QAction *phtAct;
 	QAction *phtPointsAct;
 	QAction *autoLandmarksAct;
 	QAction *measureMBaryAct;

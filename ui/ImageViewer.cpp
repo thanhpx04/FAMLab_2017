@@ -179,17 +179,17 @@ void ImageViewer::createSegmentationMenu()
 }
 void ImageViewer::createLandmarksMenu()
 {
-	phtAct = new QAction(tr("&Probabilistic Hough Transform"), this);
+	/*phtAct = new QAction(tr("&Probabilistic Hough Transform"), this);
 	phtAct->setEnabled(false);
 	phtAct->setShortcut(tr("Ctrl+P"));
-	connect(phtAct, SIGNAL(triggered()), this, SLOT(pHoughTransform()));
+	connect(phtAct, SIGNAL(triggered()), this, SLOT(pHoughTransform()));*/
 
 	phtPointsAct = new QAction(tr("&Generalizing Hough Transform"), this);
 	phtPointsAct->setEnabled(false);
 	phtPointsAct->setShortcut(tr("Ctrl+G"));
 	connect(phtPointsAct, SIGNAL(triggered()), this, SLOT(gHoughTransform()));
 
-	autoLandmarksAct = new QAction(tr("&Compute automatic landmarks"), this);
+	autoLandmarksAct = new QAction(tr("&Probabilistic Hough Transform"), this);
 	autoLandmarksAct->setEnabled(false);
 	autoLandmarksAct->setShortcut(tr("Ctrl+L"));
 	connect(autoLandmarksAct, SIGNAL(triggered()), this,
@@ -257,9 +257,8 @@ void ImageViewer::createMenus()
 	segmentationMenu->addAction(lineSegmentationAct);
 
 	dominantPointMenu = new QMenu(tr("&Landmarks"), this);
-	dominantPointMenu->addAction(phtAct);
+	//dominantPointMenu->addAction(phtAct);
 	dominantPointMenu->addAction(phtPointsAct);
-	dominantPointMenu->addSeparator();
 	dominantPointMenu->addAction(autoLandmarksAct);
 	dominantPointMenu->addSeparator();
 	dominantPointMenu->addAction(measureMBaryAct);
@@ -309,7 +308,7 @@ void ImageViewer::activeFunction()
 	cannyAct->setEnabled(true);
 	lineSegmentationAct->setEnabled(true);
 
-	phtAct->setEnabled(true);
+	//phtAct->setEnabled(true);
 	phtPointsAct->setEnabled(true);
 	autoLandmarksAct->setEnabled(true);
 	if (matImage->getListOfManualLandmarks().size() > 0)
@@ -391,7 +390,7 @@ ImageViewer::~ImageViewer()
 	delete cannyAct;
 	delete lineSegmentationAct;
 
-	delete phtAct;
+	//delete phtAct;
 	delete phtPointsAct;
 	delete autoLandmarksAct;
 	delete measureMBaryAct;
@@ -434,24 +433,12 @@ void ImageViewer::loadImage(Image *_matImage, QImage _qImage, QString tt)
 void ImageViewer::displayLandmarks(Image *image, vector<Point> lms, RGB color)
 {
 	Point lm;
-	//int rows = image->getGrayMatrix()->getRows();
-	//int cols = image->getGrayMatrix()->getCols();
 	for (size_t i = 0; i < lms.size(); i++)
 	{
 		lm = lms.at(i);
 		cout << "\nManual landmark: " << lm.getX() << "\t" << lm.getY();
-		drawingCircle(*(image->getRGBMatrix()), lm, 5, color);
-		/*vector<Point> dPoints = drawingCircle(lm, 5, color);
-		 for (size_t k = 0; k < dPoints.size(); k++)
-		 {
-		 p = dPoints.at(k);
-		 if (p.getX() >= 0 && p.getX() < cols && p.getY() >= 0
-		 && p.getY() < rows)
-		 {
-		 image->getRGBMatrix()->setAtPosition(p.getY(), p.getX(),
-		 p.getColor());
-		 }
-		 }*/
+		fillCircle(*(image->getRGBMatrix()), lm, 5, color);
+
 	}
 
 }
@@ -710,27 +697,12 @@ void ImageViewer::lineSegmentation()
 	RGB color;
 	color.R = 255;
 	color.G = color.B = 0;
-	//int rows = matImage->getGrayMatrix()->getRows();
-	//int cols = matImage->getGrayMatrix()->getCols();
-
-	//Line line1(Point(0,2000),Point(cols-1,100));
-	//listOfLines.push_back(line1);
 	Line linei;
-	/*vector<Point> pOnLine;
-	 Point pi;*/
 	for (size_t i = 0; i < listOfLines.size(); i++)
 	{
 		linei = listOfLines.at(i);
 		drawingLine(*(matImage->getRGBMatrix()), linei, color);
-		/*pOnLine = drawingLine(linei, color);
-		 for (size_t k = 0; k < pOnLine.size(); k++)
-		 {
-		 pi = pOnLine.at(k);
-		 matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(),
-		 color);
-		 }*/
 	}
-	//pOnLine.clear();
 
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 		"Landmarks result");
@@ -811,56 +783,6 @@ void ImageViewer::gHoughTransform()
 	msgbox.exec();
 
 }
-void ImageViewer::pHoughTransform()
-{
-	cout << "\n Probabilistic hough transform." << endl;
-	QMessageBox msgbox;
-	msgbox.setText("Select the model image.");
-	msgbox.exec();
-
-	QString fileName2 = QFileDialog::getOpenFileName(this);
-	if (fileName2.isEmpty())
-		return;
-	cout << endl << fileName2.toStdString() << endl;
-	Image *modelImage = new Image(fileName2.toStdString());
-
-	msgbox.setText("Select the landmark file of model image.");
-	msgbox.exec();
-	QString reflmPath = QFileDialog::getOpenFileName(this);
-	modelImage->readManualLandmarks(reflmPath.toStdString());
-
-	ProHoughTransform tr;
-	tr.setRefImage(*modelImage);
-
-	Point ePoint;
-	double angleDiff;
-	vector<Point> lms = tr.estimateLandmarks(*matImage, angleDiff, ePoint);
-	cout << "\nNumber of the landmarks: " << lms.size() << endl;
-	RGB color;
-	color.R = 255;
-	color.G = 255;
-	color.B = 0;
-
-	//int rows = matImage->getGrayMatrix()->getRows();
-	//int cols = matImage->getGrayMatrix()->getCols();
-	Point lm;
-	matImage->rotate(ePoint, angleDiff, 1);
-	for (size_t i = 0; i < lms.size(); i++)
-	{
-		lm = lms.at(i);
-		fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
-	}
-	matImage->setAutoLandmarks(lms);
-	displayALandmarksAct->setEnabled(true);
-	displayALandmarksAct->setChecked(true);
-	measureEBaryAct->setEnabled(true);
-	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-		"Landmarks result");
-	this->show();
-
-	msgbox.setText("Finish");
-	msgbox.exec();
-}
 
 void ImageViewer::extractLandmarks()
 {
@@ -892,9 +814,6 @@ void ImageViewer::extractLandmarks()
 	color.R = 255;
 	color.G = 255;
 	color.B = 0;
-
-	//int rows = matImage->getGrayMatrix()->getRows();
-	//int cols = matImage->getGrayMatrix()->getCols();
 	Point lm;
 	matImage->rotate(ePoint, angleDiff, 1);
 	for (size_t i = 0; i < lms.size(); i++)

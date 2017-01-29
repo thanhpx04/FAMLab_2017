@@ -32,7 +32,7 @@ using namespace std;
 #include "ProHoughTransform.h"
 
 vector<Point> findLandmarks(Point refPoint, Point esPoint,
-	vector<Point> refLandmarks, int width, int height, int &positive)
+		vector<Point> refLandmarks, int width, int height, int &positive)
 {
 	vector<Point> esLandmarks;
 	positive = 0;
@@ -63,7 +63,7 @@ vector<Point> findLandmarks(Point refPoint, Point esPoint,
 }
 
 Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
-	double &angleDiff, vector<Point> refLandmarks, int width, int height)
+		double &angleDiff, vector<Point> refLandmarks, int width, int height)
 {
 
 	Point inter(0, 0);
@@ -86,7 +86,7 @@ Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 	double angle4 = lineEntry1.angleLines(objl2);
 
 	vector<Point> intersects1 = objl1.interParallel(objl1, objl2, hs1.distance,
-		hs2.distance, width, height);
+			hs2.distance, width, height);
 	int max = 0;
 	vector<Point> estLM;
 	vector<double> angles;
@@ -98,7 +98,7 @@ Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 		esPoint = intersects1.at(i);
 		positive = 0;
 		lms = findLandmarks(refPoint, esPoint, refLandmarks, width, height,
-			positive);
+				positive);
 		if (positive > max)
 		{
 			estLM.clear();
@@ -118,14 +118,14 @@ Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 	}
 
 	vector<Point> intersects2 = objl1.interParallel(objl1, objl2, hs2.distance,
-		hs1.distance, width, height);
+			hs1.distance, width, height);
 
 	for (size_t i = 0; i < intersects2.size(); i++)
 	{
 		esPoint = intersects2.at(i);
 		positive = 0;
 		lms = findLandmarks(refPoint, esPoint, refLandmarks, width, height,
-			positive);
+				positive);
 		if (positive > max)
 		{
 			estLM.clear();
@@ -169,7 +169,7 @@ Point refPointInScene(PHTEntry entry, vector<Line> matchLines,
 		}
 	}
 	cout << "\n Reference point in scene: " << inter.getX() << ", "
-		<< inter.getY();
+			<< inter.getY();
 
 	return inter;
 }
@@ -190,10 +190,10 @@ bool similarPairLines(Line ref1, Line ref2, Line scene1, Line scene2)
 	double sd = sd1 + sd2;
 
 	if (abs(refAngle - sceneAngle) < cond1
-		&& (abs(
-			(ref1.getLength() / scene1.getLength())
-				- (ref2.getLength() / scene2.getLength())) < cond2)
-		&& (abs(rd - sd) < cond3))
+			&& (abs(
+					(ref1.getLength() / scene1.getLength())
+							- (ref2.getLength() / scene2.getLength())) < cond2)
+			&& (abs(rd - sd) < cond3))
 	{
 		return true;
 	}
@@ -217,10 +217,10 @@ PHTEntry findHoughSpace(vector<PHTEntry> entryTable, Line line1, Line line2)
 }
 
 PHTEntry matchingInScene(vector<PHTEntry> entryTable, vector<Line> sceneLines,
-	int width, int height, vector<Line> &maxVector)
+		int width, int height, vector<Line> &maxVector)
 {
 	ptr_IntMatrix accumulator = new Matrix<int>(
-		floor(sqrt(width * width + height * height)), 361);
+			floor(sqrt(width * width + height * height)), 361);
 	int maxValue = 0;
 	PHTEntry maxEntry;
 	Line objLine1;
@@ -246,25 +246,31 @@ PHTEntry matchingInScene(vector<PHTEntry> entryTable, vector<Line> sceneLines,
 						int angle = round(hsp.angle);
 						int distance = round(hsp.distance);
 						if (!isnan(angle) && !isnan(distance) && angle >= 0
-							&& distance >= 0)
+								&& distance >= 0)
 						{
-							int value = accumulator->getAtPosition(distance, angle);
-							accumulator->setAtPosition(distance, angle, value + 1);
-							if (accumulator->getAtPosition(distance, angle) > maxValue)
+							int value = accumulator->getAtPosition(distance,
+									angle);
+							accumulator->setAtPosition(distance, angle,
+									value + 1);
+							if (accumulator->getAtPosition(distance, angle)
+									> maxValue)
 							{
 								maxVector.clear();
 								maxVector.push_back(objLine1);
 								maxVector.push_back(objLine2);
-								maxValue = accumulator->getAtPosition(distance, angle);
+								maxValue = accumulator->getAtPosition(distance,
+										angle);
 								maxEntry.setRefLine(entry.getRefLine());
 								maxEntry.setObjLine(entry.getObjLine());
-								maxEntry.setListHoughSpace(entry.getListHoughSpace());
+								maxEntry.setListHoughSpace(
+										entry.getListHoughSpace());
 								//maxEntry= entry;
 							}
 							else
 							{
 								if (k == 0
-									&& accumulator->getAtPosition(distance, angle) == maxValue)
+										&& accumulator->getAtPosition(distance,
+												angle) == maxValue)
 								{
 									maxVector.push_back(objLine1);
 									maxVector.push_back(objLine2);
@@ -281,24 +287,24 @@ PHTEntry matchingInScene(vector<PHTEntry> entryTable, vector<Line> sceneLines,
 	return maxEntry;
 }
 vector<Point> phtLandmarks(vector<PHTEntry> entriesTable, Point refPoint,
-	vector<Line> sceneLines, int width, int height, vector<Point> mLandmarks,
-	double &angleDiff, Point &ePoint)
+		vector<Line> sceneLines, int width, int height,
+		vector<Point> mLandmarks, double &angleDiff, Point &ePoint)
 {
 	vector<Point> eLandmarks;
 	vector<Line> maxVector;
 	PHTEntry entry = matchingInScene(entriesTable, sceneLines, width, height,
-		maxVector);
+			maxVector);
 	if (maxVector.size() > 0)
 	{
 
 		ePoint = refPointInScene(entry, maxVector, angleDiff, mLandmarks, width,
-			height);
+				height);
 		double angle1 = entry.getRefLine().angleLines(entry.getObjLine());
 		double angle2 = maxVector.at(0).angleLines(maxVector.at(1));
 		angleDiff += abs(angle1 - angle2);
 		int positive = 0;
 		eLandmarks = findLandmarks(refPoint, ePoint, mLandmarks, width, height,
-			positive);
+				positive);
 	}
 	maxVector.clear();
 
@@ -332,7 +338,7 @@ PHoughTransform ProHoughTransform::constructPHT()
 }
 
 vector<Point> ProHoughTransform::estimateLandmarks(Image sImage,
-	double &angleDiff, Point &ePoint)
+		double &angleDiff, Point &ePoint)
 {
 	vector<Point> eLandmarks;
 	ptr_IntMatrix mMatrix = Treatments::refImage.getGrayMatrix();
@@ -350,98 +356,75 @@ vector<Point> ProHoughTransform::estimateLandmarks(Image sImage,
 	vector<PHTEntry> entryTable = pht.constructPHTTable(mLines);
 
 	eLandmarks = phtLandmarks(entryTable, mPoint, sLines, width, height,
-		mLandmarks, angleDiff, ePoint);
+			mLandmarks, angleDiff, ePoint);
 
 	return eLandmarks;
 
 }
 
-vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
-	Point &ePoint, Point &mPoint, ptr_IntMatrix &newScene)
+vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle, Point &translation,
+		Point &ePoint, Point &mPoint, ptr_IntMatrix &newScene)
 {
 	int rows = sImage.getGrayMatrix()->getRows();
 	int cols = sImage.getGrayMatrix()->getCols();
-	ptr_IntMatrix mMatrix = new Matrix<int>(rows, cols, 0);
-	*mMatrix = *(Treatments::refImage.getGrayMatrix());
-	int mThresholdValue = (int) Treatments::refImage.getThresholdValue();
-	ptr_IntMatrix mbinMatrix = new Matrix<int>(
-		*binaryThreshold(mMatrix, mThresholdValue, 255));
+	Image mImage = Treatments::refImage;
 	ptr_IntMatrix mgradirection = new Matrix<int>(rows, cols, -1);
-	vector<Point> medgePoints;
-	ptr_IntMatrix mcannyMatrix = new Matrix<int>(
-		*cannyProcess2(mbinMatrix, mThresholdValue, 3 * mThresholdValue,
-			mgradirection, medgePoints));
-	vector<Point> mLandmarks = Treatments::refImage.getListOfManualLandmarks();
+	*mgradirection = *(getGradientDMatrix(mImage));
+	vector<Point> mLandmarks = mImage.getListOfManualLandmarks();
 
-	int sThresholdValue = sImage.getThresholdValue();
-	ptr_IntMatrix sbinMatrix = new Matrix<int>(
-		*binaryThreshold(sImage.getGrayMatrix(), sThresholdValue, 255));
 	ptr_IntMatrix gradirection = new Matrix<int>(rows, cols, -1);
-	vector<Point> sedgePoints;
-	ptr_IntMatrix cannyMatrix = new Matrix<int>(
-		*cannyProcess2(sbinMatrix, sThresholdValue, 3 * sThresholdValue,
-			gradirection, sedgePoints));
+	*gradirection = *(getGradientDMatrix(sImage));
 
-	// Landmarks are estimated by using GHT
-	Point center(cols / 2, rows / 2);
-	RTable rentries = rTableConstruct(mgradirection, center);
-	Point sPoint = houghSpace(gradirection, rentries);
-	vector<Point> eslm = detectLandmarks(center, sPoint, mLandmarks);
+	vector<Point> eslm;
+	/*// Landmarks are estimated by using GHT
+	 Point center(cols / 2, rows / 2);
+	 RTable rentries = rTableConstruct(mgradirection, center);
+	 Point sPoint = houghSpace(gradirection, rentries);
+	 vector<Point> eslm = detectLandmarks(center, sPoint, mLandmarks);
 
-	// compute centroid of model, scene and centroid of model in scene
-	Point mTemp;
-	Line sLine = principalAxis(gradirection, ePoint);
-	Line mLine = principalAxis(mgradirection, mTemp);
-	double anglek = sLine.angleLines(mLine);
-	int dxold = sPoint.getX() - center.getX();
-	int dyold = sPoint.getY() - center.getY();
-	mTemp.setX(mTemp.getX() + dxold);
-	mTemp.setY(mTemp.getY() + dyold);
-	/*RGB color;
-	color.R = 255;
-	color.G = color.B = 0;
-	for (int r = 0; r < rows; ++r)
-	{
-		for (int c = 0; c < cols; ++c)
-		{
-			if (cannyMatrix->getAtPosition(r, c) != 0)
-			{
-				if(r < rows && c < cols)
-					sImage.getRGBMatrix()->setAtPosition(r, c, color);
-			}
-		}
-	}*/
+	 // compute centroid of model, scene and centroid of model in scene
+	 Point mTemp;
+	 Line sLine = principalAxis(gradirection, ePoint);
+	 Line mLine = principalAxis(mgradirection, mTemp);
+	 double anglek = sLine.angleLines(mLine);
+	 int dxold = sPoint.getX() - center.getX();
+	 int dyold = sPoint.getY() - center.getY();
+	 mTemp.setX(mTemp.getX() + dxold);
+	 mTemp.setY(mTemp.getY() + dyold);
 
-	// move sPoint to mTemp
-	int dx = mTemp.getX() - ePoint.getX();
-	int dy = mTemp.getY() - ePoint.getY();
-	cout<<"\nTranslate: "<<dx<<"\t"<<dy<<endl;
-	sLine.getBegin().setX(mTemp.getX());
-	sLine.getBegin().setY(mTemp.getY());
-	sLine.getEnd().setX(sLine.getEnd().getX() + dx);
-	sLine.getEnd().setY(sLine.getEnd().getY() + dy);
-	int xpk = 0, ypk = 0;
-	Point pk = sLine.getEnd();
-	rotateAPoint(pk.getX(), pk.getY(), mTemp, anglek, 1, xpk, ypk);
-	Point pk1(xpk, ypk);
-	xpk = ypk = 0;
-	rotateAPoint(pk.getX(), pk.getY(), mTemp, -anglek, 1, xpk, ypk);
-	Point pk2(xpk, ypk);
-	double angled1 = mLine.angleLines(Line(mTemp, pk1));
-	double angled2 = mLine.angleLines(Line(mTemp, pk2));
-	if (angled2 < angled1 && anglek <= 90)
-		anglek = -anglek;
-	if (angled2 < angled1 && anglek >= 90)
-		anglek = -anglek;
-	angle = anglek;
-	if (isnan(angle))
-		angle = 0;
-	cout << "\n Angle: " << angle << endl;
-	cout << "\nLandmarks by GHT: " << eslm.size() << endl;
-	mPoint.setX(mTemp.getX());
-	mPoint.setY(mTemp.getY());
+	 // move sPoint to mTemp
+	 int dx = mTemp.getX() - ePoint.getX();
+	 int dy = mTemp.getY() - ePoint.getY();
+	 cout<<"\nTranslate: "<<dx<<"\t"<<dy<<endl;
+	 sLine.getBegin().setX(mTemp.getX());
+	 sLine.getBegin().setY(mTemp.getY());
+	 sLine.getEnd().setX(sLine.getEnd().getX() + dx);
+	 sLine.getEnd().setY(sLine.getEnd().getY() + dy);
+	 int xpk = 0, ypk = 0;
+	 Point pk = sLine.getEnd();
+	 rotateAPoint(pk.getX(), pk.getY(), mTemp, anglek, 1, xpk, ypk);
+	 Point pk1(xpk, ypk);
+	 xpk = ypk = 0;
+	 rotateAPoint(pk.getX(), pk.getY(), mTemp, -anglek, 1, xpk, ypk);
+	 Point pk2(xpk, ypk);
+	 double angled1 = mLine.angleLines(Line(mTemp, pk1));
+	 double angled2 = mLine.angleLines(Line(mTemp, pk2));
+	 if (angled2 < angled1 && anglek <= 90)
+	 anglek = -anglek;
+	 if (angled2 < angled1 && anglek >= 90)
+	 anglek = -anglek;
+	 angle = anglek;
+	 if (isnan(angle))
+	 angle = 0;
+	 cout << "\n Angle: " << angle << endl;
+	 cout << "\nLandmarks by GHT: " << eslm.size() << endl;
+	 mPoint.setX(mTemp.getX());
+	 mPoint.setY(mTemp.getY());*/
 
-	//color.G = 255;
+	eslm = generalizingHoughTransform(mgradirection, gradirection, mLandmarks,
+			ePoint, mPoint, angle, translation);
+	int dx = translation.getX();
+	int dy = translation.getY();
 	// move the scene to the same and rotate the model
 	for (int r = 0; r < rows; r++)
 	{
@@ -450,27 +433,12 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 			int value = sImage.getGrayMatrix()->getAtPosition(r, c);
 			int xnew = c + dx;
 			int ynew = r + dy;
-			rotateAPoint(c + dx, r + dy, mTemp, angle, 1, xnew, ynew);
+			rotateAPoint(c + dx, r + dy, mPoint, angle, 1, xnew, ynew);
 			if (xnew >= 0 && ynew >= 0 && ynew < rows && xnew < cols)
 			{
 				newScene->setAtPosition(ynew, xnew, value);
 			}
-			/*if (cannyMatrix->getAtPosition(r, c) != 0)
-			{
-				rotateAPoint(c + dx, r + dy, mTemp, angle, 1, xnew, ynew);
-				//sImage.getRGBMatrix()->setAtPosition(r, c, color);
-				if (xnew >= 0 && ynew >= 0 && ynew < rows && xnew < cols)
-				{
-					sImage.getRGBMatrix()->setAtPosition(ynew, xnew, color);
-				}
-			}*/
 		}
 	}
-	delete mMatrix;
-	delete mgradirection;
-	delete mcannyMatrix;
-	delete sbinMatrix;
-	delete gradirection;
-	delete cannyMatrix;
 	return eslm;
 }
