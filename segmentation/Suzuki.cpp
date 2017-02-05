@@ -910,7 +910,7 @@ vector<Edge> suzuki(ptr_IntMatrix inputImage)
 	for (int i = edges.size() - 1; i >= 0; i--)
 	{
 		vector<Point> edgei = edges.at(i);
-		if (edgei.size() >= 10)
+		if (edgei.size() >= 1)
 			result.push_back(Edge(edgei));
 	}
 	//edgei.clear();

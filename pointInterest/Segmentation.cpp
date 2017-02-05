@@ -43,6 +43,9 @@ Segmentation::~Segmentation()
 ptr_IntMatrix Segmentation::threshold(int tValue, int maxValue)
 {
 	ptr_IntMatrix inputMatrix = Treatments::refImage.getGrayMatrix();
+	ptr_IntMatrix binaryMatrix = new Matrix<int>(inputMatrix->getRows(),inputMatrix->getCols(),255);
+	*binaryMatrix = *(binaryThreshold(inputMatrix, tValue, maxValue));
+	//return postProcess(binaryMatrix);
 	return binaryThreshold(inputMatrix, tValue, maxValue);
 }
 

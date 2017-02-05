@@ -57,7 +57,13 @@ bool Point::operator>(const Point &cPoint)
 }
 bool Point::operator==(const Point &cPoint)
 {
-	if(this->x == cPoint.x && this->y == cPoint.y)
-			return true;
-		return false;
+	if (this->x == cPoint.x && this->y == cPoint.y)
+		return true;
+	return false;
+}
+bool Point::operator!=(int value)
+{
+	if(this->x != value && this->y  != value)
+		return true;
+	return false;
 }
