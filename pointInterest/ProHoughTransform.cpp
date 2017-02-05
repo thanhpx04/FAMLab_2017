@@ -369,11 +369,13 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle, 
 	int cols = sImage.getGrayMatrix()->getCols();
 	Image mImage = Treatments::refImage;
 	ptr_IntMatrix mgradirection = new Matrix<int>(rows, cols, -1);
-	*mgradirection = *(getGradientDMatrix(mImage));
+	vector<Point> modelPoints;
+	*mgradirection = *(getGradientDMatrix(mImage,modelPoints));
 	vector<Point> mLandmarks = mImage.getListOfManualLandmarks();
 
 	ptr_IntMatrix gradirection = new Matrix<int>(rows, cols, -1);
-	*gradirection = *(getGradientDMatrix(sImage));
+	vector<Point> scenePoints;
+	*gradirection = *(getGradientDMatrix(sImage,scenePoints));
 
 	vector<Point> eslm;
 	/*// Landmarks are estimated by using GHT

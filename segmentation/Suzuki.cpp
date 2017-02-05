@@ -910,12 +910,58 @@ vector<Edge> suzuki(ptr_IntMatrix inputImage)
 	for (int i = edges.size() - 1; i >= 0; i--)
 	{
 		vector<Point> edgei = edges.at(i);
-		result.push_back(Edge(edgei));
+		if (edgei.size() >= 10)
+			result.push_back(Edge(edgei));
 	}
 	//edgei.clear();
 	edge.clear();
 	edges.clear();
 	delete sbinMatrix;
 
+	return result;
+}
+
+// the region is represent by 2 points top-left and right-bottom (one a line)
+double areaRegion(Line area)
+{
+	double result = 0;
+	Point tl = area.getBegin();
+	Point br = area.getEnd();
+	int w = abs(tl.getX() - br.getX());
+	int h = abs(tl.getY() - br.getY());
+	result = (double) w * h;
+	return result;
+}
+vector<Edge> verifyProcess(vector<Edge> listOfEdges)
+{
+	vector<Edge> result;
+	vector<Line> boxes;
+	Edge edgei;
+	int xl = 0, yl = 0, xr = 0, yr = 0;
+	for (size_t i = 0; i < listOfEdges.size(); i++)
+	{
+		edgei = listOfEdges.at(i);
+		edgei.sortByX();
+		xl = edgei.getPoints().at(0).getX();
+		xr = edgei.getPoints().at(edgei.getPoints().size() - 1).getX();
+		edgei.sortByY();
+		yl = edgei.getPoints().at(0).getY();
+		yr = edgei.getPoints().at(edgei.getPoints().size() - 1).getY();
+		boxes.push_back(Line(Point(xl, yl), Point(xr, yr)));
+	}
+
+	// remove small edge
+	for (size_t i = 0; i < boxes.size(); i++)
+	{
+		if (areaRegion(boxes.at(i)) < 1000)
+		{
+			listOfEdges.erase(listOfEdges.begin() + i);
+			boxes.erase(boxes.begin() + i);
+			i--;
+		}
+	}
+
+
+	result = listOfEdges;
 	return result;
 }

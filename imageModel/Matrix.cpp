@@ -108,16 +108,17 @@ ptr_DoubleMatrix getRotationMatrix2D(Point center, double angle, double scale)
 	rotateM->setAtPosition(0, 0, alpha);
 	rotateM->setAtPosition(0, 1, beta);
 	rotateM->setAtPosition(0, 2,
-			(1 - alpha) * center.getX() - beta * center.getY());
+		(1 - alpha) * center.getX() - beta * center.getY());
 	rotateM->setAtPosition(1, 0, -beta);
 	rotateM->setAtPosition(1, 1, alpha);
 	rotateM->setAtPosition(1, 2,
-			beta * center.getX() + (1 - alpha) * center.getY());
+		beta * center.getX() + (1 - alpha) * center.getY());
 
 	return rotateM;
 }
+// angle in degree
 void rotateAPoint(int x, int y, Point center, double angle, double scale,
-		int &xnew, int &ynew)
+	int &xnew, int &ynew)
 {
 	xnew = 0;
 	ynew = 0;
@@ -135,7 +136,7 @@ void rotateAPoint(int x, int y, Point center, double angle, double scale,
 }
 template<typename T>
 void Matrix<T>::rotation(Point center, double angle, double scale,
-		T defaultValue)
+	T defaultValue)
 {
 	Matrix<T> result(rows, cols);
 	result.InitWithValue(defaultValue);
@@ -191,7 +192,48 @@ Matrix<T> Matrix<T>::translate(int dx, int dy, T defaultValue)
 	}
 	return result;
 }
+template<typename T>
+Matrix<T> Matrix<T>::transposition(T defaultValue)
+{
+	Matrix<T> result(cols, rows);
+	result.InitWithValue(defaultValue);
+	for (int row = 0; row < rows; row++)
+	{
+		for (int col = 0; col < cols; col++)
+		{
+			T value = data[row][col];
+			result.data[col][row] = value;
+		}
+	}
+	return result;
+}
+template<typename T>
+Matrix<T> Matrix<T>::multiply(Matrix<T> object, T defaultValue)
+{
+	int objRows = object.rows;
+	int objCols = object.cols;
+	Matrix<T> result(rows, objCols);
+	result.InitWithValue(defaultValue);
+	if (cols != objRows)
+		return result;
+	for (int row = 0; row < rows; row++)
+	{
+		for (int col = 0; col < objCols; col++)
+		{
+			T sum = defaultValue;
+			for (int k = 0; k < cols; k++)
+			{
+				T value1 = data[row][k];
+				T value2 = object.data[k][col];
+				sum += value1 * value2;
+			}
+			result.data[row][col] = sum;
+		}
+	}
+}
+
 template class Matrix<int> ;
 template class Matrix<double> ;
+template class Matrix<float>;
 template class Matrix<RGB> ;
 

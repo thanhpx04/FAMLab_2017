@@ -22,7 +22,7 @@ using namespace std;
 #include "../segmentation/Canny.h"
 #include "GHTInPoint.h"
 
-ptr_IntMatrix getGradientDMatrix(Image grayImage)
+ptr_IntMatrix getGradientDMatrix(Image grayImage,vector<Point> &edgePoints)
 {
 	int rows = grayImage.getGrayMatrix()->getRows();
 	int cols = grayImage.getGrayMatrix()->getCols();
@@ -34,7 +34,7 @@ ptr_IntMatrix getGradientDMatrix(Image grayImage)
 	ptr_IntMatrix mgradirection = new Matrix<int>(rows, cols, -1);
 	ptr_IntMatrix mcannyMatrix = new Matrix<int>(
 			*cannyProcess2(mbinMatrix, mThresholdValue, 3 * mThresholdValue,
-					mgradirection));
+					mgradirection,edgePoints));
 	delete mMatrix;
 	delete mbinMatrix;
 	delete mcannyMatrix;
@@ -172,6 +172,8 @@ double avgDistance(vector<Point> listPoints, Line axis)
 	return totalDist / (int) nPoints;
 }
 
+// compute centroid point from the gradient matrix of image
+// output: centroid point and list points of edge.
 Point centroidPoint(ptr_IntMatrix gradMatrix, vector<Point> &listPoints)
 {
 	int rows = gradMatrix->getRows();

@@ -67,6 +67,8 @@ public:
 	void rotation(Point center, double angle, double scale,
 			T defaultValue);
 	Matrix<T> translate(int dx, int dy, T defaultValue);
+	Matrix<T> transposition(T defaultValue);
+	Matrix<T> multiply(Matrix<T> object, T defaultValue);
 };
 typedef Matrix<int>* ptr_IntMatrix;
 typedef Matrix<double>* ptr_DoubleMatrix;

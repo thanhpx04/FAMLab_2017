@@ -24,7 +24,7 @@ struct RTable
 	Point center;
 	vector<REntry> entriesTable;
 };
-ptr_IntMatrix getGradientDMatrix(Image grayImage);
+ptr_IntMatrix getGradientDMatrix(Image grayImage,vector<Point> &edgePoints);
 double angleVector(Point p1, Point p2, Point q1, Point q2);
 RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center);
 Point houghSpace(ptr_IntMatrix gradMatrix, RTable rentries);

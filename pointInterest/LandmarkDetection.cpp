@@ -123,13 +123,15 @@ vector<Point> LandmarkDetection::landmarksAutoDectect2(Image &sceneImage,
 
 	// reverse the coordinate of estimated landmarks
 	Point pi;
+	int dx = ePoint.getX() - mPoint.getX();
+	int dy = ePoint.getY() - mPoint.getY();
 	for (size_t i = 0; i < result.size(); i++)
 	{
 		pi = result.at(i);
 		int xnew = 0, ynew = 0;
 		rotateAPoint(pi.getX(), pi.getY(), mPoint, -angle, 1, xnew, ynew);
-		xnew -= translation.getX();
-		ynew -= translation.getY();
+		xnew += dx;
+		ynew += dy;
 		result.at(i).setX(xnew);
 		result.at(i).setY(ynew);
 	}
@@ -213,7 +215,8 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 	int rows = modelImage.getGrayMatrix()->getRows();
 	int cols = modelImage.getGrayMatrix()->getCols();
 	ptr_IntMatrix mgradirection = new Matrix<int>(rows, cols, -1);
-	*mgradirection = *(getGradientDMatrix(modelImage));
+	vector<Point> modelPoints;
+	*mgradirection = *(getGradientDMatrix(modelImage,modelPoints));
 	vector<Point> mLandmarks = modelImage.getListOfManualLandmarks();
 
 	for (size_t i = 0; i < sceneImages.size(); i++)
@@ -225,7 +228,8 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 		sceneImage = new Image(folderScene + "/" + sceneName);
 
 		ptr_IntMatrix gradirection = new Matrix<int>(rows, cols, -1);
-		*gradirection = *(getGradientDMatrix(*sceneImage));
+		vector<Point> scenePoints;
+		*gradirection = *(getGradientDMatrix(*sceneImage,scenePoints));
 
 		Point mPoint, ePoint, translation;
 		double angle;

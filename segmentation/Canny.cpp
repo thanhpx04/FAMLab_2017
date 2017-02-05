@@ -373,7 +373,7 @@ ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	return thresholdImage;
 }
 ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
-	int highThreshold, ptr_IntMatrix &gradDirection)
+	int highThreshold, ptr_IntMatrix &gradDirection,vector<Point> &edgePoints)
 {
 	ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
@@ -386,12 +386,14 @@ ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
 	//gradDirection = new Matrix<int>(rows, cols, -1);
 	double angle = 0;
 	int count = 0;
+	edgePoints.clear();
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
 		{
 			if (thresholdImage->getAtPosition(r, c) == 255)
 			{
+				edgePoints.push_back(Point(c,r));
 				angle = angles->getAtPosition(r, c);
 
 				if (angle < 0)

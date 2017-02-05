@@ -48,6 +48,7 @@ private slots:
 
 	void binThreshold();
 	void cannyAlgorithm();
+	void suzukiAlgorithm();
 	void lineSegmentation();
 
 	//void pHoughTransform();
@@ -95,6 +96,7 @@ private:
 
 	QAction *binaryThresholdAct;
 	QAction *cannyAct;
+	QAction *suzukiAct;
 	QAction *lineSegmentationAct;
 
 	//QAction *phtAct;

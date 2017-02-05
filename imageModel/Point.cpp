@@ -41,5 +41,23 @@ void Point::setColor(RGB rgb)
 
 void Point::toString()
 {
-	cout<<"\n"<<x<<"\t"<<y<<endl;
+	cout << "\n" << x << "\t" << y << endl;
+}
+bool Point::operator<(const Point &cPoint)
+{
+	if (this->x < cPoint.x && this->y < cPoint.y)
+		return true;
+	return false;
+}
+bool Point::operator>(const Point &cPoint)
+{
+	if (this->x > cPoint.x && this->y > cPoint.y)
+		return true;
+	return false;
+}
+bool Point::operator==(const Point &cPoint)
+{
+	if(this->x == cPoint.x && this->y == cPoint.y)
+			return true;
+		return false;
 }

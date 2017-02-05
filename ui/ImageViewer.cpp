@@ -45,6 +45,7 @@ using namespace std;
 #include "../pht/GHTInPoint.h"
 #include "../pht/PHTEntry.h"
 #include "../pht/PHoughTransform.h"
+#include "../pht/ICP.h"
 
 #include "../histograms/ShapeHistogram.h"
 #include "../pointInterest/Treatments.h"
@@ -172,6 +173,10 @@ void ImageViewer::createSegmentationMenu()
 	cannyAct->setEnabled(false);
 	connect(cannyAct, SIGNAL(triggered()), this, SLOT(cannyAlgorithm()));
 
+	suzukiAct = new QAction(tr("&Suzuki result"), this);
+	suzukiAct->setEnabled(false);
+	connect(suzukiAct, SIGNAL(triggered()), this, SLOT(suzukiAlgorithm()));
+
 	lineSegmentationAct = new QAction(tr("&View segmentation result"), this);
 	lineSegmentationAct->setEnabled(false);
 	connect(lineSegmentationAct, SIGNAL(triggered()), this,
@@ -180,9 +185,9 @@ void ImageViewer::createSegmentationMenu()
 void ImageViewer::createLandmarksMenu()
 {
 	/*phtAct = new QAction(tr("&Probabilistic Hough Transform"), this);
-	phtAct->setEnabled(false);
-	phtAct->setShortcut(tr("Ctrl+P"));
-	connect(phtAct, SIGNAL(triggered()), this, SLOT(pHoughTransform()));*/
+	 phtAct->setEnabled(false);
+	 phtAct->setShortcut(tr("Ctrl+P"));
+	 connect(phtAct, SIGNAL(triggered()), this, SLOT(pHoughTransform()));*/
 
 	phtPointsAct = new QAction(tr("&Generalizing Hough Transform"), this);
 	phtPointsAct->setEnabled(false);
@@ -254,6 +259,7 @@ void ImageViewer::createMenus()
 	segmentationMenu = new QMenu(tr("&Segmentation"), this);
 	segmentationMenu->addAction(binaryThresholdAct);
 	segmentationMenu->addAction(cannyAct);
+	segmentationMenu->addAction(suzukiAct);
 	segmentationMenu->addAction(lineSegmentationAct);
 
 	dominantPointMenu = new QMenu(tr("&Landmarks"), this);
@@ -306,6 +312,7 @@ void ImageViewer::activeFunction()
 
 	binaryThresholdAct->setEnabled(true);
 	cannyAct->setEnabled(true);
+	suzukiAct->setEnabled(true);
 	lineSegmentationAct->setEnabled(true);
 
 	//phtAct->setEnabled(true);
@@ -388,6 +395,7 @@ ImageViewer::~ImageViewer()
 
 	delete binaryThresholdAct;
 	delete cannyAct;
+	delete suzukiAct;
 	delete lineSegmentationAct;
 
 	//delete phtAct;
@@ -687,6 +695,43 @@ void ImageViewer::cannyAlgorithm()
 	other->move(x() - 40, y() - 40);
 	other->show();
 }
+void ImageViewer::suzukiAlgorithm()
+{
+	cout << "\nSuzuki Algorithm...\n";
+	Segmentation tr;
+	tr.setRefImage(*matImage);
+	vector<Edge> edgesCanny = tr.canny();
+	vector<Edge> edges = verifyProcess(edgesCanny);
+
+
+
+	RGB color;
+	color.R = 255;
+	color.G = color.B = 0;
+	Edge edgei;
+	Point pi;
+	int rows = matImage->getGrayMatrix()->getRows();
+	int cols = matImage->getGrayMatrix()->getCols();
+
+	for (size_t i = 0; i < edges.size(); i++)
+	{
+		edgei = edges.at(i);
+		for (size_t k = 0; k < edgei.getPoints().size(); k++)
+		{
+			pi = edgei.getPoints().at(k);
+			if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+				&& pi.getY() < rows)
+			{
+				matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+			}
+		}
+	}
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
+		"Canny result");
+	other->move(x() - 40, y() - 40);
+	other->show();
+}
 void ImageViewer::lineSegmentation()
 {
 	cout << "\nDisplay the list of lines." << endl;
@@ -730,8 +775,8 @@ void ImageViewer::gHoughTransform()
 	msgbox.exec();
 	QString reflmPath = QFileDialog::getOpenFileName(this);
 	modelImage->readManualLandmarks(reflmPath.toStdString());
-	int rows = matImage->getGrayMatrix()->getRows();
-	int cols = matImage->getGrayMatrix()->getCols();
+	//int rows = matImage->getGrayMatrix()->getRows();
+	//int cols = matImage->getGrayMatrix()->getCols();
 	/*ProHoughTransform tr;
 	 tr.setRefImage(*modelImage);
 
@@ -742,11 +787,11 @@ void ImageViewer::gHoughTransform()
 	 vector<Point> estLandmarks = tr.generalTransform(*matImage, angleDiff, ePoint,
 	 mPoint, newScene);*/
 	//==================================================================
-	LandmarkDetection lmDetect;
+	/*LandmarkDetection lmDetect;
 	lmDetect.setRefImage(*modelImage);
 	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 100,
 		300);
-	cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
+	cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;*/
 
 	RGB color;
 	color.G = 0;
@@ -759,7 +804,7 @@ void ImageViewer::gHoughTransform()
 
 	//drawingLine(*(matImage->getRGBMatrix()), l2, color);
 
-	Point lm;
+	/*Point lm;
 	color.B = 255;
 	for (size_t i = 0; i < estLandmarks.size(); i++)
 	{
@@ -774,7 +819,8 @@ void ImageViewer::gHoughTransform()
 		"<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
 			+ QString::number(ebary.getY()) + ")</p>"
 				"<p>Centroid value: " + QString::number(mCentroid) + "</p");
-	msgbox.exec();
+	msgbox.exec();*/
+	icpmethod(*modelImage,*matImage);
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 		"Landmarks result");
 	this->show();
