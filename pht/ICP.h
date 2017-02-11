@@ -7,6 +7,6 @@
 
 #ifndef ICP_H_
 #define ICP_H_
-void icpmethod(Image modelGray, Image &sceneGray);
+void icpMethod(Image modelGray, Image &sceneGray);
 
 #endif /* ICP_H_ */

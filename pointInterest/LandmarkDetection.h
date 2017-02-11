@@ -23,6 +23,8 @@ public:
 			int templSize, int sceneSize);
 	void landmarksOnDir2(string modelName, string folderScene,
 		vector<string> sceneImages, string saveFolder);
+	void landmarksOnDir3(string modelName, string folderScene,
+		vector<string> sceneImages, string saveFolder);
 };
 
 #endif /* LANDMARKDETECTION_H_ */

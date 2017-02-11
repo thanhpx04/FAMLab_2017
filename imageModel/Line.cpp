@@ -62,10 +62,16 @@ Point Line::getEnd()
 void Line::setBegin(Point ep1)
 {
 	begin = ep1;
+	dx = end.getX() - begin.getX();
+	dy = end.getY() - begin.getY();
+	lengthOfLine();
 }
 void Line::setEnd(Point ep2)
 {
 	end = ep2;
+	dx = end.getX() - begin.getX();
+	dy = end.getY() - begin.getY();
+	lengthOfLine();
 }
 
 double Line::getLength()

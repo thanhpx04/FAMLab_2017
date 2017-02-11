@@ -234,6 +234,6 @@ Matrix<T> Matrix<T>::multiply(Matrix<T> object, T defaultValue)
 
 template class Matrix<int> ;
 template class Matrix<double> ;
-template class Matrix<float>;
+template class Matrix<float> ;
 template class Matrix<RGB> ;
 

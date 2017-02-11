@@ -22,7 +22,7 @@ using namespace std;
 
 #include "JPEGReader.h"
 
-ptr_RGBMatrix decompressJPEG(const char* filename) {
+ptr_RGBMatrix decompressJPEG(const char* filename, int &rows, int &cols) {
 	std::cout << "\nBegin decompress JPEG image.\n";
 
 	ptr_RGBMatrix rgbMatrix;
@@ -46,6 +46,8 @@ ptr_RGBMatrix decompressJPEG(const char* filename) {
 	jpeg_start_decompress(&cinfo);
 
 	rgbMatrix = new Matrix<RGB>(cinfo.output_height, cinfo.output_width);
+	rows = rgbMatrix->getRows();
+	cols = rgbMatrix->getCols();
 
 	row_stride = cinfo.output_width * cinfo.output_components;
 	buffer = new unsigned char[cinfo.output_height * row_stride];

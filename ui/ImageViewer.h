@@ -60,6 +60,8 @@ private slots:
 	void dirCentroidMeasure();
 	void dirGenerateData();
 
+	void icpMethodViewer();
+
 private:
 
 	QLabel *imageLabel;
@@ -71,6 +73,7 @@ private:
 	QMenu *viewMenu;
 	QMenu *segmentationMenu;
 	QMenu *dominantPointMenu;
+	QMenu *registrationMenu;
 	QMenu *helpMenu;
 
 	// toolbar
@@ -108,6 +111,10 @@ private:
 	QAction *dirCentroidMeasureAct;
 	QAction *dirGenerateDataAct;
 
+
+	// Action registration
+	QAction *icpAct;
+
 	// private methods
 	void createActions();
 	void createMenus();
@@ -118,7 +125,7 @@ private:
 	void createHelpMenu();
 	void createSegmentationMenu();
 	void createLandmarksMenu();
-
+	void createRegistrationMenu();
 
 	void activeFunction();
 	void viewMenuUpdateActions();

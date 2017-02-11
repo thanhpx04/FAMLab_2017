@@ -362,7 +362,7 @@ vector<Point> ProHoughTransform::estimateLandmarks(Image sImage,
 
 }
 
-vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle, Point &translation,
+vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 		Point &ePoint, Point &mPoint, ptr_IntMatrix &newScene)
 {
 	int rows = sImage.getGrayMatrix()->getRows();
@@ -378,51 +378,7 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle, 
 	*gradirection = *(getGradientDMatrix(sImage,scenePoints));
 
 	vector<Point> eslm;
-	/*// Landmarks are estimated by using GHT
-	 Point center(cols / 2, rows / 2);
-	 RTable rentries = rTableConstruct(mgradirection, center);
-	 Point sPoint = houghSpace(gradirection, rentries);
-	 vector<Point> eslm = detectLandmarks(center, sPoint, mLandmarks);
-
-	 // compute centroid of model, scene and centroid of model in scene
-	 Point mTemp;
-	 Line sLine = principalAxis(gradirection, ePoint);
-	 Line mLine = principalAxis(mgradirection, mTemp);
-	 double anglek = sLine.angleLines(mLine);
-	 int dxold = sPoint.getX() - center.getX();
-	 int dyold = sPoint.getY() - center.getY();
-	 mTemp.setX(mTemp.getX() + dxold);
-	 mTemp.setY(mTemp.getY() + dyold);
-
-	 // move sPoint to mTemp
-	 int dx = mTemp.getX() - ePoint.getX();
-	 int dy = mTemp.getY() - ePoint.getY();
-	 cout<<"\nTranslate: "<<dx<<"\t"<<dy<<endl;
-	 sLine.getBegin().setX(mTemp.getX());
-	 sLine.getBegin().setY(mTemp.getY());
-	 sLine.getEnd().setX(sLine.getEnd().getX() + dx);
-	 sLine.getEnd().setY(sLine.getEnd().getY() + dy);
-	 int xpk = 0, ypk = 0;
-	 Point pk = sLine.getEnd();
-	 rotateAPoint(pk.getX(), pk.getY(), mTemp, anglek, 1, xpk, ypk);
-	 Point pk1(xpk, ypk);
-	 xpk = ypk = 0;
-	 rotateAPoint(pk.getX(), pk.getY(), mTemp, -anglek, 1, xpk, ypk);
-	 Point pk2(xpk, ypk);
-	 double angled1 = mLine.angleLines(Line(mTemp, pk1));
-	 double angled2 = mLine.angleLines(Line(mTemp, pk2));
-	 if (angled2 < angled1 && anglek <= 90)
-	 anglek = -anglek;
-	 if (angled2 < angled1 && anglek >= 90)
-	 anglek = -anglek;
-	 angle = anglek;
-	 if (isnan(angle))
-	 angle = 0;
-	 cout << "\n Angle: " << angle << endl;
-	 cout << "\nLandmarks by GHT: " << eslm.size() << endl;
-	 mPoint.setX(mTemp.getX());
-	 mPoint.setY(mTemp.getY());*/
-
+	Point translation;
 	eslm = generalizingHoughTransform(mgradirection, gradirection, mLandmarks,
 			ePoint, mPoint, angle, translation);
 	int dx = translation.getX();

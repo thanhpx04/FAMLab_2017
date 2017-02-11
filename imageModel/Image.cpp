@@ -92,12 +92,13 @@ Image::Image(const Image &cpimage)
 Image::~Image()
 {
 	/*listOfLines.clear();
-	manualLandmarks.clear();
-	autoLandmarks.clear();
-	delete grayMatrix;
-	delete imgMatrix;
-	delete grayHistogram;*/
-};
+	 manualLandmarks.clear();
+	 autoLandmarks.clear();
+	 delete grayMatrix;
+	 delete imgMatrix;
+	 delete grayHistogram;*/
+}
+;
 Image::Image(std::string filePath)
 {
 	medianHistogram = 0;
@@ -105,12 +106,19 @@ Image::Image(std::string filePath)
 	thresholdValue = 0;
 
 	fileName = filePath;
-	imgMatrix = readJPGToRGB(filePath.c_str());
+	int rows = 0, cols = 0;
+	imgMatrix = readJPGToRGB(filePath.c_str(),rows, cols);
+	//imgMatrix = new Matrix<RGB>(rows,cols);
+//	*imgMatrix = *imgTemp;
+
+	grayMatrix = new Matrix<int>(rows,cols);
 	grayMatrix = convertRGBToGray(imgMatrix);
 
+	grayHistogram = new Matrix<int>(1, BIN_SIZE, 0);
 	calcGrayHistogram();
 
 	calThresholdValue();
+	//delete imgTemp;
 	cout << endl << "Threshold value: " << thresholdValue;
 }
 
@@ -248,7 +256,7 @@ void Image::calcGrayHistogram()
 			}
 		}
 
-		grayHistogram = new Matrix<int>(1, BIN_SIZE, 0);
+
 
 		for (int k = 0; k < BIN_SIZE; k++)
 		{
