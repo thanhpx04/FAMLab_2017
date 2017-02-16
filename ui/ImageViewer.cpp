@@ -424,7 +424,7 @@ ImageViewer::~ImageViewer()
 
 	delete icpAct;
 }
-;
+
 void ImageViewer::loadImage(QString fn)
 {
 
@@ -669,8 +669,10 @@ void ImageViewer::binThreshold()
 {
 	cout << "\nBinary thresholding...\n";
 	float tValue = matImage->getThresholdValue();
+
 	Segmentation tr; // = new Segmentation();
 	tr.setRefImage(*matImage);
+	cout << "\ntValue: " << tValue << endl;
 	ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
 
 	ImageViewer *other = new ImageViewer;
@@ -717,8 +719,7 @@ void ImageViewer::suzukiAlgorithm()
 	cout << "\nSuzuki Algorithm...\n";
 	Segmentation tr;
 	tr.setRefImage(*matImage);
-	vector<Edge> edgesCanny = tr.canny();
-	vector<Edge> edges = verifyProcess(edgesCanny);
+	vector<Edge> edges = tr.canny();
 
 	RGB color;
 	color.R = 255;
@@ -832,8 +833,8 @@ void ImageViewer::gHoughTransform()
 		cout << "\n Landmarks " << i + 1 << ": " << lm.getX() << "\t" << lm.getY()
 			<< endl;
 		//fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
-		qpainter.drawEllipse(lm.getX(),lm.getY(),4,4);
-		qpainter.drawText(lm.getX() + 6,lm.getY(),QString::number((int)i));
+		qpainter.drawEllipse(lm.getX(), lm.getY(), 4, 4);
+		qpainter.drawText(lm.getX() + 6, lm.getY(), QString::number((int) i));
 	}
 	qpainter.end();
 	Point ebary;
@@ -844,8 +845,7 @@ void ImageViewer::gHoughTransform()
 				"<p>Centroid value: " + QString::number(mCentroid) + "</p");
 	msgbox.exec();
 	//icpmethod(*modelImage,*matImage);
-	this->loadImage(matImage, qImage,
-		"Landmarks result");
+	this->loadImage(matImage, qImage, "Landmarks result");
 	this->show();
 	//delete newScene;
 	msgbox.setText("Finish.");
@@ -1098,10 +1098,10 @@ void ImageViewer::dirGenerateData()
 	cout << "\n Automatic generate data on directory." << endl;
 	QMessageBox msgbox;
 
-	//string imageFolder = "/home/linh/Desktop/Temps/mg/images";
-	string imageFolder = "/home/linh/Desktop/rotatedImages/mg";
+	string imageFolder = "/home/linh/Desktop/Temps/mg/images";
+	//string imageFolder = "/home/linh/Desktop/rotatedImages/mg";
 	string lmFolder = "/home/linh/Desktop/Temps/mg/landmarks";
-	string saveFolder = "/home/linh/Desktop/results/2017/mg/10fevrier";
+	string saveFolder = "/home/linh/Desktop/results/2017/mg/16fevrier";
 	vector<string> images = readDirectory(imageFolder.c_str());
 	vector<string> lms = readDirectory(lmFolder.c_str());
 	int nrandom = 0;
@@ -1116,7 +1116,7 @@ void ImageViewer::dirGenerateData()
 	//for (int i = 0; i < 21; i++)
 	//{ // run on 20 images
 	//nrandom = random(0, (int) images.size());
-	nrandom = 21; // use Md 028 as ref
+	nrandom = 22; // use Md 028 as ref
 	string modelName = images.at(nrandom);
 	cout << "\n Random and model: " << nrandom << "\t" << modelName << endl;
 	model = imageFolder + "/" + images.at(nrandom);
@@ -1146,15 +1146,21 @@ void ImageViewer::icpMethodViewer()
 		return;
 	cout << endl << fileName2.toStdString() << endl;
 	Image *modelImage = new Image(fileName2.toStdString());
+	string lmfile = "/home/linh/Desktop/Temps/mg/landmarks/Mg 025.TPS";
+	modelImage->readManualLandmarks(lmfile);
 	//int rows = matImage->getGrayMatrix()->getRows();
 	//int cols = matImage->getGrayMatrix()->getCols();
-	ProHoughTransform tr;
-	tr.setRefImage(*modelImage);
-	icpMethod(*modelImage, *matImage);
+
+	icpMethod2(*modelImage, *matImage);
+	/*string imageFolder = "/home/linh/Desktop/Temps/mg/images";
+	vector<string> images = readDirectory(imageFolder.c_str());
+	icpFolder(imageFolder, images, *matImage);*/
+
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 		"ICP result");
 	this->show();
 	//delete newScene;
+	delete modelImage;
 	msgbox.setText("Finish.");
 	msgbox.exec();
 }

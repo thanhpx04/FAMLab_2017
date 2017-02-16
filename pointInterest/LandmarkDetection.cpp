@@ -222,7 +222,7 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 	Point mTemp;
 	Line mLine = principalAxis(mgradirection, mTemp);
 	//sceneImages.size()
-	for (size_t i = 190; i < 220; i++)
+	for (size_t i = 0; i < 20; i++)
 	{
 		Image *sceneImage;
 		string sceneName = sceneImages.at(i);

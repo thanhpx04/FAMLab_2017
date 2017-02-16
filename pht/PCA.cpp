@@ -57,16 +57,26 @@ Point centroidPoint(ptr_IntMatrix gradMatrix, vector<Point> &listPoints)
 	return Point(totalX / count, totalY / count);
 }
 
-Line principalAxis(ptr_IntMatrix gradMatrix, Point &cPoint)
+Line principalAxis(vector<Point> listOfPoints, Point &cPoint)
 {
-	vector<Point> listOfPoints;
-	cPoint = centroidPoint(gradMatrix, listOfPoints);
-	Point sPoint;
 	double minAvgDist = DBL_MAX;
+	Point sPoint;
 	size_t nPoints = listOfPoints.size();
-	for (size_t i = 0; i < nPoints; ++i)
+	int totalX = 0, totalY = 0;
+	Point pi;
+	for (size_t i = 0; i < nPoints; i++)
 	{
-		Point pi = listOfPoints.at(i);
+		pi = listOfPoints.at(i);
+		totalX += pi.getX();
+		totalY += pi.getY();
+	}
+	cPoint.setX(totalX / (int) nPoints);
+	cPoint.setY(totalY / (int) nPoints);
+	pi.setX(0);
+	pi.setY(0);
+	for (size_t i = 0; i < nPoints; i++)
+	{
+		pi = listOfPoints.at(i);
 		Line l(cPoint, pi);
 		double avgDist = avgDistance(listOfPoints, l);
 		if (avgDist < minAvgDist)
@@ -78,6 +88,13 @@ Line principalAxis(ptr_IntMatrix gradMatrix, Point &cPoint)
 	}
 
 	return Line(cPoint, sPoint);
+}
+Line principalAxis(ptr_IntMatrix gradMatrix, Point &cPoint)
+{
+	vector<Point> listOfPoints;
+	cPoint = centroidPoint(gradMatrix, listOfPoints);
+	return principalAxis(listOfPoints, cPoint);
+
 }
 // negative for clockwise, positive for counterclockwise
 // two lines have the same origin

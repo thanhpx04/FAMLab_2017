@@ -8,6 +8,7 @@
 #ifndef PCA_H_
 #define PCA_H_
 Line principalAxis(ptr_IntMatrix gradMatrix, Point &cPoint);
+Line principalAxis(vector<Point> listOfPoints, Point &cPoint);
 double rotateDirection(Line refLine, Line objLine, double angle);
 
 #endif /* PCA_H_ */

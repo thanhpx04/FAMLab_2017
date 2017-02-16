@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <float.h>
 #include <string.h>
+#include <algorithm>
 using namespace std;
 
 #include "../utils/Converter.h"
@@ -23,7 +24,7 @@ using namespace std;
 #include "../segmentation/Canny.h"
 #include "../utils/Drawing.h"
 #include "GHTInPoint.h"
-//#include "Vector.h"
+#include "../io/Reader.h"
 #include "PCA.h"
 #include "SVD.h"
 
@@ -181,7 +182,7 @@ void icpMethod(Image modelGray, Image &sceneGray)
 		scenePoints.at(i).setY(pi.getY() + dy);
 	}
 	double angleR = rotateDirection(mAxis, sAxis, angle);
-	cout<<"\nAngle difference: "<<angleR<<endl;
+	cout << "\nAngle difference: " << angleR << endl;
 	// rotate the scene
 	for (size_t i = 0; i < scenePoints.size(); i++)
 	{
@@ -192,6 +193,7 @@ void icpMethod(Image modelGray, Image &sceneGray)
 		scenePoints.at(i).setY(ynew);
 	}
 	// hien thi thu ket qua ===========================================
+
 	RGB color;
 	color.R = 255;
 	color.G = color.B = 0;
@@ -202,6 +204,7 @@ void icpMethod(Image modelGray, Image &sceneGray)
 			&& pi.getY() < rows)
 		{
 			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+
 		}
 	}
 	color.G = 255;
@@ -213,8 +216,10 @@ void icpMethod(Image modelGray, Image &sceneGray)
 			&& pi.getY() < rows)
 		{
 			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+
 		}
 	}
+
 	// ============================== ket thuc hien thi ket qua ==============================
 	// finding closest points
 	//vector<Line> pairPoints;
@@ -338,10 +343,10 @@ void icpMethod(Image modelGray, Image &sceneGray)
 		color.R = color.G = color.B = 0;
 		color.G = 255;
 		Point pi2;
-		float r1 = rm.getAtPosition(0,0);
-		float r2 = rm.getAtPosition(0,1);
-		float r3 = rm.getAtPosition(1,0);
-		float r4 = rm.getAtPosition(1,1);
+		float r1 = rm.getAtPosition(0, 0);
+		float r2 = rm.getAtPosition(0, 1);
+		float r3 = rm.getAtPosition(1, 0);
+		float r4 = rm.getAtPosition(1, 1);
 		for (size_t i = 0; i < modelPoints.size(); i++)
 		{
 			pi2 = modelPoints.at(i);
@@ -355,6 +360,209 @@ void icpMethod(Image modelGray, Image &sceneGray)
 			}
 		}
 		// ==================================== end print the result =====================================
+	}
+}
+struct comparey
+{
+	bool operator()(Point p1, Point p2)
+	{
+		return p1.getY() < p2.getY();
+	}
+} yComparation;
+void icpMethod2(Image modelGray, Image &sceneGray)
+{
+	// PCA
+	int rows = modelGray.getGrayMatrix()->getRows();
+	int cols = modelGray.getGrayMatrix()->getCols();
+
+	vector<Point> modelPoints;
+	ptr_IntMatrix modelGrandient = new Matrix<int>(rows, cols, -1);
+	*modelGrandient = *(getGradientDMatrix(modelGray, modelPoints));
+
+	Point mPoint;
+	Line mAxis = principalAxis(modelGrandient, mPoint);
+	Point mend = mAxis.getEnd();
+
+	vector<Point> scenePoints;
+	ptr_IntMatrix sceneGrandient = new Matrix<int>(rows, cols, -1);
+	*sceneGrandient = *(getGradientDMatrix(sceneGray, scenePoints));
+	vector<Point> scenePoints2(scenePoints);
+	Point sPoint;
+	Line sAxis = principalAxis(sceneGrandient, sPoint);
+	Point send = sAxis.getEnd();
+	double angle = mAxis.angleLines(sAxis);
+
+	// difference between two centroids
+	int dx = mPoint.getX() - sPoint.getX();
+	int dy = mPoint.getY() - sPoint.getY();
+
+	// move the scene to the model
+	sAxis.setBegin(mPoint);
+	send.setX(send.getX() + dx);
+	send.setY(send.getY() + dy);
+	sAxis.setEnd(send);
+	Point pi;
+	// translate the scene
+	/*for (size_t i = 0; i < scenePoints.size(); i++)
+	 {
+	 pi = scenePoints.at(i);
+	 scenePoints.at(i).setX(pi.getX() + dx);
+	 scenePoints.at(i).setY(pi.getY() + dy);
+	 }*/
+	double angleR = rotateDirection(mAxis, sAxis, angle);
+	cout << "\nAngle difference: " << angleR << endl;
+	// rotate and translate the scene
+	for (size_t i = 0; i < scenePoints.size(); i++)
+	{
+		pi = scenePoints.at(i);
+		int xnew = 0, ynew = 0;
+		rotateAPoint(pi.getX() + dx, pi.getY() + dy, mPoint, angleR, 1, xnew, ynew);
+		scenePoints.at(i).setX(xnew);
+		scenePoints.at(i).setY(ynew);
+	}
+
+	RGB color;
+	color.R = 255;
+	color.G = color.B = 0;
+	//drawingLine(*sceneGray.getRGBMatrix(), mAxis, color);
+
+	// hien thu ket qua lan thu nhat
+	for (size_t i = 0; i < scenePoints.size(); i++)
+	{
+		pi = scenePoints.at(i);
+		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+			&& pi.getY() < rows)
+		{
+			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+
+		}
+	}
+	color.G = 255;
+	for (size_t i = 0; i < modelPoints.size(); i++)
+	{
+		pi = modelPoints.at(i);
+		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+			&& pi.getY() < rows)
+		{
+			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+
+		}
+	}
+	size_t nlimit = modelPoints.size() / 2;
+	std::sort(modelPoints.begin(), modelPoints.end(), yComparation);
+	vector<Point> newModel(modelPoints.begin(), modelPoints.begin() + nlimit);
+
+	vector<Point> sceneTemp(scenePoints);
+	// hien thi thu ket qua ===========================================
+	int i = 0;
+	double minAngle = 0;
+	int dx2 = 0, dy2 = 0;
+	while (angle > 1.5)
+	{
+		i++;
+		//double angle1 = angle;
+		std::sort(scenePoints.begin(), scenePoints.end(), yComparation);
+		vector<Point> newScene(scenePoints.begin(), scenePoints.begin() + nlimit);
+		Point cPoint1, cPoint2;
+		Line l1 = principalAxis(newModel, cPoint1);
+		Line l2 = principalAxis(newScene, cPoint2);
+		angle = l1.angleLines(l2);
+		cout << "\nAngle difference 2: " << angle << endl;
+		if (i > 10)
+		{
+			break;
+		}
+		Point diff = cPoint1 - cPoint2;
+		l2.setBegin(l1.getBegin());
+		l2.setEnd(
+			Point(l2.getEnd().getX() + diff.getX(),
+				l2.getEnd().getY() + diff.getY()));
+		double angleR2 = rotateDirection(l1, l2, l1.angleLines(l2));
+
+		cout << "\nAngle difference 22: " << angleR << endl;
+		Point psn;
+		dx2 += diff.getX();
+		dy2 += diff.getY();
+		minAngle += angleR2;
+		for (size_t i = 0; i < scenePoints.size(); i++)
+		{
+			psn = scenePoints.at(i);
+			int xnew = psn.getX() + diff.getX(), ynew = psn.getY() + diff.getY();
+			rotateAPoint(xnew, ynew, mPoint, angleR2, 1, xnew, ynew);
+			scenePoints.at(i).setX(xnew);
+			scenePoints.at(i).setY(ynew);
+		}
+	}
+ color.B = 255;
+	for (size_t i = 0; i < scenePoints.size(); i++)
+	{
+		pi = scenePoints.at(i);
+		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+			&& pi.getY() < rows)
+		{
+			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+
+		}
+	}
+	/*color.G = 255;
+
+	 for (size_t i = 0; i < modelPoints.size(); i++)
+	 {
+	 pi = modelPoints.at(i);
+	 if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+	 && pi.getY() < rows)
+	 {
+	 sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+
+	 }
+	 }
+	 // second aligment
+	 Point nmPoint(0, 0), nsPoint(0, 0);
+	 Line nmLine = principalAxis(newModel, nmPoint);
+	 Line nsLine = principalAxis(newScene, nsPoint);
+
+	 double anglee = nmLine.angleLines(nsLine);
+	 cout << "\n Angle cuoi cung: " << anglee << endl;
+	 nmPoint.toString();
+	 nsPoint.toString();
+	 Point diff = nmPoint - nsPoint;
+	 nsLine.setBegin(nmPoint);
+	 Point temp(0, 0);
+	 temp.setX(nsLine.getEnd().getX() + diff.getX());
+	 temp.setY(nsLine.getEnd().getY() + diff.getY());
+	 nsLine.setEnd(temp);
+	 //anglee = rotateDirection(nmLine, nsLine, anglee);
+
+	 Point psn;
+	 for (size_t i = 0; i < scenePoints.size(); i++)
+	 {
+	 psn = scenePoints.at(i);
+	 int xnew = psn.getX() + diff.getX(), ynew = psn.getY() + diff.getY();
+	 rotateAPoint(psn.getX() + diff.getX(), psn.getY() + diff.getY(), nmPoint,
+	 anglee, 1, xnew, ynew);
+	 scenePoints.at(i).setX(xnew);
+	 scenePoints.at(i).setY(ynew);
+	 }*/
+	color.G = 0;
+	color.B = 255;
+
+	delete modelGrandient;
+	delete sceneGrandient;
+	// ============================== ket thuc hien thi ket qua ==============================
+}
+
+void icpFolder(string folderScene, vector<string> sceneImages, Image model)
+{
+	///Image sceneImage;
+	for (size_t i = 120; i < 140; i++)
+	{
+		string sceneName = sceneImages.at(i);
+		cout << "\n==============================================" << sceneName;
+		vector<Point> result;
+		Image sceneImage(folderScene + "/" + sceneName);
+		icpMethod2(model, sceneImage);
+		string path = "save/" + sceneName;
+		saveRGB(path.c_str(), sceneImage.getRGBMatrix());
 	}
 }
 
