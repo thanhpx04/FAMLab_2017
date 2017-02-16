@@ -27,7 +27,7 @@ using namespace std;
 #include "../io/Reader.h"
 #include "PCA.h"
 #include "SVD.h"
-
+#include "../correlation/CrossCorrelation.h"
 #include "ICP.h"
 
 /*Point centerPoint(vector<Point> listPoints)
@@ -56,26 +56,22 @@ using namespace std;
  modelPoints.at(i).setY(x+dy);
  }
  }*/
-double errorSquared(vector<Line> pairPoints)
-{
+double errorSquared(vector<Line> pairPoints) {
 	double result = 0;
 	int size = pairPoints.size();
-	for (int i = 0; i < size; i++)
-	{
+	for (int i = 0; i < size; i++) {
 		Point begin = pairPoints.at(i).getBegin();
 		Point end = pairPoints.at(i).getEnd();
 		result += (pow((double) (end.getX() - begin.getX()), 2)
-			+ pow((double) (end.getY() - begin.getY()), 2));
+				+ pow((double) (end.getY() - begin.getY()), 2));
 	}
 	return sqrt(result / size);
 }
-Matrix<float> equivalent(Point center, vector<Point> listPoints)
-{
+Matrix<float> equivalent(Point center, vector<Point> listPoints) {
 	Matrix<float> result(2, (int) listPoints.size(), 0);
 	Point pi;
 	float dx = 0.0, dy = 0.0;
-	for (size_t i = 0; i < listPoints.size(); i++)
-	{
+	for (size_t i = 0; i < listPoints.size(); i++) {
 		pi = listPoints.at(i);
 		dx = pi.getX() - center.getX();
 		dy = pi.getY() - center.getY();
@@ -85,8 +81,7 @@ Matrix<float> equivalent(Point center, vector<Point> listPoints)
 	return result;
 }
 
-void icpMethod(Image modelGray, Image &sceneGray)
-{
+void icpMethod(Image modelGray, Image &sceneGray) {
 	Matrix<float> m(2, 2, 0.0);
 	m.setAtPosition(0, 0, 5);
 	m.setAtPosition(0, 1, 5);
@@ -175,8 +170,7 @@ void icpMethod(Image modelGray, Image &sceneGray)
 	sAxis.setEnd(send);
 	Point pi;
 	// translate the scene
-	for (size_t i = 0; i < scenePoints.size(); i++)
-	{
+	for (size_t i = 0; i < scenePoints.size(); i++) {
 		pi = scenePoints.at(i);
 		scenePoints.at(i).setX(pi.getX() + dx);
 		scenePoints.at(i).setY(pi.getY() + dy);
@@ -184,8 +178,7 @@ void icpMethod(Image modelGray, Image &sceneGray)
 	double angleR = rotateDirection(mAxis, sAxis, angle);
 	cout << "\nAngle difference: " << angleR << endl;
 	// rotate the scene
-	for (size_t i = 0; i < scenePoints.size(); i++)
-	{
+	for (size_t i = 0; i < scenePoints.size(); i++) {
 		pi = scenePoints.at(i);
 		int xnew = 0, ynew = 0;
 		rotateAPoint(pi.getX(), pi.getY(), mPoint, angleR, 1, xnew, ynew);
@@ -197,25 +190,23 @@ void icpMethod(Image modelGray, Image &sceneGray)
 	RGB color;
 	color.R = 255;
 	color.G = color.B = 0;
-	for (size_t i = 0; i < scenePoints.size(); i++)
-	{
+	for (size_t i = 0; i < scenePoints.size(); i++) {
 		pi = scenePoints.at(i);
 		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-			&& pi.getY() < rows)
-		{
-			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+				&& pi.getY() < rows) {
+			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(),
+					color);
 
 		}
 	}
 	color.G = 255;
 
-	for (size_t i = 0; i < modelPoints.size(); i++)
-	{
+	for (size_t i = 0; i < modelPoints.size(); i++) {
 		pi = modelPoints.at(i);
 		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-			&& pi.getY() < rows)
-		{
-			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+				&& pi.getY() < rows) {
+			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(),
+					color);
 
 		}
 	}
@@ -228,17 +219,14 @@ void icpMethod(Image modelGray, Image &sceneGray)
 	//do
 	//{
 	vector<Point> modelCorr, sceneCorr;
-	for (size_t i = 0; i < modelPoints.size(); i++)
-	{
+	for (size_t i = 0; i < modelPoints.size(); i++) {
 		Point pm = modelPoints.at(i);
 		double minDist = DBL_MAX;
 		Point pk;
-		for (size_t j = 0; j < scenePoints.size(); j++)
-		{
+		for (size_t j = 0; j < scenePoints.size(); j++) {
 			Point ps = scenePoints.at(j);
 			Line temp(pm, ps);
-			if (temp.getLength() < minDist)
-			{
+			if (temp.getLength() < minDist) {
 				minDist = temp.getLength();
 				pk = ps;
 			}
@@ -248,13 +236,11 @@ void icpMethod(Image modelGray, Image &sceneGray)
 		//pairPoints.push_back(Line(pm, pk));
 		//drawingLine(*sceneGray.getRGBMatrix(), Line(pm, pk), color);
 	}
-	if (modelCorr.size() == sceneCorr.size())
-	{
+	if (modelCorr.size() == sceneCorr.size()) {
 		Point mi, si;
 		Matrix<float> P(2, (int) sceneCorr.size(), 0.0), Q(2,
-			(int) modelCorr.size(), 0.0);
-		for (size_t i = 0; i < modelCorr.size(); i++)
-		{
+				(int) modelCorr.size(), 0.0);
+		for (size_t i = 0; i < modelCorr.size(); i++) {
 			mi = modelCorr.at(i);
 			si = sceneCorr.at(i);
 			int mx = mi.getX() - mPoint.getX();
@@ -268,10 +254,8 @@ void icpMethod(Image modelGray, Image &sceneGray)
 		}
 		Matrix<float> M(2, 2, 0.0);
 		M = P.multiply(Q.transposition(0.0), 0.0);
-		for (int r = 0; r < M.getRows(); r++)
-		{
-			for (int c = 0; c < M.getCols(); c++)
-			{
+		for (int r = 0; r < M.getRows(); r++) {
+			for (int c = 0; c < M.getCols(); c++) {
 				cout << "\t" << M.getAtPosition(r, c);
 			}
 			cout << "\n";
@@ -294,47 +278,37 @@ void icpMethod(Image modelGray, Image &sceneGray)
 		 }*/
 		cout << "\n Matrix mT:" << endl;
 		Matrix<float> mT = M.transposition(0.0);
-		for (int r = 0; r < mT.getRows(); r++)
-		{
-			for (int c = 0; c < mT.getCols(); c++)
-			{
+		for (int r = 0; r < mT.getRows(); r++) {
+			for (int c = 0; c < mT.getCols(); c++) {
 				cout << "\t" << mT.getAtPosition(r, c);
 			}
 			cout << "\n";
 		}
 		cout << "\n Matrix v:" << endl;
-		for (int r = 0; r < v.getRows(); r++)
-		{
-			for (int c = 0; c < v.getCols(); c++)
-			{
+		for (int r = 0; r < v.getRows(); r++) {
+			for (int c = 0; c < v.getCols(); c++) {
 				cout << "\t" << v.getAtPosition(r, c);
 			}
 			cout << "\n";
 		}
 		cout << "\n Matrix s:" << endl;
-		for (int r = 0; r < s.getRows(); r++)
-		{
-			for (int c = 0; c < s.getCols(); c++)
-			{
+		for (int r = 0; r < s.getRows(); r++) {
+			for (int c = 0; c < s.getCols(); c++) {
 				cout << "\t" << s.getAtPosition(r, c);
 			}
 			cout << "\n";
 		}
 		cout << "\n Matrix u:" << endl;
-		for (int r = 0; r < u.getRows(); r++)
-		{
-			for (int c = 0; c < u.getCols(); c++)
-			{
+		for (int r = 0; r < u.getRows(); r++) {
+			for (int c = 0; c < u.getCols(); c++) {
 				cout << "\t" << u.getAtPosition(r, c);
 			}
 			cout << "\n";
 		}
 		Matrix<float> rm = v.multiply(u.transposition(0.0), 0.0);
 		cout << "\n Matrix r:" << endl;
-		for (int r = 0; r < rm.getRows(); r++)
-		{
-			for (int c = 0; c < rm.getCols(); c++)
-			{
+		for (int r = 0; r < rm.getRows(); r++) {
+			for (int c = 0; c < rm.getCols(); c++) {
 				cout << "\t" << rm.getAtPosition(r, c);
 			}
 			cout << "\n";
@@ -347,34 +321,32 @@ void icpMethod(Image modelGray, Image &sceneGray)
 		float r2 = rm.getAtPosition(0, 1);
 		float r3 = rm.getAtPosition(1, 0);
 		float r4 = rm.getAtPosition(1, 1);
-		for (size_t i = 0; i < modelPoints.size(); i++)
-		{
+		for (size_t i = 0; i < modelPoints.size(); i++) {
 			pi2 = modelPoints.at(i);
 			int x = pi2.getX(), y = pi2.getY();
 			pi2.setX(r1 * x + r2 * y);
 			pi2.setX(r3 * x + r4 * y);
 			if (pi2.getX() >= 0 && pi2.getX() < cols && pi2.getY() >= 0
-				&& pi2.getY() < rows)
-			{
-				sceneGray.getRGBMatrix()->setAtPosition(pi2.getY(), pi2.getX(), color);
+					&& pi2.getY() < rows) {
+				sceneGray.getRGBMatrix()->setAtPosition(pi2.getY(), pi2.getX(),
+						color);
 			}
 		}
 		// ==================================== end print the result =====================================
 	}
 }
-struct comparey
-{
-	bool operator()(Point p1, Point p2)
-	{
+struct comparey {
+	bool operator()(Point p1, Point p2) {
 		return p1.getY() < p2.getY();
 	}
 } yComparation;
-void icpMethod2(Image modelGray, Image &sceneGray)
-{
+vector<Point> icpMethod2(Image modelGray, Image &sceneGray,
+		vector<Point> mnLandmarks) {
 	// PCA
 	int rows = modelGray.getGrayMatrix()->getRows();
 	int cols = modelGray.getGrayMatrix()->getCols();
-
+	ptr_IntMatrix lastModel = new Matrix<int>(rows, cols, 0);
+	ptr_IntMatrix lastScene = new Matrix<int>(rows, cols, 0);
 	vector<Point> modelPoints;
 	ptr_IntMatrix modelGrandient = new Matrix<int>(rows, cols, -1);
 	*modelGrandient = *(getGradientDMatrix(modelGray, modelPoints));
@@ -403,20 +375,15 @@ void icpMethod2(Image modelGray, Image &sceneGray)
 	sAxis.setEnd(send);
 	Point pi;
 	// translate the scene
-	/*for (size_t i = 0; i < scenePoints.size(); i++)
-	 {
-	 pi = scenePoints.at(i);
-	 scenePoints.at(i).setX(pi.getX() + dx);
-	 scenePoints.at(i).setY(pi.getY() + dy);
-	 }*/
+
 	double angleR = rotateDirection(mAxis, sAxis, angle);
 	cout << "\nAngle difference: " << angleR << endl;
 	// rotate and translate the scene
-	for (size_t i = 0; i < scenePoints.size(); i++)
-	{
+	for (size_t i = 0; i < scenePoints.size(); i++) {
 		pi = scenePoints.at(i);
 		int xnew = 0, ynew = 0;
-		rotateAPoint(pi.getX() + dx, pi.getY() + dy, mPoint, angleR, 1, xnew, ynew);
+		rotateAPoint(pi.getX() + dx, pi.getY() + dy, mPoint, angleR, 1, xnew,
+				ynew);
 		scenePoints.at(i).setX(xnew);
 		scenePoints.at(i).setY(ynew);
 	}
@@ -424,28 +391,27 @@ void icpMethod2(Image modelGray, Image &sceneGray)
 	RGB color;
 	color.R = 255;
 	color.G = color.B = 0;
-	//drawingLine(*sceneGray.getRGBMatrix(), mAxis, color);
 
 	// hien thu ket qua lan thu nhat
-	for (size_t i = 0; i < scenePoints.size(); i++)
-	{
-		pi = scenePoints.at(i);
-		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-			&& pi.getY() < rows)
-		{
-			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+	// drawing scene image
+	/*for (size_t i = 0; i < scenePoints.size(); i++) {
+	 pi = scenePoints.at(i);
+	 if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+	 && pi.getY() < rows) {
+	 sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(),
+	 color);
 
-		}
-	}
+	 }
+	 }*/
+	// drawing model image
 	color.G = 255;
-	for (size_t i = 0; i < modelPoints.size(); i++)
-	{
+	for (size_t i = 0; i < modelPoints.size(); i++) {
 		pi = modelPoints.at(i);
 		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-			&& pi.getY() < rows)
-		{
-			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
-
+				&& pi.getY() < rows) {
+			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(),
+					color);
+			lastModel->setAtPosition(pi.getY(), pi.getX(), 255);
 		}
 	}
 	size_t nlimit = modelPoints.size() / 2;
@@ -455,114 +421,120 @@ void icpMethod2(Image modelGray, Image &sceneGray)
 	vector<Point> sceneTemp(scenePoints);
 	// hien thi thu ket qua ===========================================
 	int i = 0;
-	double minAngle = 0;
-	int dx2 = 0, dy2 = 0;
-	while (angle > 1.5)
-	{
+
+	while (angle > 1.5) {
 		i++;
 		//double angle1 = angle;
-		std::sort(scenePoints.begin(), scenePoints.end(), yComparation);
-		vector<Point> newScene(scenePoints.begin(), scenePoints.begin() + nlimit);
+		std::sort(sceneTemp.begin(), sceneTemp.end(), yComparation);
+		vector<Point> newScene(sceneTemp.begin(), sceneTemp.begin() + nlimit);
 		Point cPoint1, cPoint2;
 		Line l1 = principalAxis(newModel, cPoint1);
 		Line l2 = principalAxis(newScene, cPoint2);
 		angle = l1.angleLines(l2);
 		cout << "\nAngle difference 2: " << angle << endl;
-		if (i > 10)
-		{
+		if (i > 10) {
 			break;
 		}
 		Point diff = cPoint1 - cPoint2;
 		l2.setBegin(l1.getBegin());
 		l2.setEnd(
-			Point(l2.getEnd().getX() + diff.getX(),
-				l2.getEnd().getY() + diff.getY()));
+				Point(l2.getEnd().getX() + diff.getX(),
+						l2.getEnd().getY() + diff.getY()));
 		double angleR2 = rotateDirection(l1, l2, l1.angleLines(l2));
 
-		cout << "\nAngle difference 22: " << angleR << endl;
+		cout << "\nAngle difference 22: " << angleR2 << endl;
 		Point psn;
-		dx2 += diff.getX();
-		dy2 += diff.getY();
-		minAngle += angleR2;
-		for (size_t i = 0; i < scenePoints.size(); i++)
-		{
-			psn = scenePoints.at(i);
-			int xnew = psn.getX() + diff.getX(), ynew = psn.getY() + diff.getY();
+
+		for (size_t i = 0; i < sceneTemp.size(); i++) {
+			psn = sceneTemp.at(i);
+			int xnew = psn.getX() + diff.getX(), ynew = psn.getY()
+					+ diff.getY();
 			rotateAPoint(xnew, ynew, mPoint, angleR2, 1, xnew, ynew);
-			scenePoints.at(i).setX(xnew);
-			scenePoints.at(i).setY(ynew);
+			sceneTemp.at(i).setX(xnew);
+			sceneTemp.at(i).setY(ynew);
 		}
 	}
- color.B = 255;
-	for (size_t i = 0; i < scenePoints.size(); i++)
-	{
-		pi = scenePoints.at(i);
-		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-			&& pi.getY() < rows)
-		{
-			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
 
-		}
-	}
-	/*color.G = 255;
-
-	 for (size_t i = 0; i < modelPoints.size(); i++)
-	 {
-	 pi = modelPoints.at(i);
-	 if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-	 && pi.getY() < rows)
-	 {
-	 sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
-
-	 }
-	 }
-	 // second aligment
-	 Point nmPoint(0, 0), nsPoint(0, 0);
-	 Line nmLine = principalAxis(newModel, nmPoint);
-	 Line nsLine = principalAxis(newScene, nsPoint);
-
-	 double anglee = nmLine.angleLines(nsLine);
-	 cout << "\n Angle cuoi cung: " << anglee << endl;
-	 nmPoint.toString();
-	 nsPoint.toString();
-	 Point diff = nmPoint - nsPoint;
-	 nsLine.setBegin(nmPoint);
-	 Point temp(0, 0);
-	 temp.setX(nsLine.getEnd().getX() + diff.getX());
-	 temp.setY(nsLine.getEnd().getY() + diff.getY());
-	 nsLine.setEnd(temp);
-	 //anglee = rotateDirection(nmLine, nsLine, anglee);
-
-	 Point psn;
-	 for (size_t i = 0; i < scenePoints.size(); i++)
-	 {
-	 psn = scenePoints.at(i);
-	 int xnew = psn.getX() + diff.getX(), ynew = psn.getY() + diff.getY();
-	 rotateAPoint(psn.getX() + diff.getX(), psn.getY() + diff.getY(), nmPoint,
-	 anglee, 1, xnew, ynew);
-	 scenePoints.at(i).setX(xnew);
-	 scenePoints.at(i).setY(ynew);
-	 }*/
 	color.G = 0;
 	color.B = 255;
+	for (size_t i = 0; i < sceneTemp.size(); i++) {
+		pi = sceneTemp.at(i);
+		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+				&& pi.getY() < rows) {
+			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(),
+					color);
+			lastScene->setAtPosition(pi.getY(), pi.getX(), 255);
+		}
+	}
+
+	vector<Point> result;
+	if (mnLandmarks.size() > 0) {
+		result = verifyLandmarks2(lastModel, lastScene, mnLandmarks,
+				mnLandmarks, 100, 300);
+	}
+	for (size_t i = 0; i < result.size(); i++) {
+		pi = result.at(i);
+		fillCircle(*sceneGray.getRGBMatrix(), pi, 5, color);
+	}
+	Point lsPoint1, lsPoint2;
+	Line sl1 = principalAxis(scenePoints2, lsPoint1);
+	Line sl2 = principalAxis(sceneTemp, lsPoint2);
+	Point mback = lsPoint1 - lsPoint2;
+	double mangle = sl1.angleLines(sl2);
+	sl2.setBegin(sl1.getBegin());
+	sl2.setEnd(
+			Point(sl2.getEnd().getX() + mback.getX(),
+					sl2.getEnd().getY() + mback.getY()));
+	mangle = rotateDirection(sl1, sl2, mangle);
+	color.R = 255;
+	color.G = color.B = 0;
+	for (size_t i = 0; i < result.size(); i++) {
+		pi = result.at(i);
+		int xnew = pi.getX() + mback.getX(), ynew = pi.getY() + mback.getY();
+		rotateAPoint(xnew, ynew, lsPoint1, mangle, 1, xnew, ynew);
+		pi.setX(xnew);
+		pi.setY(ynew);
+		result.at(i).setX(xnew);
+		result.at(i).setY(ynew);
+		fillCircle(*sceneGray.getRGBMatrix(), pi, 5, color);
+	}
 
 	delete modelGrandient;
 	delete sceneGrandient;
+	return result;
 	// ============================== ket thuc hien thi ket qua ==============================
 }
 
-void icpFolder(string folderScene, vector<string> sceneImages, Image model)
-{
-	///Image sceneImage;
-	for (size_t i = 120; i < 140; i++)
-	{
+void icpFolder(string folderScene, vector<string> sceneImages, Image model,
+		vector<Point> mnLandmarks) {
+	int rows = model.getRGBMatrix()->getRows();
+	int cols = model.getRGBMatrix()->getCols();
+	vector<Point> result;
+	for (size_t i = 0; i < 25; i++) {
 		string sceneName = sceneImages.at(i);
 		cout << "\n==============================================" << sceneName;
 		vector<Point> result;
 		Image sceneImage(folderScene + "/" + sceneName);
-		icpMethod2(model, sceneImage);
+		result = icpMethod2(model, sceneImage, mnLandmarks);
+
+		// save TPS
 		string path = "save/" + sceneName;
+		ofstream inFile((path+".TPS").c_str());
+		inFile << "LM=" << result.size() << "\n";
+		Point epk;
+		RGB color;
+		color.R = color.G = 255;
+		color.B = 0;
+		for (size_t k = 0; k < result.size(); k++) {
+			epk = result.at(k);
+			inFile << epk.getX() << " " << rows - epk.getY() << "\n";
+		}
+		inFile << "IMAGE=" << path << "\n";
+		inFile.close();
+
 		saveRGB(path.c_str(), sceneImage.getRGBMatrix());
+
+		result.clear();
 	}
 }
 
