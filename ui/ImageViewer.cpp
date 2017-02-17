@@ -1146,18 +1146,18 @@ void ImageViewer::icpMethodViewer()
 		return;
 	cout << endl << fileName2.toStdString() << endl;
 	Image *modelImage = new Image(fileName2.toStdString());
-	string lmfile = "/media/linh/Data/PhD/Dataset/mg/landmarks/Mg 025.TPS";
-
-	//string lmfile = "/home/linh/Desktop/Temps/mg/landmarks/Mg 025.TPS";
+	//string lmfile = "/media/linh/Data/PhD/Dataset/mg/landmarks/Mg 025.TPS";
+	string lmfile = "/home/linh/Desktop/Temps/mg/landmarks/Mg 025.TPS";
 	modelImage->readManualLandmarks(lmfile);
 	//int rows = matImage->getGrayMatrix()->getRows();
 	//int cols = matImage->getGrayMatrix()->getCols();
 
 	//icpMethod2(*modelImage, *matImage,modelImage->getListOfManualLandmarks());
-	//string imageFolder = "/home/linh/Desktop/Temps/mg/images";
-	string imageFolder = "/media/linh/Data/PhD/Dataset/mg/images";
+	string imageFolder = "/home/linh/Desktop/Temps/mg/images";
+	//string imageFolder = "/media/linh/Data/PhD/Dataset/mg/images";
 	vector<string> images = readDirectory(imageFolder.c_str());
-	icpFolder(imageFolder, images, *matImage,modelImage->getListOfManualLandmarks());
+	icpFolder(imageFolder, images, *matImage,
+		modelImage->getListOfManualLandmarks());
 
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 		"ICP result");
