@@ -32,6 +32,7 @@ public:
 	Image(std::string);
 	void setFileName(std::string);
 	std::string getFileName();
+	string getName();
 	void setMLandmarks(string);
 	void setRGBMatrix(ptr_RGBMatrix);
 	void setGrayMatrix(Matrix<int>);

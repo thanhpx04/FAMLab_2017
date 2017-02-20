@@ -45,7 +45,7 @@ using namespace std;
 #include "../pht/GHTInPoint.h"
 #include "../pht/PHTEntry.h"
 #include "../pht/PHoughTransform.h"
-#include "../pht/ICP.h"
+#include "../pht/PCA.h"
 
 #include "../histograms/ShapeHistogram.h"
 #include "../pointInterest/Treatments.h"
@@ -200,6 +200,11 @@ void ImageViewer::createLandmarksMenu()
 	connect(autoLandmarksAct, SIGNAL(triggered()), this,
 		SLOT(extractLandmarks()));
 
+	pcaiAct = new QAction(tr("PCAI method"), this);
+	pcaiAct->setEnabled(false);
+	pcaiAct->setShortcut(tr("Ctrl+I"));
+	connect(pcaiAct, SIGNAL(triggered()), this, SLOT(pcaiMethodViewer()));
+
 	measureMBaryAct = new QAction(tr("&Measure manual centroid"), this);
 	measureMBaryAct->setEnabled(false);
 	connect(measureMBaryAct, SIGNAL(triggered()), this, SLOT(measureMBary()));
@@ -225,13 +230,13 @@ void ImageViewer::createLandmarksMenu()
 	connect(dirGenerateDataAct, SIGNAL(triggered()), this,
 		SLOT(dirGenerateData()));
 }
-void ImageViewer::createRegistrationMenu()
-{
-	icpAct = new QAction(tr("ICP method"), this);
-	icpAct->setEnabled(false);
-	icpAct->setShortcut(tr("Ctrl+I"));
-	connect(icpAct, SIGNAL(triggered()), this, SLOT(icpMethodViewer()));
-}
+/*void ImageViewer::createRegistrationMenu()
+ {
+ icpAct = new QAction(tr("PCAI method"), this);
+ icpAct->setEnabled(false);
+ icpAct->setShortcut(tr("Ctrl+I"));
+ connect(icpAct, SIGNAL(triggered()), this, SLOT(icpMethodViewer()));
+ }*/
 
 void ImageViewer::createActions()
 {
@@ -240,7 +245,7 @@ void ImageViewer::createActions()
 	createHelpMenu();
 	createSegmentationMenu();
 	createLandmarksMenu();
-	createRegistrationMenu();
+	//createRegistrationMenu();
 }
 void ImageViewer::createMenus()
 {
@@ -275,6 +280,7 @@ void ImageViewer::createMenus()
 	//dominantPointMenu->addAction(phtAct);
 	dominantPointMenu->addAction(phtPointsAct);
 	dominantPointMenu->addAction(autoLandmarksAct);
+	dominantPointMenu->addAction(pcaiAct);
 	dominantPointMenu->addSeparator();
 	dominantPointMenu->addAction(measureMBaryAct);
 	dominantPointMenu->addAction(measureEBaryAct);
@@ -284,15 +290,15 @@ void ImageViewer::createMenus()
 	menuDirectory->addAction(dirCentroidMeasureAct);
 	menuDirectory->addAction(dirGenerateDataAct);
 
-	registrationMenu = new QMenu(tr("&Registration"), this);
-	registrationMenu->addAction(icpAct);
+	//registrationMenu = new QMenu(tr("&Registration"), this);
+	//registrationMenu->addAction(icpAct);
 
 	// add menus to GUI
 	menuBar()->addMenu(fileMenu);
 	menuBar()->addMenu(viewMenu);
 	menuBar()->addMenu(segmentationMenu);
 	menuBar()->addMenu(dominantPointMenu);
-	menuBar()->addMenu(registrationMenu);
+	//menuBar()->addMenu(registrationMenu);
 	menuBar()->addMenu(helpMenu);
 }
 void ImageViewer::createToolBars()
@@ -339,7 +345,7 @@ void ImageViewer::activeFunction()
 	dirCentroidMeasureAct->setEnabled(true);
 	dirGenerateDataAct->setEnabled(true);
 
-	icpAct->setEnabled(true);
+	pcaiAct->setEnabled(true);
 
 	viewMenuUpdateActions();
 	if (!fitToWindowAct->isChecked())
@@ -422,7 +428,7 @@ ImageViewer::~ImageViewer()
 	delete dirCentroidMeasureAct;
 	delete dirGenerateDataAct;
 
-	delete icpAct;
+	//delete icpAct;
 }
 
 void ImageViewer::loadImage(QString fn)
@@ -791,38 +797,21 @@ void ImageViewer::gHoughTransform()
 	msgbox.exec();
 	QString reflmPath = QFileDialog::getOpenFileName(this);
 	modelImage->readManualLandmarks(reflmPath.toStdString());
-	int rows = matImage->getGrayMatrix()->getRows();
-	int cols = matImage->getGrayMatrix()->getCols();
+	//int rows = matImage->getGrayMatrix()->getRows();
+	//int cols = matImage->getGrayMatrix()->getCols();
 	ProHoughTransform tr;
 	tr.setRefImage(*modelImage);
 
 	Point ePoint, mPoint;
-	double angleDiff;
-
-	/*ptr_IntMatrix newScene = new Matrix<int>(rows, cols, 0);
-	 vector<Point> estLandmarks = tr.generalTransform(*matImage, angleDiff, ePoint,
-	 mPoint, newScene);
-	 cout<<"\nLandmarks: "<<estLandmarks.size()<<endl;*/
+	//double angleDiff;
 	//==================================================================
 	LandmarkDetection lmDetect;
 	lmDetect.setRefImage(*modelImage);
 	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 100,
 		300);
 	cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
-
-	RGB color;
-	color.G = 0;
-	color.B = 0;
-	color.R = 0;
 	// drawing...
-	//matImage->getRGBMatrix()->rotation(ePoint,angleDiff,1,color);
-	//fillCircle(*(matImage->getRGBMatrix()), ePoint, 5, color);
-	//drawingLine(*(matImage->getRGBMatrix()), sLine, color);
-
-	//drawingLine(*(matImage->getRGBMatrix()), l2, color);
-
 	Point lm;
-	color.G = color.R = 255;
 	QPainter qpainter(&qImage);
 	qpainter.setPen(Qt::yellow);
 	qpainter.setBrush(Qt::yellow);
@@ -1133,8 +1122,39 @@ void ImageViewer::dirGenerateData()
 	msgbox.exec();
 }
 // ================================================ Registration ========================================
-void ImageViewer::icpMethodViewer()
+void ImageViewer::pcaiMethodViewer()
 {
+	/*
+	 * QMessageBox msgbox;
+
+	 // extract list of points of model image by using canny
+	 msgbox.setText("Select the model image.");
+	 msgbox.exec();
+	 QString fileName2 = QFileDialog::getOpenFileName(this);
+	 if (fileName2.isEmpty())
+	 return;
+	 cout << endl << fileName2.toStdString() << endl;
+	 Image *modelImage = new Image(fileName2.toStdString());
+
+	 msgbox.setText("Select the landmark file of model image.");
+	 msgbox.exec();
+	 QString reflmPath = QFileDialog::getOpenFileName(this);
+	 modelImage->readManualLandmarks(reflmPath.toStdString());
+	 int rows = matImage->getGrayMatrix()->getRows();
+	 int cols = matImage->getGrayMatrix()->getCols();
+	 ProHoughTransform tr;
+	 tr.setRefImage(*modelImage);
+
+	 Point ePoint, mPoint;
+	 double angleDiff;
+
+	 //==================================================================
+	 LandmarkDetection lmDetect;
+	 lmDetect.setRefImage(*modelImage);
+	 vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 100,
+	 300);
+	 cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
+	 */
 	cout << "\nImage registration" << endl;
 	QMessageBox msgbox;
 
@@ -1146,21 +1166,48 @@ void ImageViewer::icpMethodViewer()
 		return;
 	cout << endl << fileName2.toStdString() << endl;
 	Image *modelImage = new Image(fileName2.toStdString());
-	string lmfile = "/media/linh/Data/PhD/Dataset/mg/landmarks/Mg 025.TPS";
-	//string lmfile = "/home/linh/Desktop/Temps/mg/landmarks/Mg 025.TPS";
-	modelImage->readManualLandmarks(lmfile);
-	//int rows = matImage->getGrayMatrix()->getRows();
-	//int cols = matImage->getGrayMatrix()->getCols();
+	//string lmfile = "/media/linh/Data/PhD/Dataset/mg/landmarks/Mg 025.TPS";
+	msgbox.setText("Select the landmark file of model image.");
+	msgbox.exec();
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+	modelImage->readManualLandmarks(reflmPath.toStdString());
+	vector<Point> estLandmarks = PCAI(*modelImage, *matImage,
+		modelImage->getListOfManualLandmarks());
+	cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
 
-	icpMethod2(*modelImage, *matImage,modelImage->getListOfManualLandmarks());
-	/*string imageFolder = "/home/linh/Desktop/Temps/mg/images";
-	//string imageFolder = "/media/linh/Data/PhD/Dataset/mg/images";
-	vector<string> images = readDirectory(imageFolder.c_str());
-	icpFolder(imageFolder, images, *matImage,
-		modelImage->getListOfManualLandmarks());*/
+	// display the result
+	Point lm;
+	QPainter qpainter(&qImage);
+	qpainter.setPen(Qt::yellow);
+	qpainter.setBrush(Qt::yellow);
+	qpainter.setFont(QFont("Arial", 20));
+	for (size_t i = 0; i < estLandmarks.size(); i++)
+	{
+		lm = estLandmarks.at(i);
+		cout << "Landmarks " << i + 1 << ": " << lm.getX() << "\t" << lm.getY()
+			<< endl;
+		//fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
+		qpainter.drawEllipse(lm.getX(), lm.getY(), 4, 4);
+		qpainter.drawText(lm.getX() + 6, lm.getY(), QString::number((int) i));
+	}
+	qpainter.end();
+	Point ebary;
+	double mCentroid = measureCentroidPoint(estLandmarks, ebary);
+	msgbox.setText(
+		"<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
+			+ QString::number(ebary.getY()) + ")</p>"
+				"<p>Centroid value: " + QString::number(mCentroid) + "</p");
+	msgbox.exec();
 
-	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-		"ICP result");
+	// working on folder
+	/*string imageFolder = "/home/linh/Desktop/editedImages/md_images/s2tos1";
+	 string saveFolder = "/media/linh/Data/PhD/Dataset/mg/save";
+	 vector<string> images = readDirectory(imageFolder.c_str());
+	 pcaiFolder(imageFolder, images, *matImage,
+	 modelImage->getListOfManualLandmarks(),saveFolder);*/
+
+	this->loadImage(matImage, qImage,
+		"PCAI result");
 	this->show();
 	//delete newScene;
 	delete modelImage;

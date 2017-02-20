@@ -108,8 +108,6 @@ Image::Image(std::string filePath)
 	fileName = filePath;
 	int rows = 0, cols = 0;
 	imgMatrix = readJPGToRGB(filePath.c_str(),rows, cols);
-	//imgMatrix = new Matrix<RGB>(rows,cols);
-//	*imgMatrix = *imgTemp;
 
 	grayMatrix = new Matrix<int>(rows,cols);
 	grayMatrix = convertRGBToGray(imgMatrix);
@@ -133,7 +131,24 @@ std::string Image::getFileName()
 {
 	return fileName;
 }
-
+string Image::getName()
+{
+	size_t found1 = fileName.find_last_of("/");
+	size_t found2 = fileName.find_last_of(".");
+	string str = fileName.substr(found1+1,found2 - found1-1);
+	size_t len = str.length();
+	size_t i =0;
+	while(i<len)
+	{
+		char c = str.at(i);
+		if(c == ' ')
+		{
+			str.replace(i,1,"_");
+		}
+		i++;
+	}
+	return str;
+}
 void Image::setMLandmarks(string tpsFile)
 {
 	manualLandmarks = readManualLandmarks(tpsFile);

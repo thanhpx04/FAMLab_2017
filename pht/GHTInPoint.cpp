@@ -69,7 +69,6 @@ RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center)
 
 	int gd;
 	REntry rentry;
-	//ofstream off("rtable.txt");
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
@@ -87,11 +86,9 @@ RTable rTableConstruct(ptr_IntMatrix gradMatrix, Point center)
 
 				(rtable.entriesTable.at((gd))).gradient = gd;
 				(rtable.entriesTable.at((gd))).polarValues.push_back(pv);
-				//off << "\n" << pv.angle << "\t" << pv.distance;
 			}
 		}
 	}
-	//off.close();
 	return rtable;
 }
 
@@ -205,21 +202,6 @@ vector<Point> ghtWithEntries(RTable rEntries, Point refPoint, Line mLine,
 	int dx = mcPoint.getX() - ePoint.getX();
 	int dy = mcPoint.getY() - ePoint.getY();
 	cout << "\nTranslate: " << dx << "\t" << dy << endl;
-	/*mLine.setBegin(mcPoint);
-	 mLine.setEnd(
-	 Point(mLine.getEnd().getX() + dxold, mLine.getEnd().getY() + dyold));
-
-	 // move sPoint to mcPoint
-
-
-	 Point bsLine, esLine;
-	 bsLine.setX(mcPoint.getX());
-	 bsLine.setY(mcPoint.getY());
-	 esLine.setX(sLine.getEnd().getX() + dx);
-	 esLine.setY(sLine.getEnd().getY() + dy);
-	 // checking the rotate direction
-	 sLine.setBegin(bsLine);
-	 sLine.setEnd(esLine);*/
 
 	cout << "\nAngle rotation: " << angle << endl;
 	cout << "\nLandmarks by GHT: " << eslm.size() << endl;
@@ -239,8 +221,7 @@ vector<Point> generalizingHoughTransform(ptr_IntMatrix mGradient,
 	int cols = mGradient->getCols();
 	Point center(cols / 2, rows / 2);
 	RTable rentries = rTableConstruct(mGradient, center);
-	//Point sPoint = houghSpace(sGradient, rentries);
-	vector<Point> eslm; // = detectLandmarks(center, sPoint, mLandmarks);
+	vector<Point> eslm;
 	Point mTemp;
 	Line mLine = principalAxis(mGradient, mTemp);
 

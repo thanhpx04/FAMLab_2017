@@ -60,7 +60,7 @@ private slots:
 	void dirCentroidMeasure();
 	void dirGenerateData();
 
-	void icpMethodViewer();
+	void pcaiMethodViewer();
 
 private:
 
@@ -73,7 +73,7 @@ private:
 	QMenu *viewMenu;
 	QMenu *segmentationMenu;
 	QMenu *dominantPointMenu;
-	QMenu *registrationMenu;
+	//QMenu *registrationMenu;
 	QMenu *helpMenu;
 
 	// toolbar
@@ -113,7 +113,7 @@ private:
 
 
 	// Action registration
-	QAction *icpAct;
+	QAction *pcaiAct;
 
 	// private methods
 	void createActions();
