@@ -39,6 +39,7 @@ public:
 	void setAutoLandmarks(vector<Point>);
 	ptr_IntMatrix getGrayMatrix();
 	ptr_RGBMatrix getRGBMatrix();
+	ptr_IntMatrix getHistogram();
 	float getMedianHistogram();
 	float getMeanHistogram();
 	float getThresholdValue();

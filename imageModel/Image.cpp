@@ -186,6 +186,10 @@ float Image::getMedianHistogram()
 	return medianHistogram;
 
 }
+ptr_IntMatrix Image::getHistogram()
+{
+		return grayHistogram;
+}
 float Image::getMeanHistogram()
 {
 	if (meanHistogram == 0)

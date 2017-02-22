@@ -117,6 +117,10 @@ void ImageViewer::createViewMenu()
 	fitToWindowAct->setShortcut(tr("Ctrl+J"));
 	connect(fitToWindowAct, SIGNAL(triggered()), this, SLOT(fitToWindow()));
 
+	gHistogramAct = new QAction(tr("&Histogram"), this);
+	gHistogramAct->setEnabled(false);
+	connect(gHistogramAct, SIGNAL(triggered()), this, SLOT(gScaleHistogram()));
+
 	displayMLandmarksAct = new QAction(tr("&Display manual landmarks"), this);
 	displayMLandmarksAct->setEnabled(false);
 	displayMLandmarksAct->setCheckable(true);
@@ -264,6 +268,7 @@ void ImageViewer::createMenus()
 	viewMenu->addAction(normalSizeAct);
 	viewMenu->addAction(fitToWindowAct);
 	viewMenu->addSeparator();
+	viewMenu->addAction(gHistogramAct);
 	viewMenu->addAction(displayMLandmarksAct);
 	viewMenu->addAction(displayALandmarksAct);
 
@@ -325,6 +330,7 @@ void ImageViewer::activeFunction()
 	zoomOutAct->setEnabled(true);
 	fitToWindowAct->setEnabled(true);
 	normalSizeAct->setEnabled(true);
+	gHistogramAct->setEnabled(true);
 	displayMLandmarksAct->setEnabled(true);
 	if (matImage->getListOfAutoLandmarks().size() > 0)
 		displayALandmarksAct->setEnabled(true);
@@ -571,6 +577,36 @@ void ImageViewer::fitToWindow()
 		normalSize();
 	}
 	viewMenuUpdateActions();
+}
+void ImageViewer::gScaleHistogram()
+{
+	cout << "\n Gray scale histogram." << endl;
+	ptr_IntMatrix histogram = matImage->getHistogram();
+	int max = -1;
+	for (int c = 0; c < histogram->getCols(); c++)
+	{
+		if (histogram->getAtPosition(0, c) > max)
+			max = histogram->getAtPosition(0, c);
+	}
+	int cols = histogram->getCols();
+	RGB color;
+	color.R = color.G = color.B = 0;
+	ptr_RGBMatrix hDisplay = new Matrix<RGB>(240, 300, color);
+	Point pbegin,pend;
+	color.R = color.G = color.B = 255;
+	for (int c = 0; c < histogram->getCols(); c++)
+	{
+		pbegin.setX(c);
+		pbegin.setY(239);
+		pend.setX(c);
+		pend.setY(239-(histogram->getAtPosition(0, c) * 230/max));
+		drawingLine(*hDisplay, Line(pbegin, pend), color);
+	}
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrRGBToQImage(hDisplay),
+		"Histogram result");
+	other->move(x() - 40, y() - 40);
+	other->show();
 }
 void ImageViewer::displayManualLandmarks()
 {
@@ -1206,8 +1242,7 @@ void ImageViewer::pcaiMethodViewer()
 	 pcaiFolder(imageFolder, images, *matImage,
 	 modelImage->getListOfManualLandmarks(),saveFolder);*/
 
-	this->loadImage(matImage, qImage,
-		"PCAI result");
+	this->loadImage(matImage, qImage, "PCAI result");
 	this->show();
 	//delete newScene;
 	delete modelImage;

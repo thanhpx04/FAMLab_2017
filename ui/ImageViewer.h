@@ -43,6 +43,7 @@ private slots:
 	void zoomOut();
 	void normalSize();
 	void fitToWindow();
+	void gScaleHistogram();
 	void displayManualLandmarks();
 	void displayAutoLandmarks();
 
@@ -92,6 +93,7 @@ private:
 	QAction *zoomOutAct;
 	QAction *normalSizeAct;
 	QAction *fitToWindowAct;
+	QAction *gHistogramAct;
 	QAction *displayMLandmarksAct;
 	QAction *displayALandmarksAct;
 
