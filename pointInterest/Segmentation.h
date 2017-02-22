@@ -16,6 +16,7 @@ public:
 	vector<Line> segment();
 	ptr_IntMatrix threshold(int tValue, int maxValue);
 	vector<Edge> canny();
+	int removePronotum();
 };
 
 #endif /* SEGMENTATION_H_ */

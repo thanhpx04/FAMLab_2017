@@ -602,6 +602,12 @@ void ImageViewer::gScaleHistogram()
 		pend.setY(239-(histogram->getAtPosition(0, c) * 230/max));
 		drawingLine(*hDisplay, Line(pbegin, pend), color);
 	}
+	Segmentation segment;
+	segment.setRefImage(*matImage);
+	int imin = segment.removePronotum();
+	ptr_IntMatrix rsMatrix = segment.threshold(imin,255);
+	this->loadImage(matImage, ptrIntToQImage(rsMatrix),
+			"Threshold");
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrRGBToQImage(hDisplay),
 		"Histogram result");
