@@ -594,7 +594,7 @@ void ImageViewer::gScaleHistogram()
 	ptr_RGBMatrix hDisplay = new Matrix<RGB>(240, 300, color);
 	Point pbegin,pend;
 	color.R = color.G = color.B = 255;
-	for (int c = 0; c < histogram->getCols(); c++)
+	for (int c = 0; c < histogram->getCols()*2/3; c++)
 	{
 		pbegin.setX(c);
 		pbegin.setY(239);
@@ -604,10 +604,11 @@ void ImageViewer::gScaleHistogram()
 	}
 	Segmentation segment;
 	segment.setRefImage(*matImage);
-	int imin = segment.removePronotum();
-	ptr_IntMatrix rsMatrix = segment.threshold(imin,255);
+	/*int imin = segment.removePronotum();
+	ptr_IntMatrix rsMatrix = segment.threshold(imin - 15,255);
 	this->loadImage(matImage, ptrIntToQImage(rsMatrix),
-			"Threshold");
+			"Threshold");*/
+	segment.gridRemoveFolder();
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrRGBToQImage(hDisplay),
 		"Histogram result");

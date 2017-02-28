@@ -17,6 +17,7 @@ public:
 	ptr_IntMatrix threshold(int tValue, int maxValue);
 	vector<Edge> canny();
 	int removePronotum();
+	void gridRemoveFolder();
 };
 
 #endif /* SEGMENTATION_H_ */
