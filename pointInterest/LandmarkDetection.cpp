@@ -29,6 +29,7 @@ using namespace std;
 #include "../pht/PHoughTransform.h"
 #include "../pht/GHTInPoint.h"
 #include "../correlation/CrossCorrelation.h"
+#include "../correlation/DescriptorDistance.h"
 #include "../utils/Drawing.h"
 #include "../io/Reader.h"
 
@@ -108,30 +109,34 @@ vector<Point> LandmarkDetection::landmarksAutoDectect2(Image &sceneImage,
 	int rows = sceneImage.getGrayMatrix()->getRows();
 	int cols = sceneImage.getGrayMatrix()->getCols();
 	ptr_IntMatrix newScene = new Matrix<int>(rows, cols, 0);
-
+	Point translation;
 	vector<Point> phtEsLM = proHT.generalTransform(sceneImage, angle, ePoint,
-		mPoint, newScene);
+		mPoint, newScene,translation);
 	vector<Point> result;
 
 	if (phtEsLM.size() > 0)
 	{
-		result = verifyLandmarks2(modelImage.getGrayMatrix(), newScene, manualLMs,
-			phtEsLM, templSize, sceneSize);
+		/*result = verifyLandmarks2(modelImage.getGrayMatrix(), newScene, manualLMs,
+			phtEsLM, templSize, sceneSize);*/
+		result = verifyDescriptors(modelImage.getGrayMatrix(), newScene, manualLMs,
+					phtEsLM, templSize, sceneSize);
 	}
 	phtEsLM.clear();
 	delete newScene;
 	//result = phtEsLM;
 	// reverse the coordinate of estimated landmarks
 	Point pi;
-	int dx = ePoint.getX() - mPoint.getX();
-	int dy = ePoint.getY() - mPoint.getY();
+	//int dx = ePoint.getX() - mPoint.getX();
+	//int dy = ePoint.getY() - mPoint.getY();
+	int dx = translation.getX();
+	int dy = translation.getY();
 	for (size_t i = 0; i < result.size(); i++)
 	{
 		pi = result.at(i);
 		int xnew = 0, ynew = 0;
 		rotateAPoint(pi.getX(), pi.getY(), mPoint, -angle, 1, xnew, ynew);
-		xnew += dx;
-		ynew += dy;
+		xnew -= dx;
+		ynew -= dy;
 		result.at(i).setX(xnew);
 		result.at(i).setY(ynew);
 	}
