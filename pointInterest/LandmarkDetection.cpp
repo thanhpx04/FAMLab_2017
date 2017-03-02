@@ -12,6 +12,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 
 using namespace std;
 
@@ -39,21 +40,47 @@ using namespace std;
 #include "ProHoughTransform.h"
 #include "LandmarkDetection.h"
 
-LandmarkDetection::LandmarkDetection()
-{
+LandmarkDetection::LandmarkDetection() {
 	// TODO Auto-generated constructor stub
 
 }
 
-LandmarkDetection::~LandmarkDetection()
-{
+LandmarkDetection::~LandmarkDetection() {
 	// TODO Auto-generated destructor stub
 }
-
+vector<Point> LandmarkDetection::refineLandmarks(vector<Point> estLandmarks,
+		vector<Point> segmentation) {
+	vector<Point> result;
+	Point pi;
+	for (size_t i = 0; i < estLandmarks.size(); i++) {
+		pi = estLandmarks.at(i);
+		bool onCurve = checkPointInList(segmentation,pi);
+		if(onCurve)
+		{
+			result.push_back(pi);
+		}
+		else
+		{
+			Point ePoint, mPoint;
+			double minDistance = DBL_MAX;
+			for (size_t j = 0; j < segmentation.size(); j++) {
+				ePoint = segmentation.at(j);
+				Line ltemp(pi,ePoint);
+				if(ltemp.getLength() < minDistance)
+				{
+					minDistance = ltemp.getLength();
+					mPoint.setX(ePoint.getX());
+					mPoint.setY(ePoint.getY());
+				}
+			}
+			result.push_back(mPoint);
+		}
+	}
+	return result;
+}
 vector<Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
-	AngleAccuracy acc, int cols, int templSize, int sceneSize, Point &ePoint,
-	double &angleDiff)
-{
+		AngleAccuracy acc, int cols, int templSize, int sceneSize,
+		Point &ePoint, double &angleDiff) {
 	vector<Point> result;
 	Image modelImage = Treatments::refImage;
 	vector<Point> manualLMs = modelImage.getListOfManualLandmarks();
@@ -78,15 +105,14 @@ vector<Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 	mpht.setRefPoint(Point(width / 2, height / 2));
 
 	vector<PHTEntry> entriesTable = mpht.constructPHTTable(mLines);
-	vector<Point> phtEsLM = phtLandmarks(entriesTable, mpht.getRefPoint(), sLines,
-		width, height, manualLMs, angleDiff, ePoint);
+	vector<Point> phtEsLM = phtLandmarks(entriesTable, mpht.getRefPoint(),
+			sLines, width, height, manualLMs, angleDiff, ePoint);
 
 	cout << "\n Number of landmarks (pht): " << phtEsLM.size();
 	cout << "\nAngle difference: " << angleDiff << endl;
-	if (phtEsLM.size() > 0)
-	{
+	if (phtEsLM.size() > 0) {
 		result = verifyLandmarks(modelImage, sceneImage, manualLMs, phtEsLM,
-			templSize, sceneSize, angleDiff, ePoint);
+				templSize, sceneSize, angleDiff, ePoint);
 		//result = phtEsLM;
 
 	}
@@ -98,8 +124,7 @@ vector<Point> LandmarkDetection::landmarksAutoDectect(Image sceneImage,
 }
 
 vector<Point> LandmarkDetection::landmarksAutoDectect2(Image &sceneImage,
-	int templSize, int sceneSize)
-{
+		int templSize, int sceneSize) {
 	Image modelImage = Treatments::refImage;
 	vector<Point> manualLMs = modelImage.getListOfManualLandmarks();
 	ProHoughTransform proHT;
@@ -109,19 +134,28 @@ vector<Point> LandmarkDetection::landmarksAutoDectect2(Image &sceneImage,
 	int rows = sceneImage.getGrayMatrix()->getRows();
 	int cols = sceneImage.getGrayMatrix()->getCols();
 	ptr_IntMatrix newScene = new Matrix<int>(rows, cols, 0);
-	ptr_IntMatrix modelSeg = new Matrix<int>(rows, cols, 0);
-	ptr_IntMatrix sceneSeg = new Matrix<int>(rows, cols, 0);
+	vector<Point> modelPoints, scenePoints, newScenePoints;
 	Point translation;
 	vector<Point> phtEsLM = proHT.generalTransform(sceneImage, angle, ePoint,
-		mPoint, newScene, translation, modelSeg, sceneSeg);
+			mPoint, newScene, translation, modelPoints, scenePoints,
+			newScenePoints);
+	ptr_IntMatrix modelSeg = new Matrix<int>(rows, cols, 0);
+	ptr_IntMatrix sceneSeg = new Matrix<int>(rows, cols, 0);
+	Point mi;
+	for (size_t i = 0; i < modelPoints.size(); i++) {
+		mi = modelPoints.at(i);
+		modelSeg->setAtPosition(mi.getY(), mi.getX(), 255);
+	}
+	for (size_t i = 0; i < newScenePoints.size(); i++) {
+		mi = newScenePoints.at(i);
+		sceneSeg->setAtPosition(mi.getY(), mi.getX(), 255);
+	}
 	vector<Point> result;
-
-	if (phtEsLM.size() > 0)
-	{
+	if (phtEsLM.size() > 0) {
 		//result = verifyLandmarks2(modelImage.getGrayMatrix(), newScene, manualLMs,
 		//	phtEsLM, templSize, sceneSize);
 		result = verifyDescriptors(modelSeg, sceneSeg, manualLMs, phtEsLM,
-			templSize, sceneSize);
+				templSize, sceneSize);
 	}
 	phtEsLM.clear();
 	delete newScene;
@@ -134,24 +168,20 @@ vector<Point> LandmarkDetection::landmarksAutoDectect2(Image &sceneImage,
 	//int dy = ePoint.getY() - mPoint.getY();
 	int dx = translation.getX();
 	int dy = translation.getY();
-	for (size_t i = 0; i < result.size(); i++)
-	{
+	for (size_t i = 0; i < result.size(); i++) {
 		pi = result.at(i);
-		int xnew = 0, ynew = 0;
-		rotateAPoint(pi.getX(), pi.getY(), mPoint, -angle, 1, xnew, ynew);
-		xnew += dx;
-		ynew += dy;
-		result.at(i).setX(xnew);
-		result.at(i).setY(ynew);
+		int xnew = pi.getX(), ynew = pi.getY();
+		rotateAPoint(xnew, ynew, ePoint, angle, 1, xnew, ynew);
+		result.at(i).setX(xnew+dx);
+		result.at(i).setY(ynew+dy);
 	}
-
+	result = refineLandmarks(result,scenePoints);
 	return result;
 }
 
 void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
-	vector<string> sceneImages, AngleAccuracy acc, int cols, int templSize,
-	int sceneSize, Point &ePoint, double &angleDiff, string saveFolder)
-{
+		vector<string> sceneImages, AngleAccuracy acc, int cols, int templSize,
+		int sceneSize, Point &ePoint, double &angleDiff, string saveFolder) {
 
 	Image modelImage = Treatments::refImage;
 	vector<Point> manualLMs = modelImage.getListOfManualLandmarks();
@@ -166,8 +196,7 @@ void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
 	ShapeHistogram sHistogram;
 	vector<LocalHistogram> sLocalHist;
 	Image *sceneImage;
-	for (size_t i = 0; i < sceneImages.size(); i++)
-	{
+	for (size_t i = 0; i < sceneImages.size(); i++) {
 		string sceneName = sceneImages.at(i);
 		cout << "\n==============================================" << sceneName;
 		vector<Point> result;
@@ -185,26 +214,25 @@ void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
 
 		vector<PHTEntry> entriesTable = mpht.constructPHTTable(mLines);
 		vector<Point> phtEsLM = phtLandmarks(entriesTable, mpht.getRefPoint(),
-			sLines, width, height, manualLMs, angleDiff, ePoint);
+				sLines, width, height, manualLMs, angleDiff, ePoint);
 
 		cout << "\n Number of landmarks (pht): " << phtEsLM.size();
 		cout << "\nAngle difference: " << angleDiff << endl;
 
-		if (phtEsLM.size() > 0)
-		{
-			result = verifyLandmarks(modelImage, *sceneImage, manualLMs, phtEsLM,
-				templSize, sceneSize, angleDiff, ePoint);
+		if (phtEsLM.size() > 0) {
+			result = verifyLandmarks(modelImage, *sceneImage, manualLMs,
+					phtEsLM, templSize, sceneSize, angleDiff, ePoint);
 
 		}
 		entriesTable.clear();
 		phtEsLM.clear();
 
-		string saveFile = saveFolder + "/" + modelName + "_" + sceneName + ".TPS";
+		string saveFile = saveFolder + "/" + modelName + "_" + sceneName
+				+ ".TPS";
 		ofstream inFile(saveFile.c_str());
 		inFile << "LM=" << result.size() << "\n";
 		Point pk;
-		for (size_t k = 0; k < result.size(); k++)
-		{
+		for (size_t k = 0; k < result.size(); k++) {
 			pk = result.at(k);
 			inFile << pk.getX() << "\t" << pk.getY() << "\n";
 		}
@@ -215,8 +243,7 @@ void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
 
 }
 void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
-	vector<string> sceneImages, string saveFolder)
-{
+		vector<string> sceneImages, string saveFolder) {
 
 	Image modelImage = Treatments::refImage;
 
@@ -231,8 +258,7 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 	Point mTemp;
 	Line mLine = principalAxis(mgradirection, mTemp);
 	//sceneImages.size()
-	for (size_t i = 0; i < 20; i++)
-	{
+	for (size_t i = 0; i < 20; i++) {
 		Image *sceneImage;
 		string sceneName = sceneImages.at(i);
 		cout << "\n==============================================" << sceneName;
@@ -249,22 +275,19 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 		//	mLandmarks, ePoint, mPoint, angle, translation);
 
 		vector<Point> eslm = ghtWithEntries(rentries, center, mLine, mTemp,
-			gradirection, mLandmarks, ePoint, mPoint, angle, translation);
+				gradirection, mLandmarks, ePoint, mPoint, angle, translation);
 
 		ptr_IntMatrix newScene = new Matrix<int>(rows, cols, 0);
 		// move the model to the same and rotate the scene
 		int dx = translation.getX();
 		int dy = translation.getY();
-		for (int r = 0; r < rows; r++)
-		{
-			for (int c = 0; c < cols; c++)
-			{
+		for (int r = 0; r < rows; r++) {
+			for (int c = 0; c < cols; c++) {
 				int value = sceneImage->getGrayMatrix()->getAtPosition(r, c);
 				int xnew = c + dx;
 				int ynew = r + dy;
 				rotateAPoint(c + dx, r + dy, mPoint, angle, 1, xnew, ynew);
-				if (xnew >= 0 && ynew >= 0 && ynew < rows && xnew < cols)
-				{
+				if (xnew >= 0 && ynew >= 0 && ynew < rows && xnew < cols) {
 					newScene->setAtPosition(ynew, xnew, value);
 				}
 			}
@@ -272,12 +295,11 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 
 		vector<Point> estLandmarks;
 
-		if (eslm.size() > 0)
-		{
+		if (eslm.size() > 0) {
 			cout << "\nAngle difference: " << angle << endl;
 			cout << "\n Number of landmarks (ght): " << eslm.size();
-			estLandmarks = verifyLandmarks2(modelImage.getGrayMatrix(), newScene,
-				mLandmarks, eslm, 100, 300);
+			estLandmarks = verifyLandmarks2(modelImage.getGrayMatrix(),
+					newScene, mLandmarks, eslm, 100, 300);
 		}
 
 		cout << "\n Number of landmarks (matching): " << estLandmarks.size();
@@ -286,8 +308,7 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 		Point pi;
 		int dx2 = ePoint.getX() - mPoint.getX();
 		int dy2 = ePoint.getY() - mPoint.getY();
-		for (size_t i = 0; i < estLandmarks.size(); i++)
-		{
+		for (size_t i = 0; i < estLandmarks.size(); i++) {
 			pi = estLandmarks.at(i);
 			int xnew = 0, ynew = 0;
 			rotateAPoint(pi.getX(), pi.getY(), mPoint, -angle, 1, xnew, ynew);
@@ -297,19 +318,18 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 			estLandmarks.at(i).setY(ynew);
 		}
 
-		string saveFile = saveFolder + "/" + modelName + "_" + sceneName + ".TPS";
+		string saveFile = saveFolder + "/" + modelName + "_" + sceneName
+				+ ".TPS";
 		ofstream inFile(saveFile.c_str());
 		inFile << "LM=" << estLandmarks.size() << "\n";
 		Point epk;
 		RGB color;
 		color.R = color.G = 255;
 		color.B = 0;
-		for (size_t k = 0; k < estLandmarks.size(); k++)
-		{
+		for (size_t k = 0; k < estLandmarks.size(); k++) {
 			epk = estLandmarks.at(k);
 			if (epk.getX() >= 0 && epk.getX() < cols && epk.getY() >= 0
-				&& epk.getY() < rows)
-			{
+					&& epk.getY() < rows) {
 				fillCircle(*(sceneImage->getRGBMatrix()), epk, 5, color);
 			}
 
@@ -331,8 +351,7 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 
 }
 void LandmarkDetection::landmarksOnDir3(string modelName, string folderScene,
-	vector<string> sceneImages, string saveFolder)
-{
+		vector<string> sceneImages, string saveFolder) {
 
 	Image modelImage = Treatments::refImage;
 
@@ -349,12 +368,11 @@ void LandmarkDetection::landmarksOnDir3(string modelName, string folderScene,
 	string saveFile = saveFolder + "/" + modelName + "_angle.TPS";
 	ofstream inFile(saveFile.c_str());
 //sceneImages.size()
-	for (size_t i = 260; i < sceneImages.size(); i++)
-	{
+	for (size_t i = 260; i < sceneImages.size(); i++) {
 		Image *sceneImage;
 		string sceneName = sceneImages.at(i);
 		cout << "\n==============================================" << sceneName
-			<< endl;
+				<< endl;
 
 		sceneImage = new Image(folderScene + "/" + sceneName);
 
@@ -368,7 +386,7 @@ void LandmarkDetection::landmarksOnDir3(string modelName, string folderScene,
 		//	mLandmarks, ePoint, mPoint, angle, translation);
 
 		vector<Point> eslm = ghtWithEntries(rentries, center, mLine, mTemp,
-			gradirection, mLandmarks, ePoint, mPoint, angle, translation);
+				gradirection, mLandmarks, ePoint, mPoint, angle, translation);
 		inFile << sceneName << "\t" << angle << "\n";
 
 		eslm.clear();

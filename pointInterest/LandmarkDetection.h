@@ -10,6 +10,8 @@
 
 class LandmarkDetection: public Treatments
 {
+private:
+	vector<Point> refineLandmarks(vector<Point> estLandmarks,vector<Point> segmentation);
 public:
 	LandmarkDetection();
 	virtual ~LandmarkDetection();
