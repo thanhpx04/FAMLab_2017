@@ -21,6 +21,7 @@ using namespace std;
 #include "../segmentation/Thresholds.h"
 #include "../segmentation/Canny.h"
 #include "../correlation/CrossCorrelation.h"
+#include "../correlation/DescriptorDistance.h"
 #include "../utils/Drawing.h"
 #include "../io/Reader.h"
 #include "GHTInPoint.h"
@@ -242,8 +243,10 @@ vector<Point> PCAI(vector<Point> modelPoints, Image sceneGray,
 	vector<Point> result;
 	if (mnLandmarks.size() > 0)
 	{
-		result = verifyLandmarks2(lastModel, lastScene, mnLandmarks, mnLandmarks,
-			100, 300);
+		//result = verifyLandmarks2(lastModel, lastScene, mnLandmarks, mnLandmarks,
+		//	100, 300);
+		result = verifyDescriptors(lastModel, lastScene, mnLandmarks,
+			mnLandmarks, 9, 36);
 	}
 
 	// compute the difference between original scene and rotated scene

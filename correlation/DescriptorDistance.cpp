@@ -78,14 +78,14 @@ Matrix<double> createDescriptor(ptr_IntMatrix mImage, Point lefttop,
 	return orientation;
 }
 vector<double> orientHist4(Matrix<double> gradient, Matrix<double> orientation,
-	int rbegin, int cbegin)
+	int rbegin, int cbegin, int size) // default size = 4
 {
 	vector<double> histograms;
 	histograms.resize(8, 0.0);
 	double grad = 0.0, orien = 0.0;
-	for (int r = rbegin; r < rbegin + 4; r++)
+	for (int r = rbegin; r < rbegin + size; r++)
 	{
-		for (int c = cbegin; c < cbegin + 4; c++)
+		for (int c = cbegin; c < cbegin + size; c++)
 		{
 			grad = gradient.getAtPosition(r, c);
 			orien = orientation.getAtPosition(r, c);
@@ -96,15 +96,16 @@ vector<double> orientHist4(Matrix<double> gradient, Matrix<double> orientation,
 	}
 	return histograms;
 }
-vector<double> orientHist16(Matrix<double> gradient, Matrix<double> orientation)
+vector<double> orientHist16(Matrix<double> gradient, Matrix<double> orientation,
+	int subsize)
 {
 	vector<double> histograms, hist;
-	for (int r = 0; r < gradient.getRows(); r += 4)
+	for (int r = 0; r < gradient.getRows(); r += subsize)
 	{
-		for (int c = 0; c < gradient.getCols(); c += 4)
+		for (int c = 0; c < gradient.getCols(); c += subsize)
 		{
 			hist.resize(8, 0.0);
-			hist = orientHist4(gradient, orientation, r, c);
+			hist = orientHist4(gradient, orientation, r, c, subsize);
 			histograms.insert(histograms.end(), hist.begin(), hist.end());
 		}
 	}
@@ -115,24 +116,24 @@ vector<double> orientHist16(Matrix<double> gradient, Matrix<double> orientation)
 		totalValue += (histograms.at(i) * histograms.at(i));
 	}
 	totalValue = sqrt(totalValue);
-
 	//  normalizing and theshold < 0.2
-	double totalValue2 = 0.0;
-	for (int i = 0; i < histograms.size(); i++)
+	if (totalValue > 0)
 	{
-		histograms.at(i) /= totalValue;
-		if (histograms.at(i) < 0.2)
-			histograms.at(i) = 0;
-		totalValue2 += (histograms.at(i) * histograms.at(i));
+		double totalValue2 = 0.0;
+		for (int i = 0; i < histograms.size(); i++)
+		{
+			histograms.at(i) /= totalValue;
+			if (histograms.at(i) < 0.2)
+				histograms.at(i) = 0;
+			totalValue2 += (histograms.at(i) * histograms.at(i));
+		}
+		//re-normalize
+		for (int i = 0; i < histograms.size(); i++)
+		{
+			histograms.at(i) /= totalValue2;
+			//cout << "\t" << histograms.at(i);
+		}
 	}
-	//re-normalize
-	for (int i = 0; i < histograms.size(); i++)
-	{
-		histograms.at(i) /= totalValue2;
-		//cout << "\t" << histograms.at(i);
-	}
-	// end normalize vector
-	//cout << "\nSize of histogram: " << histograms.size() << endl;
 	return histograms;
 }
 double l2Distance(vector<double> sourceTarget, vector<double> targetHist)
@@ -166,8 +167,12 @@ Point createPatch(ptr_IntMatrix imageMatrix, int psize, Point center,
 	left.setX(lx);
 	left.setY(ly);
 
-	int rx = (cx + hsize - 1) >= cols ? cols - 1 : (cx + hsize - 1);
-	int ry = (cy + hsize - 1) >= rows ? rows - 1 : (cy + hsize - 1);
+	int tempx = cx + hsize;
+	int tempy = cy + hsize;
+	tempx = (psize % 2 != 0) ? tempx : tempx - 1;
+	tempy = (psize % 2 != 0) ? tempy : tempy - 1;
+	int rx = tempx >= cols ? cols - 1 : tempx;
+	int ry = tempy >= rows ? rows - 1 : tempy;
 	right.setX(rx);
 	right.setY(ry);
 	return left;
@@ -205,7 +210,7 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 				mright.getX() - mleft.getX() + 1, 0.0);
 			Matrix<double> mOrient = createDescriptor(model, mleft, mright,
 				mgradient);
-			vector<double> mHistogram = orientHist16(mgradient, mOrient);
+			vector<double> mHistogram = orientHist16(mgradient, mOrient, templSize);
 			double minDistance = DBL_MAX, maxDistance = 0.0;
 			Point minPoint(0, 0), maxPoint(0, 0);
 			//
@@ -220,8 +225,10 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 						ssright.getX() - ssleft.getX() + 1, 0.0);
 					Matrix<double> sOrient = createDescriptor(model, ssleft, ssright,
 						sgradient);
-					vector<double> sHistogram = orientHist16(sgradient, sOrient);
+					vector<double> sHistogram = orientHist16(sgradient, sOrient,
+						templSize);
 					double distance = l2Distance(mHistogram, sHistogram);
+					//cout << "\nDistance: " << distance << endl;
 					if (distance > maxDistance)
 					{
 						maxDistance = distance;

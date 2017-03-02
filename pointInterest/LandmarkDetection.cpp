@@ -109,21 +109,25 @@ vector<Point> LandmarkDetection::landmarksAutoDectect2(Image &sceneImage,
 	int rows = sceneImage.getGrayMatrix()->getRows();
 	int cols = sceneImage.getGrayMatrix()->getCols();
 	ptr_IntMatrix newScene = new Matrix<int>(rows, cols, 0);
+	ptr_IntMatrix modelSeg = new Matrix<int>(rows, cols, 0);
+	ptr_IntMatrix sceneSeg = new Matrix<int>(rows, cols, 0);
 	Point translation;
 	vector<Point> phtEsLM = proHT.generalTransform(sceneImage, angle, ePoint,
-		mPoint, newScene,translation);
+		mPoint, newScene, translation, modelSeg, sceneSeg);
 	vector<Point> result;
 
 	if (phtEsLM.size() > 0)
 	{
-		/*result = verifyLandmarks2(modelImage.getGrayMatrix(), newScene, manualLMs,
-			phtEsLM, templSize, sceneSize);*/
-		result = verifyDescriptors(modelImage.getGrayMatrix(), newScene, manualLMs,
-					phtEsLM, templSize, sceneSize);
+		//result = verifyLandmarks2(modelImage.getGrayMatrix(), newScene, manualLMs,
+		//	phtEsLM, templSize, sceneSize);
+		result = verifyDescriptors(modelSeg, sceneSeg, manualLMs, phtEsLM,
+			templSize, sceneSize);
 	}
 	phtEsLM.clear();
 	delete newScene;
-	//result = phtEsLM;
+	delete modelSeg;
+	delete sceneSeg;
+
 	// reverse the coordinate of estimated landmarks
 	Point pi;
 	//int dx = ePoint.getX() - mPoint.getX();
@@ -135,8 +139,8 @@ vector<Point> LandmarkDetection::landmarksAutoDectect2(Image &sceneImage,
 		pi = result.at(i);
 		int xnew = 0, ynew = 0;
 		rotateAPoint(pi.getX(), pi.getY(), mPoint, -angle, 1, xnew, ynew);
-		xnew -= dx;
-		ynew -= dy;
+		xnew += dx;
+		ynew += dy;
 		result.at(i).setX(xnew);
 		result.at(i).setY(ynew);
 	}
@@ -303,9 +307,10 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 		for (size_t k = 0; k < estLandmarks.size(); k++)
 		{
 			epk = estLandmarks.at(k);
-			if(epk.getX() >=0 && epk.getX() < cols && epk.getY() >= 0 && epk.getY() < rows)
+			if (epk.getX() >= 0 && epk.getX() < cols && epk.getY() >= 0
+				&& epk.getY() < rows)
 			{
-				fillCircle(*(sceneImage->getRGBMatrix()),epk,5,color);
+				fillCircle(*(sceneImage->getRGBMatrix()), epk, 5, color);
 			}
 
 			inFile << epk.getX() << " " << rows - epk.getY() << "\n";
@@ -314,7 +319,7 @@ void LandmarkDetection::landmarksOnDir2(string modelName, string folderScene,
 		inFile.close();
 
 		string imgFile = saveFolder + "/" + modelName + "_" + sceneName;
-		saveRGB(imgFile.c_str(),sceneImage->getRGBMatrix());
+		saveRGB(imgFile.c_str(), sceneImage->getRGBMatrix());
 
 		estLandmarks.clear();
 		eslm.clear();

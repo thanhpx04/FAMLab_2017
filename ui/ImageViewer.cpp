@@ -474,7 +474,7 @@ void ImageViewer::displayLandmarks(Image *image, vector<Point> lms, RGB color)
 	{
 		lm = lms.at(i);
 		cout << "\nManual landmark: " << lm.getX() << "\t" << lm.getY();
-		fillCircle(*(image->getRGBMatrix()), lm, 5, color);
+		fillCircle(*(image->getRGBMatrix()), lm, 3, color);
 
 	}
 
@@ -850,8 +850,8 @@ void ImageViewer::gHoughTransform()
 	//==================================================================
 	LandmarkDetection lmDetect;
 	lmDetect.setRefImage(*modelImage);
-	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 16,
-		160);
+	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 9,
+		36);
 	cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
 	// drawing...
 	Point lm;

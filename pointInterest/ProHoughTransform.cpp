@@ -28,6 +28,8 @@ using namespace std;
 #include "../pht/PHoughTransform.h"
 #include "../pht/GHTInPoint.h"
 #include "../io/Reader.h"
+#include "../utils/Drawing.h"
+#include "../pht/PCA.h"
 
 #include "Treatments.h"
 #include "ProHoughTransform.h"
@@ -358,7 +360,8 @@ vector<Point> ProHoughTransform::estimateLandmarks(Image sImage,
 }
 
 vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
-	Point &ePoint, Point &mPoint, ptr_IntMatrix &newScene,Point &translation)
+	Point &ePoint, Point &mPoint, ptr_IntMatrix &newSceneGray, Point &translation,
+	ptr_IntMatrix &modelSeg, ptr_IntMatrix &sceneSeg)
 {
 	int rows = sImage.getGrayMatrix()->getRows();
 	int cols = sImage.getGrayMatrix()->getCols();
@@ -390,7 +393,7 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 			rotateAPoint(xnew, ynew, mPoint, angle, 1, xnew, ynew);
 			if (xnew >= 0 && ynew >= 0 && ynew < rows && xnew < cols)
 			{
-				newScene->setAtPosition(ynew, xnew, value);
+				newSceneGray->setAtPosition(ynew, xnew, value);
 			}
 		}
 	}
@@ -399,29 +402,84 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 		for (int c = 0; c < cols; c++)
 		{
 			int t1 = 0, t2 = 0, t3 = 0, t4 = 0;
-			int t = newScene->getAtPosition(r, c);
+			int t = newSceneGray->getAtPosition(r, c);
 			if (r - 1 >= 0 && r - 1 < rows)
 			{
-				t1 = newScene->getAtPosition(r - 1, c);
+				t1 = newSceneGray->getAtPosition(r - 1, c);
 			}
 			if (r + 1 >= 0 && r + 1 < rows)
 			{
-				t2 = newScene->getAtPosition(r + 1, c);
+				t2 = newSceneGray->getAtPosition(r + 1, c);
 			}
 			if (c - 1 >= 0 && c - 1 < cols)
 			{
-				t3 = newScene->getAtPosition(r, c - 1);
+				t3 = newSceneGray->getAtPosition(r, c - 1);
 			}
 			if (c + 1 >= 0 && c + 1 < cols)
 			{
-				t4 = newScene->getAtPosition(r, c + 1);
+				t4 = newSceneGray->getAtPosition(r, c + 1);
 			}
-			if(t == 0)
+			if (t == 0)
 			{
-				newScene->setAtPosition(r,c,(t1 + t2 + t3 + t4)/4);
+				newSceneGray->setAtPosition(r, c, (t1 + t2 + t3 + t4) / 4);
 			}
 		}
 	}
-	saveGrayScale("abc.jpg", newScene);
+	saveGrayScale("abc.jpg", newSceneGray);
+	// export two images of segmentation
+	Point mi;
+	for (size_t i = 0; i < modelPoints.size(); i++)
+	{
+		mi = modelPoints.at(i);
+		modelSeg->setAtPosition(mi.getY(), mi.getX(), 255);
+	}
+	saveGrayScale("model.jpg", modelSeg);
+	mi.setX(0);
+	mi.setY(0);
+	RGB color;
+	color.R = 255;
+	color.G = color.B = 0;
+	vector<Point> newScenePoints;
+	for (size_t i = 0; i < scenePoints.size(); i++)
+	{
+		mi = scenePoints.at(i);
+		int xnew = mi.getX() + dx;
+		int ynew = mi.getY() + dy;
+		rotateAPoint(xnew, ynew, mPoint, angle, 1, xnew, ynew);
+		sceneSeg->setAtPosition(ynew, xnew, 255);
+		newScenePoints.push_back(Point(xnew, ynew));
+		sImage.getRGBMatrix()->setAtPosition(ynew, xnew, color);
+	}
+	color.R = 0;
+	color.B = 255;
+	for (int k = 0; k < eslm.size(); k++)
+	{
+		mi = eslm.at(k);
+		fillCircle(*sImage.getRGBMatrix(), mi, 3, color);
+	}
+	saveRGB("scenecolor.jpg", sImage.getRGBMatrix());
+	saveGrayScale("scene.jpg", sceneSeg);
+// ================================================================================
+	Point osPoint, nsPoint;
+	Line oSLine = principalAxis(scenePoints, osPoint);
+	Line nSLine = principalAxis(newScenePoints, nsPoint);
+	double eangle = oSLine.angleLines(nSLine);
+	// difference between two centroids
+	int dx1 = osPoint.getX() - nsPoint.getX();
+	int dy1 = osPoint.getY() - nsPoint.getY();
+
+	// move the scene to the model
+	nSLine.setBegin(osPoint);
+	Point nsEnd = nSLine.getEnd();
+	nsEnd.setX(nsEnd.getX() + dx);
+	nsEnd.setY(nsEnd.getY() + dy);
+	//send.setY(send.getY() + dy);
+	nSLine.setEnd(nsEnd);
+	Point pi;
+	// Detecting the rotated direction
+	double angleR = rotateDirection(oSLine, nSLine, eangle);
+	angle = angleR;
+	translation.setX(dx1);
+	translation.setY(dy1);
 	return eslm;
 }
