@@ -245,7 +245,7 @@ vector<Point> PCAI(vector<Point> modelPoints, Image sceneGray,
 	{
 		//result = verifyLandmarks2(lastModel, lastScene, mnLandmarks, mnLandmarks,
 		//	100, 300);
-		result = verifyDescriptors(lastModel, lastScene, mnLandmarks,
+		result = verifyDescriptors2(lastModel, lastScene,sceneTemp, mnLandmarks,
 			mnLandmarks, 9, 36);
 	}
 

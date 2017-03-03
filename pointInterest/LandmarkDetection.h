@@ -27,6 +27,9 @@ public:
 		vector<string> sceneImages, string saveFolder);
 	void landmarksOnDir3(string modelName, string folderScene,
 		vector<string> sceneImages, string saveFolder);
+	void landmarksOnDir4(string modelName, string folderScene,
+		vector<string> sceneImages, string saveFolder, string folderLandmarks,
+		vector<string> landmarks);
 };
 
 #endif /* LANDMARKDETECTION_H_ */

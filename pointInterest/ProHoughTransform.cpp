@@ -380,15 +380,15 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 			}
 		}
 	}
-	saveGrayScale("abc.jpg", newSceneGray);
+	//saveGrayScale("abc.jpg", newSceneGray);
 	// export two images of segmentation
 	modelSeg = modelPoints;
 	sceneSeg = scenePoints;
 
 	Point mi;
-	RGB color;
+	/*RGB color;
 	color.R = 255;
-	color.G = color.B = 0;
+	color.G = color.B = 0;*/
 	//vector<Point> newScenePoints;
 	newScenePoints.clear();
 	for (size_t i = 0; i < scenePoints.size(); i++) {
@@ -397,15 +397,16 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 		int ynew = mi.getY() + dy;
 		rotateAPoint(xnew, ynew, mPoint, angle, 1, xnew, ynew);
 		newScenePoints.push_back(Point(xnew, ynew));
-		sImage.getRGBMatrix()->setAtPosition(ynew, xnew, color);
+		//sImage.getRGBMatrix()->setAtPosition(ynew, xnew, color);
 	}
-	color.R = 0;
+
+	/*color.R = 0;
 	color.B = 255;
 	for (int k = 0; k < eslm.size(); k++) {
 		mi = eslm.at(k);
 		fillCircle(*sImage.getRGBMatrix(), mi, 3, color);
 	}
-	saveRGB("scenecolor.jpg", sImage.getRGBMatrix());
+	saveRGB("scenecolor.jpg", sImage.getRGBMatrix());*/
 // ================================================================================
 	Point osPoint, nsPoint;
 	Line oSLine = principalAxis(scenePoints, osPoint);

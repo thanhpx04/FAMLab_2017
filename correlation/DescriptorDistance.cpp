@@ -17,6 +17,7 @@
 using namespace std;
 
 #include "../imageModel/Point.h"
+#include "../imageModel/Line.h"
 #include "../imageModel/Matrix.h"
 
 #include "DescriptorDistance.h"
@@ -87,11 +88,14 @@ vector<double> orientHist4(Matrix<double> gradient, Matrix<double> orientation,
 	{
 		for (int c = cbegin; c < cbegin + size; c++)
 		{
-			grad = gradient.getAtPosition(r, c);
-			orien = orientation.getAtPosition(r, c);
-			int bin = ceil(orien / 45);
-			bin = (bin == 0) ? 0 : (bin - 1);
-			histograms.at(bin) += grad;
+			if (r >= 0 && c >= 0 && r < gradient.getRows() && c < gradient.getCols())
+			{
+				grad = gradient.getAtPosition(r, c);
+				orien = orientation.getAtPosition(r, c);
+				int bin = ceil(orien / 45);
+				bin = (bin == 0) ? 0 : (bin - 1);
+				histograms.at(bin) += grad;
+			}
 		}
 	}
 	return histograms;
@@ -206,6 +210,7 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 			sleft = createPatch(scene, sceneSize, epi, sright);
 			// calculate the histogram for model
 			cout << "\nCreate patches..." << endl;
+
 			Matrix<double> mgradient(mright.getY() - mleft.getY() + 1,
 				mright.getX() - mleft.getX() + 1, 0.0);
 			Matrix<double> mOrient = createDescriptor(model, mleft, mright,
@@ -213,7 +218,8 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 			vector<double> mHistogram = orientHist16(mgradient, mOrient, templSize);
 			double minDistance = DBL_MAX, maxDistance = 0.0;
 			Point minPoint(0, 0), maxPoint(0, 0);
-			//
+			mpi.toString();
+			int count = 0;
 			for (int r = sleft.getY(); r < sright.getY(); r++)
 			{
 				for (int c = sleft.getX(); c < sright.getX(); c++)
@@ -235,14 +241,107 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 						maxPoint.setX(c);
 						maxPoint.setY(r);
 					}
+					if (distance == minDistance)
+					{
+						count++;
+					}
 					if (distance < minDistance)
 					{
 						minDistance = distance;
 						minPoint.setX(c);
 						minPoint.setY(r);
 					}
+
 				}
 			}
+			cout << "\nDuplicate: " << count << endl;
+			result.push_back(minPoint);
+		}
+	}
+	return result;
+}
+Point nearestPoint(vector<Point> lsPoints, Point p)
+{
+	double minDistance = DBL_MAX;
+	Point ePoint, mPoint;
+	for (size_t j = 0; j < lsPoints.size(); j++)
+	{
+		ePoint = lsPoints.at(j);
+		Line ltemp(p, ePoint);
+		if (ltemp.getLength() < minDistance)
+		{
+			minDistance = ltemp.getLength();
+			mPoint.setX(ePoint.getX());
+			mPoint.setY(ePoint.getY());
+		}
+	}
+	return mPoint;
+}
+vector<Point> verifyDescriptors2(ptr_IntMatrix model, ptr_IntMatrix scene,
+	vector<Point> scenePoints, vector<Point> manualLM, vector<Point> esLandmarks,
+	int templSize, int sceneSize)
+{
+	vector<Point> result;
+	int width = model->getCols();
+	int height = model->getRows();
+	size_t limit = 0;
+	if (manualLM.size() < esLandmarks.size())
+		limit = manualLM.size();
+	else
+		limit = esLandmarks.size();
+	Point mpi, epi;
+	for (size_t i = 0; i < limit; i++)
+	{
+		Point mleft(0, 0), mright(0, 0), sleft(0, 0), sright(0, 0);
+		epi = esLandmarks.at(i);
+		mpi = manualLM.at(i);
+		if (epi.getX() >= 0 && epi.getY() >= 0 && epi.getX() < width
+			&& epi.getY() < height)
+		{
+
+			mleft = createPatch(model, templSize, mpi, mright);
+			epi = nearestPoint(scenePoints, epi);
+			sleft = createPatch(scene, sceneSize, epi, sright);
+			// calculate the histogram for model
+			cout << "\nCreate patches..." << endl;
+			Matrix<double> mgradient(mright.getY() - mleft.getY() + 1,
+				mright.getX() - mleft.getX() + 1, 0.0);
+			Matrix<double> mOrient = createDescriptor(model, mleft, mright,
+				mgradient);
+			vector<double> mHistogram = orientHist16(mgradient, mOrient, templSize);
+			double minDistance = DBL_MAX;
+			Point minPoint(0, 0), maxPoint(0, 0);
+			//
+			int count = 0;
+			for (int r = sleft.getY(); r < sright.getY(); r++)
+			{
+				for (int c = sleft.getX(); c < sright.getX(); c++)
+				{
+					Point p(c, r);
+					Point ssleft(0, 0), ssright(0, 0);
+					ssleft = createPatch(scene, templSize, p, ssright);
+					Matrix<double> sgradient(ssright.getY() - ssleft.getY() + 1,
+						ssright.getX() - ssleft.getX() + 1, 0.0);
+					Matrix<double> sOrient = createDescriptor(model, ssleft, ssright,
+						sgradient);
+					vector<double> sHistogram = orientHist16(sgradient, sOrient,
+						templSize);
+					double distance = l2Distance(mHistogram, sHistogram);
+					//cout << "\nDistance: " << distance << endl;
+					if (distance == minDistance)
+					{
+						count++;
+					}
+					if (distance < minDistance)
+					{
+						minDistance = distance;
+						minPoint.setX(c);
+						minPoint.setY(r);
+					}
+
+				}
+			}
+			cout << "\nDuplicate: " << count << endl;
 			result.push_back(minPoint);
 		}
 	}

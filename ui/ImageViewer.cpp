@@ -592,26 +592,25 @@ void ImageViewer::gScaleHistogram()
 	RGB color;
 	color.R = color.G = color.B = 0;
 	ptr_RGBMatrix hDisplay = new Matrix<RGB>(240, 300, color);
-	Point pbegin,pend;
+	Point pbegin, pend;
 	color.R = color.G = color.B = 255;
-	for (int c = 0; c < histogram->getCols()*2/3; c++)
+	for (int c = 0; c < histogram->getCols() * 2 / 3; c++)
 	{
 		pbegin.setX(c);
 		pbegin.setY(239);
 		pend.setX(c);
-		pend.setY(239-(histogram->getAtPosition(0, c) * 230/max));
+		pend.setY(239 - (histogram->getAtPosition(0, c) * 230 / max));
 		drawingLine(*hDisplay, Line(pbegin, pend), color);
 	}
 	Segmentation segment;
 	segment.setRefImage(*matImage);
 	/*int imin = segment.removePronotum();
-	ptr_IntMatrix rsMatrix = segment.threshold(imin - 15,255);
-	this->loadImage(matImage, ptrIntToQImage(rsMatrix),
-			"Threshold");*/
+	 ptr_IntMatrix rsMatrix = segment.threshold(imin - 15,255);
+	 this->loadImage(matImage, ptrIntToQImage(rsMatrix),
+	 "Threshold");*/
 	segment.gridRemoveFolder();
 	ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ptrRGBToQImage(hDisplay),
-		"Histogram result");
+	other->loadImage(matImage, ptrRGBToQImage(hDisplay), "Histogram result");
 	other->move(x() - 40, y() - 40);
 	other->show();
 }
@@ -850,8 +849,7 @@ void ImageViewer::gHoughTransform()
 	//==================================================================
 	LandmarkDetection lmDetect;
 	lmDetect.setRefImage(*modelImage);
-	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 9,
-		36);
+	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 9, 36);
 	cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
 	// drawing...
 	Point lm;
@@ -865,8 +863,12 @@ void ImageViewer::gHoughTransform()
 		cout << "\n Landmarks " << i + 1 << ": " << lm.getX() << "\t" << lm.getY()
 			<< endl;
 		//fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
-		qpainter.drawEllipse(lm.getX(), lm.getY(), 4, 4);
-		qpainter.drawText(lm.getX() + 6, lm.getY(), QString::number((int) i));
+		if (lm.getX() >= 0 && lm.getX() < matImage->getRGBMatrix()->getCols()
+			&& lm.getY() >= 0 && lm.getY() < matImage->getRGBMatrix()->getRows())
+		{
+			qpainter.drawEllipse(lm.getX(), lm.getY(), 4, 4);
+			qpainter.drawText(lm.getX() + 6, lm.getY(), QString::number((int) i));
+		}
 	}
 	qpainter.end();
 	Point ebary;
@@ -876,7 +878,7 @@ void ImageViewer::gHoughTransform()
 			+ QString::number(ebary.getY()) + ")</p>"
 				"<p>Centroid value: " + QString::number(mCentroid) + "</p");
 	msgbox.exec();
-	//icpmethod(*modelImage,*matImage);
+
 	this->loadImage(matImage, qImage, "Landmarks result");
 	this->show();
 	//delete newScene;
@@ -1130,10 +1132,10 @@ void ImageViewer::dirGenerateData()
 	cout << "\n Automatic generate data on directory." << endl;
 	QMessageBox msgbox;
 
-	string imageFolder = "/home/linh/Desktop/Temps/mg/images";
+	string imageFolder = "/home/linh/Desktop/editedImages/md_images/size1";
 	//string imageFolder = "/home/linh/Desktop/rotatedImages/mg";
-	string lmFolder = "/home/linh/Desktop/Temps/mg/landmarks";
-	string saveFolder = "/home/linh/Desktop/results/2017/mg/16fevrier";
+	string lmFolder = "/home/linh/Desktop/editedImages/md_landmarks/size1";
+	string saveFolder = "/home/linh/Desktop/results/2017/md/3mars";
 	vector<string> images = readDirectory(imageFolder.c_str());
 	vector<string> lms = readDirectory(lmFolder.c_str());
 	int nrandom = 0;
@@ -1148,7 +1150,7 @@ void ImageViewer::dirGenerateData()
 	//for (int i = 0; i < 21; i++)
 	//{ // run on 20 images
 	//nrandom = random(0, (int) images.size());
-	nrandom = 22; // use Md 028 as ref
+	nrandom = 41; // use Md 028 as ref
 	string modelName = images.at(nrandom);
 	cout << "\n Random and model: " << nrandom << "\t" << modelName << endl;
 	model = imageFolder + "/" + images.at(nrandom);
@@ -1156,9 +1158,8 @@ void ImageViewer::dirGenerateData()
 	matImage = new Image(model);
 	matImage->readManualLandmarks(lmFile);
 	tr.setRefImage(*matImage);
-	tr.landmarksOnDir2(modelName, imageFolder, images, saveFolder);
-	//tr.landmarksOnDir3(modelName, imageFolder, images, saveFolder);
-
+	//tr.landmarksOnDir2(modelName, imageFolder, images, saveFolder);
+	tr.landmarksOnDir4(modelName, imageFolder, images, saveFolder,lmFolder,lms);
 	//}
 
 	msgbox.setText("Finish");
