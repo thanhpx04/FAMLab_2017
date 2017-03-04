@@ -35,8 +35,8 @@ double avgDistance(vector<Point> listPoints, Line axis);
 Line principalAxis(ptr_IntMatrix gradMatrix, Point &cPoint);
 vector<Point> generalizingHoughTransform(ptr_IntMatrix mGradient,
 		ptr_IntMatrix sGradient, vector<Point> mLandmarks, Point &ePoint,
-		Point &mPoint, double &angle, Point &translation);
-vector<Point> ghtWithEntries(RTable rEntries, Point refPoint, Line mLine,
+		Point &mPoint, double &angle, Point &translation, Point &mtranslation);
+vector<Point> ghtWithEntries(RTable rEntries, Line mLine,
 	Point mcPoint, ptr_IntMatrix sGradient, vector<Point> mLandmarks,
-	Point &ePoint, Point &mPoint, double &angle, Point &translation);
+	Point &ePoint, Point &mPoint, double &angle, Point &translation, Point &mtranslation);
 #endif /* GHTINPOINT_H_ */

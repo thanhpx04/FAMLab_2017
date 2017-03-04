@@ -491,6 +491,7 @@ void ImageViewer::open()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
 		QDir::currentPath());
+	cout<<fileName.toStdString()<<endl;
 	if (!fileName.isEmpty())
 	{
 		QImage image(fileName);
@@ -849,18 +850,18 @@ void ImageViewer::gHoughTransform()
 	//==================================================================
 	LandmarkDetection lmDetect;
 	lmDetect.setRefImage(*modelImage);
-	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 9, 36);
+	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 9, 54);
 	cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
 	// drawing...
 	Point lm;
 	QPainter qpainter(&qImage);
 	qpainter.setPen(Qt::yellow);
 	qpainter.setBrush(Qt::yellow);
-	qpainter.setFont(QFont("Arial", 20));
+	qpainter.setFont(QFont("Arial", 15));
 	for (size_t i = 0; i < estLandmarks.size(); i++)
 	{
 		lm = estLandmarks.at(i);
-		cout << "\n Landmarks " << i + 1 << ": " << lm.getX() << "\t" << lm.getY()
+		cout << "Landmarks " << i + 1 << ":\t" << lm.getX() << "\t" << lm.getY()
 			<< endl;
 		//fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
 		if (lm.getX() >= 0 && lm.getX() < matImage->getRGBMatrix()->getCols()
@@ -1228,7 +1229,7 @@ void ImageViewer::pcaiMethodViewer()
 	for (size_t i = 0; i < estLandmarks.size(); i++)
 	{
 		lm = estLandmarks.at(i);
-		cout << "Landmarks " << i + 1 << ": " << lm.getX() << "\t" << lm.getY()
+		cout << "Landmarks " << i + 1 << ":\t" << lm.getX() << "\t" << lm.getY()
 			<< endl;
 		//fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
 		qpainter.drawEllipse(lm.getX(), lm.getY(), 4, 4);

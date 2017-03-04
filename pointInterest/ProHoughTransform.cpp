@@ -343,11 +343,126 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 	vector<Point> eslm;
 	translation.setX(0);
 	translation.setY(0);
+	Point mtranslation;
+
+	/*
+	 * ePoint: centroid's location of original scene
+	 * mPoint: centroid's location of original model in the scene
+	 * angle: different angle between scene and model (include direction)
+	 * translation: translating from scene to model in scene
+	 * mtranslation: translating of original model and model in scene
+	 */
+
 	eslm = generalizingHoughTransform(mgradirection, gradirection, mLandmarks,
-			ePoint, mPoint, angle, translation);
+			ePoint, mPoint, angle, translation, mtranslation);
 	int dx = translation.getX();
 	int dy = translation.getY();
-	// move the scene to the same and rotate the model
+	// rotation the scene points
+	Point mi;
+	newScenePoints.clear();
+	int minOx = 0, minOy = 0, maxOx = 0, maxOy = 0;
+	for (size_t i = 0; i < scenePoints.size(); i++) {
+		mi = scenePoints.at(i);
+		int xnew = mi.getX() + dx;
+		int ynew = mi.getY() + dy;
+		rotateAPoint(xnew, ynew, mPoint, angle, 1, xnew, ynew);
+		newScenePoints.push_back(Point(xnew, ynew));
+		if (xnew < 0) {
+			int temp = xnew - 0;
+			if (temp < minOx)
+				minOx = temp;
+		}
+		if (xnew >= cols) {
+			int temp = xnew - cols;
+			if (temp > maxOx)
+				maxOx = temp;
+		}
+		if (ynew < 0) {
+			int temp = ynew - 0;
+			if (temp < minOy)
+				minOy = temp;
+		}
+		if (ynew >= rows) {
+			int temp = ynew - rows;
+			if (temp > maxOy)
+				maxOy = temp;
+		}
+	}
+	// new location of model points
+	vector<Point> newModelPoints;
+	Point nmi;
+
+	for (size_t i = 0; i < modelPoints.size(); i++) {
+		nmi = modelPoints.at(i);
+		int x = nmi.getX() + mtranslation.getX();
+		int y = nmi.getY() + mtranslation.getY();
+		newModelPoints.push_back(Point(x, y));
+	}
+
+	// move new scene and new model into the image
+	if (minOx != 0) {
+		mPoint.setX(mPoint.getX() - minOx + 50);
+		for (size_t i = 0; i < newScenePoints.size(); i++) {
+			mi = newScenePoints.at(i);
+			newScenePoints.at(i).setX(mi.getX() - minOx + 50);
+		}
+		for (size_t i = 0; i < eslm.size(); i++) {
+			mi = eslm.at(i);
+			eslm.at(i).setX(mi.getX() - minOx + 50);
+		}
+		for (size_t i = 0; i < newModelPoints.size(); i++) {
+			mi = newModelPoints.at(i);
+			newModelPoints.at(i).setX(mi.getX() - minOx + 50);
+		}
+	}
+	if (maxOx != 0) {
+		mPoint.setX(mPoint.getX() - maxOx - 50);
+		for (size_t i = 0; i < newScenePoints.size(); i++) {
+			mi = newScenePoints.at(i);
+			newScenePoints.at(i).setX(mi.getX() - maxOx - 50);
+		}
+		for (size_t i = 0; i < eslm.size(); i++) {
+			mi = eslm.at(i);
+			eslm.at(i).setX(mi.getX() - maxOx - 50);
+		}
+		for (size_t i = 0; i < newModelPoints.size(); i++) {
+			mi = newModelPoints.at(i);
+			newModelPoints.at(i).setX(mi.getX() - maxOx - 50);
+		}
+	}
+	if (minOy != 0) {
+		mPoint.setY(mPoint.getY() - minOy + 50);
+		for (size_t i = 0; i < newScenePoints.size(); i++) {
+			mi = newScenePoints.at(i);
+			newScenePoints.at(i).setY(mi.getY() - minOy + 50);
+		}
+		for (size_t i = 0; i < eslm.size(); i++) {
+			mi = eslm.at(i);
+			eslm.at(i).setY(mi.getY() - minOy + 50);
+		}
+		for (size_t i = 0; i < newModelPoints.size(); i++) {
+			mi = newModelPoints.at(i);
+			newModelPoints.at(i).setY(mi.getY() - minOy + 50);
+		}
+	}
+	if (maxOy != 0) {
+		mPoint.setY(mPoint.getY() - maxOy - 50);
+		for (size_t i = 0; i < newScenePoints.size(); i++) {
+			mi = newScenePoints.at(i);
+			newScenePoints.at(i).setY(mi.getY() - maxOy - 50);
+		}
+		for (size_t i = 0; i < eslm.size(); i++) {
+			mi = eslm.at(i);
+			eslm.at(i).setY(mi.getY() - maxOy + 50);
+		}
+		for (size_t i = 0; i < newModelPoints.size(); i++) {
+			mi = newModelPoints.at(i);
+			newModelPoints.at(i).setY(mi.getY() - maxOy - 50);
+		}
+	}
+	vector<Point> newScene = PCAIPoints(newModelPoints,mPoint,newScenePoints,abs(angle));
+	newScenePoints = newScene;
+// move the scene gray to the same and rotate the model
 	for (int r = 0; r < rows; r++) {
 		for (int c = 0; c < cols; c++) {
 			int value = sImage.getGrayMatrix()->getAtPosition(r, c);
@@ -380,51 +495,51 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 			}
 		}
 	}
-	//saveGrayScale("abc.jpg", newSceneGray);
-	// export two images of segmentation
+//saveGrayScale("abc.jpg", newSceneGray);
+// export two images of segmentation
 	modelSeg = modelPoints;
 	sceneSeg = scenePoints;
 
-	Point mi;
-	/*RGB color;
+	RGB color;
 	color.R = 255;
-	color.G = color.B = 0;*/
-	//vector<Point> newScenePoints;
-	newScenePoints.clear();
-	for (size_t i = 0; i < scenePoints.size(); i++) {
-		mi = scenePoints.at(i);
-		int xnew = mi.getX() + dx;
-		int ynew = mi.getY() + dy;
-		rotateAPoint(xnew, ynew, mPoint, angle, 1, xnew, ynew);
-		newScenePoints.push_back(Point(xnew, ynew));
-		//sImage.getRGBMatrix()->setAtPosition(ynew, xnew, color);
+	color.G = color.B = 0;
+	for (size_t i = 0; i < newScenePoints.size(); i++) {
+		mi = newScenePoints.at(i);
+		int x = mi.getX();
+		int y = mi.getY();
+		if (x >= 0 && y >= 0 && y < rows && x < cols) {
+			sImage.getRGBMatrix()->setAtPosition(y, x, color);
+		}
 	}
 
-	/*color.R = 0;
+	color.R = 0;
 	color.B = 255;
-	for (int k = 0; k < eslm.size(); k++) {
-		mi = eslm.at(k);
-		fillCircle(*sImage.getRGBMatrix(), mi, 3, color);
+	for (int k = 0; k < newModelPoints.size(); k++) {
+		mi = newModelPoints.at(k);
+		if (mi.getX() >= 0 && mi.getY() >= 0 && mi.getY() < rows
+				&& mi.getX() < cols) {
+			sImage.getRGBMatrix()->setAtPosition(mi.getY(), mi.getX(), color);
+		}
 	}
-	saveRGB("scenecolor.jpg", sImage.getRGBMatrix());*/
+	saveRGB("color.jpg", sImage.getRGBMatrix());
 // ================================================================================
 	Point osPoint, nsPoint;
 	Line oSLine = principalAxis(scenePoints, osPoint);
 	Line nSLine = principalAxis(newScenePoints, nsPoint);
 	double eangle = oSLine.angleLines(nSLine);
-	// difference between two centroids
+// difference between two centroids
 	int dx1 = osPoint.getX() - nsPoint.getX();
 	int dy1 = osPoint.getY() - nsPoint.getY();
 
-	// move the scene to the model
+// move the scene to the model
 	nSLine.setBegin(osPoint);
 	Point nsEnd = nSLine.getEnd();
 	nsEnd.setX(nsEnd.getX() + dx1);
 	nsEnd.setY(nsEnd.getY() + dy1);
-	//send.setY(send.getY() + dy);
+//send.setY(send.getY() + dy);
 	nSLine.setEnd(nsEnd);
 	Point pi;
-	// Detecting the rotated direction
+// Detecting the rotated direction
 	double angleR = rotateDirection(oSLine, nSLine, eangle);
 	angle = angleR;
 	translation.setX(dx1);

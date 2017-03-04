@@ -26,12 +26,10 @@ using namespace std;
 #include "../io/Reader.h"
 #include "GHTInPoint.h"
 #include "PCA.h"
-double avgDistance(vector<Point> listPoints, Line axis)
-{
+double avgDistance(vector<Point> listPoints, Line axis) {
 	double totalDist = 0;
 	size_t nPoints = listPoints.size();
-	for (size_t j = 0; j < nPoints; j++)
-	{
+	for (size_t j = 0; j < nPoints; j++) {
 		Point pj = listPoints.at(j);
 		double distance = axis.perpendicularDistance(pj);
 		totalDist += distance;
@@ -41,17 +39,13 @@ double avgDistance(vector<Point> listPoints, Line axis)
 
 // compute centroid point from the gradient matrix of image
 // output: centroid point and list points of edge.
-Point centroidPoint(ptr_IntMatrix gradMatrix, vector<Point> &listPoints)
-{
+Point centroidPoint(ptr_IntMatrix gradMatrix, vector<Point> &listPoints) {
 	int rows = gradMatrix->getRows();
 	int cols = gradMatrix->getCols();
 	int totalX = 0, totalY = 0, count = 0;
-	for (int r = 0; r < rows; r++)
-	{
-		for (int c = 0; c < cols; c++)
-		{
-			if (gradMatrix->getAtPosition(r, c) != -1)
-			{
+	for (int r = 0; r < rows; r++) {
+		for (int c = 0; c < cols; c++) {
+			if (gradMatrix->getAtPosition(r, c) != -1) {
 				listPoints.push_back(Point(c, r));
 				totalX += c;
 				totalY += r;
@@ -62,15 +56,13 @@ Point centroidPoint(ptr_IntMatrix gradMatrix, vector<Point> &listPoints)
 	return Point(totalX / count, totalY / count);
 }
 
-Line principalAxis(vector<Point> listOfPoints, Point &cPoint)
-{
+Line principalAxis(vector<Point> listOfPoints, Point &cPoint) {
 	double minAvgDist = DBL_MAX;
 	Point sPoint;
 	size_t nPoints = listOfPoints.size();
 	int totalX = 0, totalY = 0;
 	Point pi;
-	for (size_t i = 0; i < nPoints; i++)
-	{
+	for (size_t i = 0; i < nPoints; i++) {
 		pi = listOfPoints.at(i);
 		totalX += pi.getX();
 		totalY += pi.getY();
@@ -79,13 +71,11 @@ Line principalAxis(vector<Point> listOfPoints, Point &cPoint)
 	cPoint.setY(totalY / (int) nPoints);
 	pi.setX(0);
 	pi.setY(0);
-	for (size_t i = 0; i < nPoints; i++)
-	{
+	for (size_t i = 0; i < nPoints; i++) {
 		pi = listOfPoints.at(i);
 		Line l(cPoint, pi);
 		double avgDist = avgDistance(listOfPoints, l);
-		if (avgDist < minAvgDist)
-		{
+		if (avgDist < minAvgDist) {
 			minAvgDist = avgDist;
 			sPoint.setX(pi.getX());
 			sPoint.setY(pi.getY());
@@ -94,8 +84,7 @@ Line principalAxis(vector<Point> listOfPoints, Point &cPoint)
 
 	return Line(cPoint, sPoint);
 }
-Line principalAxis(ptr_IntMatrix gradMatrix, Point &cPoint)
-{
+Line principalAxis(ptr_IntMatrix gradMatrix, Point &cPoint) {
 	vector<Point> listOfPoints;
 	cPoint = centroidPoint(gradMatrix, listOfPoints);
 	return principalAxis(listOfPoints, cPoint);
@@ -103,8 +92,7 @@ Line principalAxis(ptr_IntMatrix gradMatrix, Point &cPoint)
 }
 // negative for clockwise, positive for counterclockwise
 // two lines have the same origin
-double rotateDirection(Line refLine, Line objLine, double angle)
-{
+double rotateDirection(Line refLine, Line objLine, double angle) {
 	int xnew = 0, ynew = 0;
 	Point origin = refLine.getBegin();
 	Point rpoint = objLine.getEnd();
@@ -118,17 +106,62 @@ double rotateDirection(Line refLine, Line objLine, double angle)
 	return angle;
 }
 // estimated by using PCAI
-struct comparey
-{
-	bool operator()(Point p1, Point p2)
-	{
+struct comparey {
+	bool operator()(Point p1, Point p2) {
 		return p1.getY() < p2.getY();
 	}
 } yComparation;
+vector<Point> PCAIPoints(vector<Point> modelPoints, Point mPoint,
+		vector<Point> scenePoints, double angle) {
 
+	size_t nlimit = modelPoints.size() / 2;
+	std::sort(modelPoints.begin(), modelPoints.end(), yComparation);
+	vector<Point> newModel(modelPoints.begin(), modelPoints.begin() + nlimit);
+	vector<Point> sceneTemp(scenePoints); // copy the points of scene
+	int index = 0;
+	double minAngle = 360;
+	while (angle > 1.5) {
+		index++;
+		std::sort(sceneTemp.begin(), sceneTemp.end(), yComparation);
+		vector<Point> newScene(sceneTemp.begin(), sceneTemp.begin() + nlimit);
+		Point cPoint1, cPoint2;
+		Line l1 = principalAxis(newModel, cPoint1);
+		Line l2 = principalAxis(newScene, cPoint2);
+		angle = l1.angleLines(l2);
+		if (index > 20 || angle < 1.5) {
+			if (angle < minAngle)
+				minAngle = angle;
+		}
+		Point diff = cPoint1 - cPoint2;
+		l2.setBegin(l1.getBegin());
+		l2.setEnd(
+				Point(l2.getEnd().getX() + diff.getX(),
+						l2.getEnd().getY() + diff.getY()));
+		double angleR2 = rotateDirection(l1, l2, l1.angleLines(l2));
+
+		Point psn;
+		for (size_t i = 0; i < sceneTemp.size(); i++) {
+			psn = sceneTemp.at(i);
+			int xnew = psn.getX() + diff.getX(), ynew = psn.getY()
+					+ diff.getY();
+			rotateAPoint(xnew, ynew, mPoint, angleR2, 1, xnew, ynew);
+			sceneTemp.at(i).setX(xnew);
+			sceneTemp.at(i).setY(ynew);
+		}
+		if (index > 30) {
+			if ((int) angle == (int) minAngle) {
+				break;
+			}
+		}
+	}
+	cout << "\nMin angle: " << minAngle << endl;
+	if (minAngle > 10) {
+		sceneTemp = scenePoints;
+	}
+	return sceneTemp;
+}
 vector<Point> PCAI(vector<Point> modelPoints, Image sceneGray,
-	vector<Point> mnLandmarks)
-{
+		vector<Point> mnLandmarks) {
 	int rows = sceneGray.getGrayMatrix()->getRows();
 	int cols = sceneGray.getGrayMatrix()->getCols();
 	ptr_IntMatrix lastModel = new Matrix<int>(rows, cols, 0);
@@ -160,34 +193,32 @@ vector<Point> PCAI(vector<Point> modelPoints, Image sceneGray,
 	double angleR = rotateDirection(mAxis, sAxis, angle);
 
 	// rotate and translate the scene to match with the model
-	for (size_t i = 0; i < scenePoints.size(); i++)
-	{
+	for (size_t i = 0; i < scenePoints.size(); i++) {
 		pi = scenePoints.at(i);
 		int xnew = 0, ynew = 0;
-		rotateAPoint(pi.getX() + dx, pi.getY() + dy, mPoint, angleR, 1, xnew, ynew);
+		rotateAPoint(pi.getX() + dx, pi.getY() + dy, mPoint, angleR, 1, xnew,
+				ynew);
 		scenePoints.at(i).setX(xnew);
 		scenePoints.at(i).setY(ynew);
 	}
 
 	// hien thu ket qua lan thu nhat
-	for (size_t i = 0; i < modelPoints.size(); i++)
-	{
+	for (size_t i = 0; i < modelPoints.size(); i++) {
 		pi = modelPoints.at(i);
 		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-			&& pi.getY() < rows)
-		{
+				&& pi.getY() < rows) {
 			lastModel->setAtPosition(pi.getY(), pi.getX(), 255);
 		}
 	}
-
-	size_t nlimit = modelPoints.size() / 2;
+	vector<Point> sceneTemp;
+	sceneTemp = PCAIPoints(modelPoints,mPoint,scenePoints,angle);
+	/*size_t nlimit = modelPoints.size() / 2;
 	std::sort(modelPoints.begin(), modelPoints.end(), yComparation);
 	vector<Point> newModel(modelPoints.begin(), modelPoints.begin() + nlimit);
 	vector<Point> sceneTemp(scenePoints); // copy the points of scene
 	int index = 0;
 	double minAngle = 360;
-	while (angle > 1.5)
-	{
+	while (angle > 1) {
 		index++;
 		std::sort(sceneTemp.begin(), sceneTemp.end(), yComparation);
 		vector<Point> newScene(sceneTemp.begin(), sceneTemp.begin() + nlimit);
@@ -195,58 +226,51 @@ vector<Point> PCAI(vector<Point> modelPoints, Image sceneGray,
 		Line l1 = principalAxis(newModel, cPoint1);
 		Line l2 = principalAxis(newScene, cPoint2);
 		angle = l1.angleLines(l2);
-		if (index > 20 || angle < 1.5)
-		{
+		if (index > 20 || angle < 1.5) {
 			if (angle < minAngle)
 				minAngle = angle;
 		}
 		Point diff = cPoint1 - cPoint2;
 		l2.setBegin(l1.getBegin());
 		l2.setEnd(
-			Point(l2.getEnd().getX() + diff.getX(),
-				l2.getEnd().getY() + diff.getY()));
+				Point(l2.getEnd().getX() + diff.getX(),
+						l2.getEnd().getY() + diff.getY()));
 		double angleR2 = rotateDirection(l1, l2, l1.angleLines(l2));
 
 		Point psn;
-		for (size_t i = 0; i < sceneTemp.size(); i++)
-		{
+		for (size_t i = 0; i < sceneTemp.size(); i++) {
 			psn = sceneTemp.at(i);
-			int xnew = psn.getX() + diff.getX(), ynew = psn.getY() + diff.getY();
+			int xnew = psn.getX() + diff.getX(), ynew = psn.getY()
+					+ diff.getY();
 			rotateAPoint(xnew, ynew, mPoint, angleR2, 1, xnew, ynew);
 			sceneTemp.at(i).setX(xnew);
 			sceneTemp.at(i).setY(ynew);
 		}
-		if (index > 30)
-		{
-			if ((int) angle == (int) minAngle)
-			{
+		if (index > 30) {
+			if ((int) angle == (int) minAngle) {
 				break;
 			}
 		}
 	}
 	cout << "\nMin angle: " << minAngle << endl;
-	if (minAngle > 10)
-	{
+	if (minAngle > 10) {
 		sceneTemp = scenePoints;
-	}
+	}*/
 	// display scene points
-	for (size_t i = 0; i < sceneTemp.size(); i++)
-	{
+	for (size_t i = 0; i < sceneTemp.size(); i++) {
 		pi = sceneTemp.at(i);
 		if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-			&& pi.getY() < rows)
-		{
+				&& pi.getY() < rows) {
 			lastScene->setAtPosition(pi.getY(), pi.getX(), 255);
 		}
 	}
 
 	vector<Point> result;
-	if (mnLandmarks.size() > 0)
-	{
+	if (mnLandmarks.size() > 0) {
 		//result = verifyLandmarks2(lastModel, lastScene, mnLandmarks, mnLandmarks,
 		//	100, 300);
-		result = verifyDescriptors2(lastModel, lastScene,sceneTemp, mnLandmarks,
-			mnLandmarks, 9, 36);
+		result = verifyDescriptors2(lastModel, lastScene, sceneTemp,
+				mnLandmarks, mnLandmarks, 9, 36);
 	}
 
 	// compute the difference between original scene and rotated scene
@@ -258,11 +282,10 @@ vector<Point> PCAI(vector<Point> modelPoints, Image sceneGray,
 	double mangle = sl1.angleLines(sl2);
 	sl2.setBegin(sl1.getBegin());
 	sl2.setEnd(
-		Point(sl2.getEnd().getX() + mback.getX(),
-			sl2.getEnd().getY() + mback.getY()));
+			Point(sl2.getEnd().getX() + mback.getX(),
+					sl2.getEnd().getY() + mback.getY()));
 	mangle = rotateDirection(sl1, sl2, mangle);
-	for (size_t i = 0; i < result.size(); i++)
-	{
+	for (size_t i = 0; i < result.size(); i++) {
 		pi = result.at(i);
 		int xnew = pi.getX() + mback.getX(), ynew = pi.getY() + mback.getY();
 		rotateAPoint(xnew, ynew, lsPoint1, mangle, 1, xnew, ynew);
@@ -275,8 +298,8 @@ vector<Point> PCAI(vector<Point> modelPoints, Image sceneGray,
 	delete sceneGrandient;
 	return result;
 }
-vector<Point> PCAI(Image modelGray, Image &sceneGray, vector<Point> mnLandmarks)
-{
+vector<Point> PCAI(Image modelGray, Image &sceneGray,
+		vector<Point> mnLandmarks) {
 	// PCA
 	int rows = modelGray.getGrayMatrix()->getRows();
 	int cols = modelGray.getGrayMatrix()->getCols();
@@ -296,16 +319,14 @@ vector<Point> PCAI(Image modelGray, Image &sceneGray, vector<Point> mnLandmarks)
 	return result;
 }
 void pcaiFolder(string folderScene, vector<string> sceneImages, Image model,
-	vector<Point> mnLandmarks,string savePath)
-{
+		vector<Point> mnLandmarks, string savePath) {
 	int rows = model.getRGBMatrix()->getRows();
 	int cols = model.getRGBMatrix()->getCols();
 	vector<Point> modelPoints;
 	ptr_IntMatrix modelGrandient = new Matrix<int>(rows, cols, -1);
 	*modelGrandient = *(getGradientDMatrix(model, modelPoints));
 	vector<Point> result;
-	for (size_t i = 0; i < 20; i++)
-	{
+	for (size_t i = 0; i < 20; i++) {
 		string sceneName = sceneImages.at(i);
 		cout << "\n==============================================" << sceneName;
 		vector<Point> result;
@@ -313,15 +334,14 @@ void pcaiFolder(string folderScene, vector<string> sceneImages, Image model,
 		result = PCAI(modelPoints, sceneImage, mnLandmarks);
 
 		// save TPS
-		string path = savePath +"/" + sceneImage.getName();
+		string path = savePath + "/" + sceneImage.getName();
 		ofstream inFile((path + ".TPS").c_str());
 		inFile << "LM=" << result.size() << "\n";
 		Point epk;
 		RGB color;
 		color.R = color.G = 255;
 		color.B = 0;
-		for (size_t k = 0; k < result.size(); k++)
-		{
+		for (size_t k = 0; k < result.size(); k++) {
 			epk = result.at(k);
 			inFile << epk.getX() << " " << rows - epk.getY() << "\n";
 		}
