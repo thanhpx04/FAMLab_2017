@@ -460,15 +460,28 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 			newModelPoints.at(i).setY(mi.getY() - maxOy - 50);
 		}
 	}
-	vector<Point> newScene = PCAIPoints(newModelPoints,mPoint,newScenePoints,abs(angle));
+	vector<Point> newScene = PCAIPoints(newModelPoints, mPoint, newScenePoints,
+			abs(angle));
 	newScenePoints = newScene;
+
+	Point osPoint, nsPoint;
+	Line olineScene = principalAxis(scenePoints,osPoint);
+	Line nlineScene = principalAxis(newScenePoints,nsPoint);
+	double sangle = nlineScene.angleLines(olineScene);
+	Point smove = nsPoint - osPoint;
+	olineScene.setBegin(nlineScene.getBegin());
+	Point eoScene = olineScene.getEnd();
+	eoScene.setX(eoScene.getX() + smove.getX());
+	eoScene.setY(eoScene.getY() + smove.getY());
+	olineScene.setEnd(eoScene);
+	sangle = rotateDirection(nlineScene,olineScene,sangle);
 // move the scene gray to the same and rotate the model
 	for (int r = 0; r < rows; r++) {
 		for (int c = 0; c < cols; c++) {
 			int value = sImage.getGrayMatrix()->getAtPosition(r, c);
-			int xnew = c + dx;
-			int ynew = r + dy;
-			rotateAPoint(xnew, ynew, mPoint, angle, 1, xnew, ynew);
+			int xnew = c + smove.getX();
+			int ynew = r + smove.getY();
+			rotateAPoint(xnew, ynew, mPoint, sangle, 1, xnew, ynew);
 			if (xnew >= 0 && ynew >= 0 && ynew < rows && xnew < cols) {
 				newSceneGray->setAtPosition(ynew, xnew, value);
 			}
@@ -495,7 +508,7 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 			}
 		}
 	}
-//saveGrayScale("abc.jpg", newSceneGray);
+saveGrayScale("abc.jpg", newSceneGray);
 // export two images of segmentation
 	modelSeg = modelPoints;
 	sceneSeg = scenePoints;
@@ -523,7 +536,7 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 	}
 	saveRGB("color.jpg", sImage.getRGBMatrix());
 // ================================================================================
-	Point osPoint, nsPoint;
+	/*Point osPoint, nsPoint;
 	Line oSLine = principalAxis(scenePoints, osPoint);
 	Line nSLine = principalAxis(newScenePoints, nsPoint);
 	double eangle = oSLine.angleLines(nSLine);
@@ -538,12 +551,11 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 	nsEnd.setY(nsEnd.getY() + dy1);
 //send.setY(send.getY() + dy);
 	nSLine.setEnd(nsEnd);
-	Point pi;
 // Detecting the rotated direction
-	double angleR = rotateDirection(oSLine, nSLine, eangle);
-	angle = angleR;
-	translation.setX(dx1);
-	translation.setY(dy1);
+	double angleR = rotateDirection(oSLine, nSLine, eangle);*/
+	angle = -sangle;
+	translation.setX(-smove.getX());
+	translation.setY(-smove.getY());
 	ePoint = nsPoint;
 	return eslm;
 }

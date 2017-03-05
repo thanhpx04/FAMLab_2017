@@ -145,12 +145,12 @@ vector<Point> LandmarkDetection::landmarksAutoDectect2(Image &sceneImage,
 	}
 	vector<Point> result;
 	if (phtEsLM.size() > 0) {
-		//result = verifyLandmarks2(modelImage.getGrayMatrix(), newScene, manualLMs,
-		//	phtEsLM, templSize, sceneSize);
-		/*result = verifyDescriptors(modelImage.getGrayMatrix(), newScene, manualLMs,
-		 phtEsLM, templSize, sceneSize);*/
+		/*result = verifyLandmarks2(modelImage.getGrayMatrix(), newScene, manualLMs,
+			phtEsLM, templSize, sceneSize);*/
+		/*result = verifyDescriptors(modelImage.getGrayMatrix(), newScene,
+				manualLMs, phtEsLM, templSize, sceneSize);*/
 		result = verifyDescriptors(modelSeg, sceneSeg, manualLMs, phtEsLM,
-				templSize, sceneSize);
+		 templSize, sceneSize);
 	}
 	phtEsLM.clear();
 	delete newScene;
@@ -159,8 +159,6 @@ vector<Point> LandmarkDetection::landmarksAutoDectect2(Image &sceneImage,
 
 	// reverse the coordinate of estimated landmarks
 	Point pi;
-	//int dx = ePoint.getX() - mPoint.getX();
-	//int dy = ePoint.getY() - mPoint.getY();
 	int dx = translation.getX();
 	int dy = translation.getY();
 	for (size_t i = 0; i < result.size(); i++) {
