@@ -850,7 +850,7 @@ void ImageViewer::gHoughTransform()
 	//==================================================================
 	LandmarkDetection lmDetect;
 	lmDetect.setRefImage(*modelImage);
-	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 9, 54);
+	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 9, 18);
 	cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
 	// drawing...
 	Point lm;
@@ -1136,7 +1136,7 @@ void ImageViewer::dirGenerateData()
 	string imageFolder = "/home/linh/Desktop/editedImages/md_images/size1";
 	//string imageFolder = "/home/linh/Desktop/rotatedImages/mg";
 	string lmFolder = "/home/linh/Desktop/editedImages/md_landmarks/size1";
-	string saveFolder = "/home/linh/Desktop/results/2017/md/3mars";
+	string saveFolder = "/home/linh/Desktop/results/2017/md/6mars";
 	vector<string> images = readDirectory(imageFolder.c_str());
 	vector<string> lms = readDirectory(lmFolder.c_str());
 	int nrandom = 0;

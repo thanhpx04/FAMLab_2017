@@ -120,6 +120,7 @@ vector<Point> PCAIPoints(vector<Point> modelPoints, Point mPoint,
 	vector<Point> sceneTemp(scenePoints); // copy the points of scene
 	int index = 0;
 	double minAngle = 360;
+	cout<<"\nFirst angle: "<<angle<<endl;
 	while (angle > 1.5) {
 		index++;
 		std::sort(sceneTemp.begin(), sceneTemp.end(), yComparation);
@@ -267,10 +268,10 @@ vector<Point> PCAI(vector<Point> modelPoints, Image sceneGray,
 
 	vector<Point> result;
 	if (mnLandmarks.size() > 0) {
-		//result = verifyLandmarks2(lastModel, lastScene, mnLandmarks, mnLandmarks,
-		//	100, 300);
-		result = verifyDescriptors2(lastModel, lastScene, sceneTemp,
-				mnLandmarks, mnLandmarks, 9, 36);
+		result = verifyLandmarks2(lastModel, lastScene, mnLandmarks, mnLandmarks,
+			100, 300);
+		/*result = verifyDescriptors2(lastModel, lastScene, sceneTemp,
+				mnLandmarks, mnLandmarks, 9, 36);*/
 	}
 
 	// compute the difference between original scene and rotated scene

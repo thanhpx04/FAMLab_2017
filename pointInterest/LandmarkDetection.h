@@ -23,6 +23,8 @@ public:
 		int sceneSize, Point &ePoint, double &angleDiff,string saveFolder);
 	vector<Point> landmarksAutoDectect2(Image &sceneImage,
 			int templSize, int sceneSize);
+	vector<Point> landmarksWithSIFT(Image &sceneImage,
+			int templSize, int sceneSize);
 	void landmarksOnDir2(string modelName, string folderScene,
 		vector<string> sceneImages, string saveFolder);
 	void landmarksOnDir3(string modelName, string folderScene,

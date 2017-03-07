@@ -196,6 +196,7 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 		limit = manualLM.size();
 	else
 		limit = esLandmarks.size();
+	cout<<"\nLimit: "<<limit<<endl;
 	Point mpi, epi;
 	for (size_t i = 0; i < limit; i++)
 	{
@@ -209,7 +210,7 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 			mleft = createPatch(model, templSize, mpi, mright);
 			sleft = createPatch(scene, sceneSize, epi, sright);
 			// calculate the histogram for model
-			cout << "\nCreate patches..." << endl;
+			//cout << "\nCreate patches..." << endl;
 
 			Matrix<double> mgradient(mright.getY() - mleft.getY() + 1,
 				mright.getX() - mleft.getX() + 1, 0.0);
@@ -218,7 +219,7 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 			vector<double> mHistogram = orientHist16(mgradient, mOrient, templSize);
 			double minDistance = DBL_MAX, maxDistance = 0.0;
 			Point minPoint(0, 0), maxPoint(0, 0);
-			mpi.toString();
+			//mpi.toString();
 			int count = 0;
 			for (int r = sleft.getY(); r < sright.getY(); r++)
 			{
@@ -254,7 +255,7 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 
 				}
 			}
-			cout << "\nDuplicate: " << count << endl;
+			//cout << "\nDuplicate: " << count << endl;
 			result.push_back(minPoint);
 		}
 	}
