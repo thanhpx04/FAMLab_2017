@@ -119,16 +119,23 @@ int main(int argc, char* argv[])
 	ofstream inFile(savetps.c_str());
 	inFile << "LM=" << estLandmarks.size() << "\n";
 	Point epk;
-	double totalDiff=0;
+	double totalDiff1=0, totalDiff2 = 0;
+	vector<double> distances;
 	for (size_t k = 0; k < estLandmarks.size(); k++)
 	{
 		epk = estLandmarks.at(k);
 		Line line(epk, sceneManual.at(k));
 		inFile << epk.getX() << "\t" << rows - epk.getY() << "\t"
 			<< line.getLength() << "\n";
-		totalDiff += line.getLength();
+		distances.push_back(line.getLength());
+		totalDiff1 += line.getLength();
 	}
-	inFile<<"Total difference: "<<totalDiff<<"\n";
+	for (int m = 0; m < distances.size(); m++) {
+		inFile <<distances.at(m)<<"\t";
+		totalDiff2 += distances.at(m);
+	}
+	if(totalDiff1 == totalDiff2)
+		inFile<<"\nTotal difference: "<<totalDiff1<<"\n";
 	inFile << "IMAGE=" << savejpg << "\n";
 	inFile.close();
 	return 0;

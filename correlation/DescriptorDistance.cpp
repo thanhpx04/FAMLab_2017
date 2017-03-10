@@ -246,7 +246,7 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 					{
 						count++;
 					}
-					if (distance < minDistance)
+					if (distance < minDistance && scene->getAtPosition(r,c) == 255)
 					{
 						minDistance = distance;
 						minPoint.setX(c);

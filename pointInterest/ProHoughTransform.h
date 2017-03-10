@@ -27,7 +27,7 @@ public:
 
 	vector<Point> generalTransform(Image &sImage, double &angle, Point &ePoint,
 		Point &mPoint, ptr_IntMatrix &newScene, Point &translation,
-		vector<Point> &modelSeg, vector<Point> &sceneSeg, vector<Point> &newScenePoints);
+		vector<Point> &modelSeg, vector<Point> &sceneSeg, vector<Point> &newScenePoints,double &scaleX, double &scaleY, Point &moveScale);
 };
 
 #endif /* PROHOUGHTRANSFORM_H_ */

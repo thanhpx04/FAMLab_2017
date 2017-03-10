@@ -850,7 +850,8 @@ void ImageViewer::gHoughTransform()
 	//==================================================================
 	LandmarkDetection lmDetect;
 	lmDetect.setRefImage(*modelImage);
-	vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 9, 18);
+	//vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 9, 36);
+	vector<Point> estLandmarks = lmDetect.landmarksWithSIFT(*matImage, 9, 36);
 	cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
 	// drawing...
 	Point lm;
