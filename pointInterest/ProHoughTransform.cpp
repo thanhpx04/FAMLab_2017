@@ -485,7 +485,8 @@ struct comparey
 vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 	Point &ePoint, Point &mPoint, ptr_IntMatrix &newSceneGray, Point &translation,
 	vector<Point> &modelSeg, vector<Point> &sceneSeg,
-	vector<Point> &newScenePoints,double &scaleX, double &scaleY, Point &moveScale)
+	vector<Point> &newScenePoints, double &scaleX, double &scaleY,
+	Point &moveScale)
 {
 	int rows = sImage.getGrayMatrix()->getRows();
 	int cols = sImage.getGrayMatrix()->getCols();
@@ -637,14 +638,17 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 	}
 	//draw the bounding box
 	/*drawingLine(*sImage.getRGBMatrix(),
-		Line(sLeft, Point(sRight.getX(), sLeft.getY())), color);
-	drawingLine(*sImage.getRGBMatrix(),
-		Line(sLeft, Point(sLeft.getX(), sRight.getY())), color);
-	drawingLine(*sImage.getRGBMatrix(),
-		Line(sRight, Point(sLeft.getX(), sRight.getY())), color);
-	drawingLine(*sImage.getRGBMatrix(),
-		Line(sRight, Point(sRight.getX(), sLeft.getY())), color);*/
-
+	 Line(sLeft, Point(sRight.getX(), sLeft.getY())), color);
+	 drawingLine(*sImage.getRGBMatrix(),
+	 Line(sLeft, Point(sLeft.getX(), sRight.getY())), color);
+	 drawingLine(*sImage.getRGBMatrix(),
+	 Line(sRight, Point(sLeft.getX(), sRight.getY())), color);
+	 drawingLine(*sImage.getRGBMatrix(),
+	 Line(sRight, Point(sRight.getX(), sLeft.getY())), color);*/
+	Point sceneCenter;
+	sceneCenter.setX((sLeft.getX() + sRight.getX()) / 2);
+	sceneCenter.setY((sLeft.getY() + sRight.getY()) / 2);
+	fillCircle(*sImage.getRGBMatrix(), sceneCenter, 5, color);
 	color.G = 0;
 	Point mLeft, mRight;
 	mLeft.setX(cols);
@@ -658,7 +662,7 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 		int y = mi.getY();
 		if (x >= 0 && y >= 0 && y < rows && x < cols)
 		{
-			//sImage.getRGBMatrix()->setAtPosition(y, x, color);
+			sImage.getRGBMatrix()->setAtPosition(y, x, color);
 			if (x < mLeft.getX())
 				mLeft.setX(x);
 			if (y < mLeft.getY())
@@ -669,6 +673,10 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 				mRight.setY(y);
 		}
 	}
+	Point modelCenter;
+	modelCenter.setX((mLeft.getX() + mRight.getX()) / 2);
+	modelCenter.setY((mLeft.getY() + mRight.getY()) / 2);
+	fillCircle(*sImage.getRGBMatrix(), modelCenter, 5, color);
 	// draw bounding box
 	/*drawingLine(*sImage.getRGBMatrix(),
 	 Line(mLeft, Point(mRight.getX(), mLeft.getY())), color);
@@ -711,10 +719,10 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 		int y = mi.getY() + diffSort.getY();
 		newScenePoints.at(i).setX(x);
 		newScenePoints.at(i).setY(y);
-		/*if (x >= 0 && y >= 0 && y < rows && x < cols)
+		if (x >= 0 && y >= 0 && y < rows && x < cols)
 		{
 			sImage.getRGBMatrix()->setAtPosition(y, x, color);
-		}*/
+		}
 	}
 	/*Point pca1, pca2;
 	 Line pcal1 = principalAxis(newModelPoints, pca1);
@@ -730,7 +738,10 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 	 sImage.getRGBMatrix()->setAtPosition(y, x, color);
 	 }
 	 }*/
-	saveRGB("color.jpg", sImage.getRGBMatrix());
+	color.G = 0;
+	drawingLine(*sImage.getRGBMatrix(),Line(newModelPoints.at(0),modelCenter),color);
+	color.G = 255;
+	drawingLine(*sImage.getRGBMatrix(),Line(newModelPoints.at(0),sceneCenter),color);
 	Point pi;
 	for (size_t k = 0; k < eslm.size(); k++)
 	{
@@ -738,7 +749,10 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 		Point ci = nearestPoint(newScenePoints, pi);
 		eslm.at(k).setX(ci.getX());
 		eslm.at(k).setY(ci.getY());
+		fillCircle(*(sImage.getRGBMatrix()), ci, 5, color);
 	}
+
+	saveRGB("color.jpg", sImage.getRGBMatrix());
 // ================================================================================
 	angle = -sangle;
 	translation.setX(-smove.getX());

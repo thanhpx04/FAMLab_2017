@@ -196,7 +196,7 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 		limit = manualLM.size();
 	else
 		limit = esLandmarks.size();
-	cout<<"\nLimit: "<<limit<<endl;
+	cout << "\nLimit: " << limit << endl;
 	Point mpi, epi;
 	for (size_t i = 0; i < limit; i++)
 	{
@@ -225,34 +225,36 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 			{
 				for (int c = sleft.getX(); c < sright.getX(); c++)
 				{
-					Point p(c, r);
-					Point ssleft(0, 0), ssright(0, 0);
-					ssleft = createPatch(scene, templSize, p, ssright);
-					Matrix<double> sgradient(ssright.getY() - ssleft.getY() + 1,
-						ssright.getX() - ssleft.getX() + 1, 0.0);
-					Matrix<double> sOrient = createDescriptor(model, ssleft, ssright,
-						sgradient);
-					vector<double> sHistogram = orientHist16(sgradient, sOrient,
-						templSize);
-					double distance = l2Distance(mHistogram, sHistogram);
-					//cout << "\nDistance: " << distance << endl;
-					if (distance > maxDistance)
+					if (scene->getAtPosition(r, c) == 255)
 					{
-						maxDistance = distance;
-						maxPoint.setX(c);
-						maxPoint.setY(r);
+						Point p(c, r);
+						Point ssleft(0, 0), ssright(0, 0);
+						ssleft = createPatch(scene, templSize, p, ssright);
+						Matrix<double> sgradient(ssright.getY() - ssleft.getY() + 1,
+							ssright.getX() - ssleft.getX() + 1, 0.0);
+						Matrix<double> sOrient = createDescriptor(model, ssleft, ssright,
+							sgradient);
+						vector<double> sHistogram = orientHist16(sgradient, sOrient,
+							templSize);
+						double distance = l2Distance(mHistogram, sHistogram);
+						//cout << "\nDistance: " << distance << endl;
+						if (distance > maxDistance)
+						{
+							maxDistance = distance;
+							maxPoint.setX(c);
+							maxPoint.setY(r);
+						}
+						if (distance == minDistance)
+						{
+							count++;
+						}
+						if (distance < minDistance)
+						{
+							minDistance = distance;
+							minPoint.setX(c);
+							minPoint.setY(r);
+						}
 					}
-					if (distance == minDistance)
-					{
-						count++;
-					}
-					if (distance < minDistance && scene->getAtPosition(r,c) == 255)
-					{
-						minDistance = distance;
-						minPoint.setX(c);
-						minPoint.setY(r);
-					}
-
 				}
 			}
 			//cout << "\nDuplicate: " << count << endl;

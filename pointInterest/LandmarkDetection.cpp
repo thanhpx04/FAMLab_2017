@@ -257,7 +257,7 @@ vector<Point> LandmarkDetection::landmarksWithSIFT(Image &sceneImage,
 		result.at(i).setX(xnew + dx);
 		result.at(i).setY(ynew + dy);
 	}
-	result = refineLandmarks(result, scenePoints);
+	//result = refineLandmarks(result, scenePoints);
 	return result;
 }
 void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
