@@ -724,24 +724,6 @@ vector<Point> ProHoughTransform::generalTransform(Image &sImage, double &angle,
 			sImage.getRGBMatrix()->setAtPosition(y, x, color);
 		}
 	}
-	/*Point pca1, pca2;
-	 Line pcal1 = principalAxis(newModelPoints, pca1);
-	 Line pcal2 = principalAxis(newScenePoints, pca2);
-	 Point pcad = pca1 - pca2;
-	 for (size_t i = 0; i < newScenePoints.size(); i++)
-	 {
-	 mi = newScenePoints.at(i);
-	 int x = mi.getX() + pcad.getX();
-	 int y = mi.getY() + pcad.getY();
-	 if (x >= 0 && y >= 0 && y < rows && x < cols)
-	 {
-	 sImage.getRGBMatrix()->setAtPosition(y, x, color);
-	 }
-	 }*/
-	color.G = 0;
-	drawingLine(*sImage.getRGBMatrix(),Line(newModelPoints.at(0),modelCenter),color);
-	color.G = 255;
-	drawingLine(*sImage.getRGBMatrix(),Line(newModelPoints.at(0),sceneCenter),color);
 	Point pi;
 	for (size_t k = 0; k < eslm.size(); k++)
 	{

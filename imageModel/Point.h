@@ -112,6 +112,7 @@ public:
 	bool operator==(const Point &cPoint);
 	bool operator!=(int value);
 	Point operator-(const Point cPoint);
+	Point operator+(const Point cPoint);
 };
 
 typedef Point *ptr_Point;

@@ -71,3 +71,7 @@ Point Point::operator-(const Point cPoint)
 {
 	return Point(this->x - cPoint.x,this->y - cPoint.y);
 }
+Point Point::operator+(const Point cPoint)
+{
+	return Point(this->x + cPoint.x,this->y + cPoint.y);
+}

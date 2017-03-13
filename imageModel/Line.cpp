@@ -105,7 +105,7 @@ double distancePoints(Point p1, Point p2)
  */
 double Line::lengthOfLine()
 {
-	return distancePoints(begin,end);
+	return distancePoints(begin, end);
 }
 
 /*
@@ -175,12 +175,18 @@ double Line::angleLines(Line otherLine)
 	if (dx == 0 && otherLine.dx != 0)
 	{ // line 1 is parallel with Oy
 		slope2 = (double) otherLine.dy / (double) otherLine.dx;
-		return atan(abs(1 / slope2)) * 180 / M_PI;
+		double angle = atan(abs(1 / slope2)) * 180 / M_PI;
+		if (angle < 0)
+			angle += 360;
+		return angle;
 	}
 	if (dx != 0 && otherLine.dx == 0)
 	{ //otherLine is parallel with Oy
 		slope1 = (double) dy / (double) dx;
-		return atan(abs(1 / slope1)) * 180 / M_PI;
+		double angle = atan(abs(1 / slope1)) * 180 / M_PI;
+		if (angle < 0)
+			angle += 360;
+		return angle;
 	}
 
 	slope1 = (double) dy / (double) dx;
@@ -192,13 +198,23 @@ double Line::angleLines(Line otherLine)
 		return 90;
 	if (slope1 == 0 && slope2 != 0)
 	{ // line 1 is parallel with Ox
-		return atan(abs(slope2)) * 180 / M_PI;
+		double angle = atan(abs(slope2)) * 180 / M_PI;
+		if (angle < 0)
+			angle += 360;
+		return angle;
 	}
 	if (slope1 != 0 && slope2 == 0)
 	{ // otherLine is parallel with Ox
-		return atan(abs(slope1)) * 180 / M_PI;
+		double angle = atan(abs(slope1)) * 180 / M_PI;
+		if (angle < 0)
+			angle += 360;
+		return angle;
 	}
-	return atan(abs((slope1 - slope2) / (1 + slope1 * slope2))) * 180 / M_PI;
+	double angle = atan(abs((slope1 - slope2) / (1 + slope1 * slope2)))
+		* 180/ M_PI;
+	if (angle < 0)
+		angle += 360;
+	return angle;
 }
 
 Point Line::intersection(Line otherLine)
