@@ -1251,7 +1251,7 @@ void ImageViewer::pcaiMethodViewer()
 	 vector<string> images = readDirectory(imageFolder.c_str());
 	 pcaiFolder(imageFolder, images, *matImage,
 	 modelImage->getListOfManualLandmarks(),saveFolder);*/
-
+	saveRGB("color.jpg",matImage->getRGBMatrix());
 	this->loadImage(matImage, qImage, "PCAI result");
 	this->show();
 	//delete newScene;

@@ -318,7 +318,7 @@ void LandmarkDetection::landmarksOnDir(string modelName, string folderScene,
 		for (size_t k = 0; k < result.size(); k++)
 		{
 			pk = result.at(k);
-			inFile << pk.getX() << "\t" << pk.getY() << "\n";
+			inFile << pk.getX() << " " << pk.getY() << "\n";
 		}
 		inFile << "IMAGE=" << saveFile << "\n";
 		inFile.close();
@@ -533,7 +533,7 @@ void LandmarkDetection::landmarksOnDir4(string modelName, string folderScene,
 			}
 			Line line(epk, mnLandmarks.at(k));
 
-			inFile << epk.getX() << "\t" << rows - epk.getY() << "\t"
+			inFile << epk.getX() << " " << rows - epk.getY() << "\t"
 				<< line.getLength() << "\n";
 		}
 		inFile << "IMAGE=" << saveFile << "\n";

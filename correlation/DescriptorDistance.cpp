@@ -306,7 +306,7 @@ vector<Point> verifyDescriptors2(ptr_IntMatrix model, ptr_IntMatrix scene,
 			epi = nearestPoint(scenePoints, epi);
 			sleft = createPatch(scene, sceneSize, epi, sright);
 			// calculate the histogram for model
-			cout << "\nCreate patches..." << endl;
+			//cout << "\nCreate patches..." << endl;
 			Matrix<double> mgradient(mright.getY() - mleft.getY() + 1,
 				mright.getX() - mleft.getX() + 1, 0.0);
 			Matrix<double> mOrient = createDescriptor(model, mleft, mright,
@@ -344,7 +344,7 @@ vector<Point> verifyDescriptors2(ptr_IntMatrix model, ptr_IntMatrix scene,
 
 				}
 			}
-			cout << "\nDuplicate: " << count << endl;
+			//cout << "\nDuplicate: " << count << endl;
 			result.push_back(minPoint);
 		}
 	}
