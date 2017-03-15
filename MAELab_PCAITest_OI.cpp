@@ -73,10 +73,10 @@ void measureCentroidDirectory(string lmfolder, int rows, string saveDiff,
 int main(int argc, char* argv[]) {
 	cout << "\n MAELab without graphic user interface !!!" << endl;
 	// measure
-	string lmfolder = "/home/linh/Desktop/results/temp";
+	string lmfolder = "/home/linh/Desktop/results/2017/md/13marsb/lm";
 	int rows = 2448;
-	string saveDiff = "results/dlandmarks.TPS";
-	string saveCentroid = "results/centroid.TPS";
+	string saveDiff = "/home/linh/Desktop/Statistic/2017/13mars/mddiff_b.TPS";
+	string saveCentroid = "/home/linh/Desktop/Statistic/2017/13mars/mdcentroid_b.TPS";
 	measureCentroidDirectory(lmfolder,rows,saveDiff,saveCentroid);
 	/*string modeljpg, modeltps, scenejpg, scenetps, method, savejpg, savetps;
 	int firstSize, secondSize;
