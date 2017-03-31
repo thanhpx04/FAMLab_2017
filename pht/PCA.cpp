@@ -221,7 +221,12 @@ vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 	// Detecting the rotated direction
 	double angleR = rotateDirection(mAxis, sAxis, angle);
 
+	RGB color;
+	color.B = 255;
+	color.R = color.G = 255;
+
 	// rotate and translate the scene to match with the model
+	color.R = color.G = color.B = 0;
 	for (size_t i = 0; i < scenePoints.size(); i++)
 	{
 		pi = scenePoints.at(i);
@@ -229,11 +234,13 @@ vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 		rotateAPoint(pi.getX() + dx, pi.getY() + dy, mPoint, angleR, 1, xnew, ynew);
 		scenePoints.at(i).setX(xnew);
 		scenePoints.at(i).setY(ynew);
+		/*if (xnew >= 0 && ynew >= 0 && ynew < rows && xnew < cols)
+		 {
+		 sceneGray.getRGBMatrix()->setAtPosition(ynew, xnew, color);
+		 }*/
 	}
-
-	RGB color;
 	color.R = 255;
-	color.B = color.G = 0;
+	color.B = 0;
 	// hien thu ket qua lan thu nhat
 	for (size_t i = 0; i < modelPoints.size(); i++)
 	{
@@ -242,13 +249,14 @@ vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 			&& pi.getY() < rows)
 		{
 			lastModel->setAtPosition(pi.getY(), pi.getX(), 255);
-			sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
+			//sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
 		}
 	}
 	vector<Point> sceneTemp;
 	sceneTemp = PCAIPoints(modelPoints, mPoint, scenePoints, angle);
 	// display scene points
-	color.G = 255;
+	color.R = 0;
+	color.B = 255;
 	for (size_t i = 0; i < sceneTemp.size(); i++)
 	{
 		pi = sceneTemp.at(i);
@@ -259,6 +267,7 @@ vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 			//sceneGray.getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
 		}
 	}
+
 // indicate the bounding box of the edges
 	Point mLeft, mRight;
 	std::sort(modelPoints.begin(), modelPoints.end(), xComparation);
@@ -289,10 +298,10 @@ vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 		int y = round(mi.getY() * scaleY);
 		sceneTemp.at(i).setX(x);
 		sceneTemp.at(i).setY(y);
-		if (x >= 0 && y >= 0 && y < rows && x < cols)
-		{
-			sceneGray.getRGBMatrix()->setAtPosition(y, x, color);
-		}
+		/*if (x >= 0 && y >= 0 && y < rows && x < cols)
+		 {
+		 sceneGray.getRGBMatrix()->setAtPosition(y, x, color);
+		 }*/
 	}
 	std::sort(modelPoints.begin(), modelPoints.end(), yComparation);
 	std::sort(sceneTemp.begin(), sceneTemp.end(), yComparation);
@@ -305,10 +314,10 @@ vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 		int y = mi.getY() + diffSort.getY();
 		sceneTemp.at(i).setX(x);
 		sceneTemp.at(i).setY(y);
-		if (x >= 0 && y >= 0 && y < rows && x < cols)
-		{
-			sceneGray.getRGBMatrix()->setAtPosition(y, x, color);
-		}
+		/*if (x >= 0 && y >= 0 && y < rows && x < cols)
+		 {
+		 sceneGray.getRGBMatrix()->setAtPosition(y, x, color);
+		 }*/
 	}
 	vector<Point> eslm;
 	for (size_t k = 0; k < mnLandmarks.size(); k++)
@@ -316,7 +325,7 @@ vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 		Point pi = mnLandmarks.at(k);
 		Point ci = nearestPoint(sceneTemp, pi);
 		eslm.push_back(ci);
-		fillCircle(*(sceneGray.getRGBMatrix()), ci, 3, color);
+		//fillCircle(*(sceneGray.getRGBMatrix()), ci, 3, color);
 	}
 // end indicate the bounding box of the edges
 	vector<Point> result;

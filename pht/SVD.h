@@ -8,6 +8,5 @@
 #ifndef SVD_H_
 #define SVD_H_
 
-void svdMethod(Matrix<float> m, Matrix<float> &u, Matrix<float> &s,
-	Matrix<float> &v);
+vector<Point> test(Image modelImage, Image sceneImage, vector<Point> mnLandmarks);
 #endif /* SVD_H_ */

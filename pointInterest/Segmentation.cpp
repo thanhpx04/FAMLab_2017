@@ -104,7 +104,7 @@ void Segmentation::gridRemoveFolder()
 	string path = "/home/linh/Datasets/Morphometrics/pronotum/Original_images";
 	vector<string> images = readDirectory(path.c_str());
 	string saveFolder = "/home/linh/Desktop/test";
-	for (size_t i = 80; i < 100; i++) {
+	for (size_t i = 180; i < 200; i++) {
 		string sceneName = images.at(i);
 		Image image(path +"/"+sceneName);
 		setRefImage(image);

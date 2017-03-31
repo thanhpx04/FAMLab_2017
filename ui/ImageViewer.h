@@ -34,6 +34,7 @@ public:
 	void loadImage(Image *_matImage, QImage _qImage, QString tt);
 private slots:
 	void about();
+	void testMethod();
 
 	void open();
 	void save();
@@ -98,6 +99,7 @@ private:
 	QAction *displayALandmarksAct;
 
 	QAction *aboutAct;
+	QAction *testAct;
 
 	QAction *binaryThresholdAct;
 	QAction *cannyAct;
