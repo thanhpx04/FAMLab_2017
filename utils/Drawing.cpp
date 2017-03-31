@@ -16,12 +16,12 @@ using namespace std;
 #include "Drawing.h"
 
 // draw a line using Breshenham algorithm
-vector<Point> detectLine(Line line, RGB color)
+vector<Point> detectLine(Line line)
 {
 	Point begin = line.getBegin();
 	Point end = line.getEnd();
-	begin.setColor(color);
-	end.setColor(color);
+	//begin.setColor(color);
+	//end.setColor(color);
 	int dx = abs(end.getX() - begin.getX());
 	int dy = abs(end.getY() - begin.getY());
 
@@ -37,14 +37,14 @@ vector<Point> detectLine(Line line, RGB color)
 	if (end.getY() - begin.getY() < 0)
 		y_unit = -y_unit;
 	vector<Point> listOfPoints;
-	listOfPoints.push_back(Point(x, y, color));
+	listOfPoints.push_back(Point(x, y));
 	// vertical line
 	if (begin.getX() == end.getX())
 	{
 		while (y != end.getY())
 		{
 			y += y_unit;
-			listOfPoints.push_back(Point(x, y, color));
+			listOfPoints.push_back(Point(x, y));
 		}
 	}
 	else
@@ -54,7 +54,7 @@ vector<Point> detectLine(Line line, RGB color)
 			while (x != end.getX())
 			{
 				x += x_unit;
-				listOfPoints.push_back(Point(x, y, color));
+				listOfPoints.push_back(Point(x, y));
 			}
 		}
 		else
@@ -75,7 +75,7 @@ vector<Point> detectLine(Line line, RGB color)
 						y += y_unit;
 					}
 
-					listOfPoints.push_back(Point(x, y, color));
+					listOfPoints.push_back(Point(x, y));
 				}
 			}
 		}
@@ -83,30 +83,30 @@ vector<Point> detectLine(Line line, RGB color)
 	return listOfPoints;
 }
 
-vector<Point> put8pixel(Point center, Point p, RGB color)
+vector<Point> put8pixel(Point center, Point p)
 {
 	int xc = center.getX();
 	int yc = center.getY();
 	int x = p.getX();
 	int y = p.getY();
 	vector<Point> eightPoints;
-	eightPoints.push_back(Point(x + xc, y + yc, color));
-	eightPoints.push_back(Point(-x + xc, y + yc, color));
-	eightPoints.push_back(Point(x + xc, -y + yc, color));
-	eightPoints.push_back(Point(-x + xc, -y + yc, color));
-	eightPoints.push_back(Point(y + xc, x + yc, color));
-	eightPoints.push_back(Point(-y + xc, x + yc, color));
-	eightPoints.push_back(Point(y + xc, -x + yc, color));
-	eightPoints.push_back(Point(-y + xc, -x + yc, color));
+	eightPoints.push_back(Point(x + xc, y + yc));
+	eightPoints.push_back(Point(-x + xc, y + yc));
+	eightPoints.push_back(Point(x + xc, -y + yc));
+	eightPoints.push_back(Point(-x + xc, -y + yc));
+	eightPoints.push_back(Point(y + xc, x + yc));
+	eightPoints.push_back(Point(-y + xc, x + yc));
+	eightPoints.push_back(Point(y + xc, -x + yc));
+	eightPoints.push_back(Point(-y + xc, -x + yc));
 	return eightPoints;
 }
-vector<Point> detectCircle(Point center, int radius, RGB color)
+vector<Point> detectCircle(Point center, int radius)
 {
 	int x = 0;
 	int y = radius;
 	int f = 1 - radius;
 	vector<Point> result;
-	vector<Point> drawPoints = put8pixel(center, Point(x, y), color);
+	vector<Point> drawPoints = put8pixel(center, Point(x, y));
 	result.insert(result.end(), drawPoints.begin(), drawPoints.end());
 	while (x < y)
 	{
@@ -120,7 +120,7 @@ vector<Point> detectCircle(Point center, int radius, RGB color)
 			y--;
 		}
 		x++;
-		drawPoints = put8pixel(center, Point(x, y), color);
+		drawPoints = put8pixel(center, Point(x, y));
 		result.insert(result.end(), drawPoints.begin(), drawPoints.end());
 	}
 	return result;
@@ -144,7 +144,7 @@ vector<Point> detectFillCircle(Point center, int radius, RGB color)
 }
 void drawingCircle(Matrix<RGB> &mat, Point center, int radius, RGB color)
 {
-	vector<Point> dpoints = detectCircle(center, radius, color);
+	vector<Point> dpoints = detectCircle(center, radius);
 	int rows = mat.getRows();
 	int cols = mat.getCols();
 	Point p1;
@@ -176,7 +176,7 @@ void fillCircle(Matrix<RGB> &mat, Point center, int radius, RGB color)
 }
 void drawingLine(Matrix<RGB> &mat, Line line, RGB color)
 {
-	vector<Point> dpoints = detectLine(line, color);
+	vector<Point> dpoints = detectLine(line);
 	int rows = mat.getRows();
 	int cols = mat.getCols();
 	Point p1;

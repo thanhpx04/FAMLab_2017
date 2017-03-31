@@ -58,6 +58,7 @@ using namespace std;
 #include "../utils/Drawing.h"
 #include "../utils/Converter.h"
 #include "../correlation/CrossCorrelation.h"
+#include "../correlation/DescriptorDistance.h"
 
 #include "../MAELab.h"
 
@@ -499,7 +500,10 @@ void ImageViewer::about()
 void ImageViewer::testMethod()
 {
 	cout << "\nTest a method ..." << endl;
-	ptr_IntMatrix quant = quantization(matImage->getGrayMatrix(),3);
+	matImage->readManualLandmarks("data/landmarks/Md 054.TPS");
+	TestSIFT(matImage->getGrayMatrix(),matImage->getListOfManualLandmarks());
+
+	/*ptr_IntMatrix quant = quantization(matImage->getGrayMatrix(),3);
 
 	vector<Point> corners = boundingBoxDetection(matImage->getGrayMatrix());
 	Point p1 = corners.at(0), p2 = corners.at(1), p3 = corners.at(2), p4 =
@@ -510,7 +514,7 @@ void ImageViewer::testMethod()
 	drawingLine(*matImage->getRGBMatrix(), Line(p1, p2), color);
 	drawingLine(*matImage->getRGBMatrix(), Line(p1, p3), color);
 	drawingLine(*matImage->getRGBMatrix(), Line(p2, p4), color);
-	drawingLine(*matImage->getRGBMatrix(), Line(p3, p4), color);
+	drawingLine(*matImage->getRGBMatrix(), Line(p3, p4), color);*/
 
 	/*Image scene("data/md028.jpg");
 	 scene.readManualLandmarks("data/landmarks/Md 028.TPS");
@@ -529,10 +533,10 @@ void ImageViewer::testMethod()
 	this->show();
 
 
-	ImageViewer *other = new ImageViewer;
+	/*ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrIntToQImage(quant), "Quantization");
 	other->move(x() - 40, y() - 40);
-	other->show();
+	other->show();*/
 
 	cout << "\nFinish.\n";
 	cout << "\n End test method!" << endl;

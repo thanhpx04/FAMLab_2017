@@ -30,14 +30,14 @@ Matrix<double> createDescriptor(ptr_IntMatrix mImage, Point lefttop,
 	int rpatch = rightbot.getY() - lefttop.getY() + 1;
 	int cpatch = rightbot.getX() - lefttop.getX() + 1;
 	Matrix<double> orientation(rpatch, cpatch, 0.0);
-	int location = 0, llocation = 0, rlocation = 0, alocation = 0, blocation = 0;
+	int llocation = 0, rlocation = 0, alocation = 0, blocation = 0;
 	int i = 0, j = 0;
 	for (int r = lefttop.getY(); r <= rightbot.getY(); r++)
 	{
 		for (int c = lefttop.getX(); c <= rightbot.getX(); c++)
 		{
-			location = llocation = rlocation = alocation = blocation = 0;
-			location = mImage->getAtPosition(r, c);
+			llocation = rlocation = alocation = blocation = 0;
+
 			if (r - 1 >= 0 && r - 1 < rows)
 			{
 				alocation = mImage->getAtPosition(r - 1, c);
@@ -115,7 +115,7 @@ vector<double> orientHist16(Matrix<double> gradient, Matrix<double> orientation,
 	}
 	// normalize the vector (twice)
 	double totalValue = 0;
-	for (int i = 0; i < histograms.size(); i++)
+	for (size_t i = 0; i < histograms.size(); i++)
 	{
 		totalValue += (histograms.at(i) * histograms.at(i));
 	}
@@ -132,7 +132,7 @@ vector<double> orientHist16(Matrix<double> gradient, Matrix<double> orientation,
 			totalValue2 += (histograms.at(i) * histograms.at(i));
 		}
 		//re-normalize
-		for (int i = 0; i < histograms.size(); i++)
+		for (size_t i = 0; i < histograms.size(); i++)
 		{
 			histograms.at(i) /= totalValue2;
 			//cout << "\t" << histograms.at(i);
@@ -181,6 +181,35 @@ Point createPatch(ptr_IntMatrix imageMatrix, int psize, Point center,
 	right.setY(ry);
 	return left;
 }
+Point nearestPoint(vector<Point> lsPoints, Point p)
+{
+	double minDistance = DBL_MAX;
+	Point ePoint, mPoint;
+	for (size_t j = 0; j < lsPoints.size(); j++)
+	{
+		ePoint = lsPoints.at(j);
+		Line ltemp(p, ePoint);
+		if (ltemp.getLength() < minDistance)
+		{
+			minDistance = ltemp.getLength();
+			mPoint.setX(ePoint.getX());
+			mPoint.setY(ePoint.getY());
+		}
+	}
+	return mPoint;
+}
+
+vector<double> SIFTDescriptor(ptr_IntMatrix imgMatrix, Point center, int size)
+{
+	Point mright(0, 0);
+	Point mleft = createPatch(imgMatrix, size, center, mright);
+	Matrix<double> mgradient(mright.getY() - mleft.getY() + 1,
+		mright.getX() - mleft.getX() + 1, 0.0);
+	Matrix<double> mOrient = createDescriptor(imgMatrix, mleft, mright,
+		mgradient);
+	vector<double> mHistogram = orientHist16(mgradient, mOrient, size);
+	return mHistogram;
+}
 
 // sceneSize and templSize should be is multiple of 16
 
@@ -207,19 +236,18 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 			&& epi.getY() < height)
 		{
 
-			mleft = createPatch(model, templSize, mpi, mright);
-			sleft = createPatch(scene, sceneSize, epi, sright);
-			// calculate the histogram for model
-			//cout << "\nCreate patches..." << endl;
-
-			Matrix<double> mgradient(mright.getY() - mleft.getY() + 1,
-				mright.getX() - mleft.getX() + 1, 0.0);
-			Matrix<double> mOrient = createDescriptor(model, mleft, mright,
-				mgradient);
-			vector<double> mHistogram = orientHist16(mgradient, mOrient, templSize);
+			/*mleft = createPatch(model, templSize, mpi, mright);
+			 Matrix<double> mgradient(mright.getY() - mleft.getY() + 1,
+			 mright.getX() - mleft.getX() + 1, 0.0);
+			 Matrix<double> mOrient = createDescriptor(model, mleft, mright,
+			 mgradient);
+			 vector<double> mHistogram = orientHist16(mgradient, mOrient, templSize);*/
+			vector<double> mHistogram;
+			mHistogram = SIFTDescriptor(model, mpi, templSize);
 			double minDistance = DBL_MAX, maxDistance = 0.0;
 			Point minPoint(0, 0), maxPoint(0, 0);
 			//mpi.toString();
+			sleft = createPatch(scene, sceneSize, epi, sright);
 			int count = 0;
 			for (int r = sleft.getY(); r < sright.getY(); r++)
 			{
@@ -228,14 +256,15 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 					if (scene->getAtPosition(r, c) == 255)
 					{
 						Point p(c, r);
-						Point ssleft(0, 0), ssright(0, 0);
-						ssleft = createPatch(scene, templSize, p, ssright);
-						Matrix<double> sgradient(ssright.getY() - ssleft.getY() + 1,
-							ssright.getX() - ssleft.getX() + 1, 0.0);
-						Matrix<double> sOrient = createDescriptor(model, ssleft, ssright,
-							sgradient);
-						vector<double> sHistogram = orientHist16(sgradient, sOrient,
-							templSize);
+						/*Point ssleft(0, 0), ssright(0, 0);
+						 ssleft = createPatch(scene, templSize, p, ssright);
+						 Matrix<double> sgradient(ssright.getY() - ssleft.getY() + 1,
+						 ssright.getX() - ssleft.getX() + 1, 0.0);
+						 Matrix<double> sOrient = createDescriptor(scene, ssleft, ssright,
+						 sgradient);
+						 vector<double> sHistogram = orientHist16(sgradient, sOrient,
+						 templSize);*/
+						vector<double> sHistogram = SIFTDescriptor(scene, p, templSize);
 						double distance = l2Distance(mHistogram, sHistogram);
 						//cout << "\nDistance: " << distance << endl;
 						if (distance > maxDistance)
@@ -263,23 +292,11 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 	}
 	return result;
 }
-Point nearestPoint(vector<Point> lsPoints, Point p)
-{
-	double minDistance = DBL_MAX;
-	Point ePoint, mPoint;
-	for (size_t j = 0; j < lsPoints.size(); j++)
-	{
-		ePoint = lsPoints.at(j);
-		Line ltemp(p, ePoint);
-		if (ltemp.getLength() < minDistance)
-		{
-			minDistance = ltemp.getLength();
-			mPoint.setX(ePoint.getX());
-			mPoint.setY(ePoint.getY());
-		}
-	}
-	return mPoint;
-}
+
+/*
+ * Create the descriptor for each estimated landmark.
+ * But firstly is find out the location of closest point in the contours.
+ */
 vector<Point> verifyDescriptors2(ptr_IntMatrix model, ptr_IntMatrix scene,
 	vector<Point> scenePoints, vector<Point> manualLM, vector<Point> esLandmarks,
 	int templSize, int sceneSize)
@@ -302,16 +319,15 @@ vector<Point> verifyDescriptors2(ptr_IntMatrix model, ptr_IntMatrix scene,
 			&& epi.getY() < height)
 		{
 
-			mleft = createPatch(model, templSize, mpi, mright);
-			epi = nearestPoint(scenePoints, epi);
+			vector<double> mHistogram = SIFTDescriptor(model, mpi, templSize);
+			/*mleft = createPatch(model, templSize, mpi, mright);
+			 Matrix<double> mgradient(mright.getY() - mleft.getY() + 1,
+			 mright.getX() - mleft.getX() + 1, 0.0);
+			 Matrix<double> mOrient = createDescriptor(model, mleft, mright,
+			 mgradient);
+			 vector<double> mHistogram = orientHist16(mgradient, mOrient, templSize);*/
+			epi = nearestPoint(scenePoints, epi); // find the closest point with estimated landmark
 			sleft = createPatch(scene, sceneSize, epi, sright);
-			// calculate the histogram for model
-			//cout << "\nCreate patches..." << endl;
-			Matrix<double> mgradient(mright.getY() - mleft.getY() + 1,
-				mright.getX() - mleft.getX() + 1, 0.0);
-			Matrix<double> mOrient = createDescriptor(model, mleft, mright,
-				mgradient);
-			vector<double> mHistogram = orientHist16(mgradient, mOrient, templSize);
 			double minDistance = DBL_MAX;
 			Point minPoint(0, 0), maxPoint(0, 0);
 			//
@@ -321,14 +337,15 @@ vector<Point> verifyDescriptors2(ptr_IntMatrix model, ptr_IntMatrix scene,
 				for (int c = sleft.getX(); c < sright.getX(); c++)
 				{
 					Point p(c, r);
-					Point ssleft(0, 0), ssright(0, 0);
-					ssleft = createPatch(scene, templSize, p, ssright);
-					Matrix<double> sgradient(ssright.getY() - ssleft.getY() + 1,
-						ssright.getX() - ssleft.getX() + 1, 0.0);
-					Matrix<double> sOrient = createDescriptor(model, ssleft, ssright,
-						sgradient);
-					vector<double> sHistogram = orientHist16(sgradient, sOrient,
-						templSize);
+					/*Point ssleft(0, 0), ssright(0, 0);
+					 ssleft = createPatch(scene, templSize, p, ssright);
+					 Matrix<double> sgradient(ssright.getY() - ssleft.getY() + 1,
+					 ssright.getX() - ssleft.getX() + 1, 0.0);
+					 Matrix<double> sOrient = createDescriptor(scene, ssleft, ssright,
+					 sgradient);
+					 vector<double> sHistogram = orientHist16(sgradient, sOrient,
+					 templSize);*/
+					vector<double> sHistogram = SIFTDescriptor(scene, p, templSize);
 					double distance = l2Distance(mHistogram, sHistogram);
 					//cout << "\nDistance: " << distance << endl;
 					if (distance == minDistance)
@@ -349,4 +366,17 @@ vector<Point> verifyDescriptors2(ptr_IntMatrix model, ptr_IntMatrix scene,
 		}
 	}
 	return result;
+}
+
+void TestSIFT(ptr_IntMatrix imgMatrix,vector<Point> lms)
+{
+		for (size_t i = 0; i < lms.size(); i++) {
+			Point p = lms.at(i);
+			vector<double> des = SIFTDescriptor(imgMatrix,p,9);
+			for (size_t k = 0; k < des.size(); k++) {
+				cout.precision(2);
+				cout<<"\t"<<des.at(k);
+			}
+			cout<<"\n";
+		}
 }

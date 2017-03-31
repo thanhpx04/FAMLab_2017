@@ -188,6 +188,96 @@ vector<Point> PCAIPoints(vector<Point> modelPoints, Point mPoint,
 	}
 	return sceneTemp;
 }
+
+Point checkOneDirection(vector<Point> contours, Point pi, Point closest)
+{
+	int mIndex = -1;
+	Point p(0, 0);
+	for (int k = 0; k < contours.size(); k++)
+	{
+		if (closest == contours.at(k))
+		{
+			mIndex = k;
+			break;
+		}
+	}
+	if (mIndex != -1)
+	{
+
+		Point pyNext(0, 0), pyPrev(0, 0);
+
+		Point p1(0, 0), p2(0, 0);
+		if (mIndex < contours.size() - 1)
+		{
+			pyNext = contours.at(mIndex + 1);
+			// check line 1
+			vector<Point> pOnLine1 = detectLine(Line(pyNext, closest));
+			bool onLine = checkPointInList(pOnLine1, pi);
+			if (onLine)
+			{
+				p1 = pi;
+			}
+			else
+			{
+				Point pi1 = nearestPoint(pOnLine1, pi);
+				p1 = pi1;
+			}
+		}
+		if (mIndex != 0)
+		{
+			pyPrev = contours.at(mIndex - 1);
+			// check line 2
+			vector<Point> pOnLine2 = detectLine(Line(pyPrev, closest));
+			bool onLine2 = checkPointInList(pOnLine2, pi);
+			if (onLine2)
+			{
+				p2 = pi;
+			}
+			else
+			{
+				Point pi2 = nearestPoint(pOnLine2, pi);
+				p2 = pi2;
+			}
+		}
+		Line l1(pi, p1);
+		Line l2(pi, p2);
+		if (l1.getLength() <= l2.getLength())
+			p = p1;
+		else
+			p = p2;
+	}
+	return p;
+}
+vector<Point> refine(vector<Point> contours, vector<Point> estlm)
+{
+	vector<Point> results;
+	for (size_t i = 0; i < estlm.size(); i++)
+	{
+		Point pi = estlm.at(i);
+		bool onCurve = checkPointInList(contours, pi);
+		if (!onCurve)
+		{
+			Point mPoint = nearestPoint(contours, pi);
+			std::sort(contours.begin(), contours.end(), yComparation);
+			Point py = checkOneDirection(contours, pi, mPoint);
+
+			std::sort(contours.begin(), contours.end(), yComparation);
+			Point px = checkOneDirection(contours, pi, mPoint);
+
+			Line lx(pi, px);
+			Line ly(pi, py);
+			if (lx.getLength() <= ly.getLength())
+				results.push_back(px);
+			else
+				results.push_back(py);
+		}
+		else
+		{
+			results.push_back(pi);
+		}
+	}
+	return results;
+}
 vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 	vector<Point> mnLandmarks)
 {
@@ -364,10 +454,11 @@ vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 	for (size_t i = 0; i < result.size(); i++)
 	{
 		Point mi = result.at(i);
-		Point ci = nearestPoint(scenePoints2, mi);
+		Point ci = nearestPoint(scenePoints2, mi);	// find the closest point
 		result.at(i).setX(ci.getX());
 		result.at(i).setY(ci.getY());
 	}
+	//result = refine(scenePoints2, result);
 	delete sceneGrandient;
 	return result;
 }

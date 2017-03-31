@@ -14,4 +14,6 @@ vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 vector<Point> verifyDescriptors2(ptr_IntMatrix model, ptr_IntMatrix scene,
 	vector<Point> scenePoints, vector<Point> manualLM, vector<Point> esLandmarks,
 	int templSize, int sceneSize);
+
+void TestSIFT(ptr_IntMatrix imgMatrix,vector<Point> lms);
 #endif /* DESCRIPTORDISTANCE_H_ */
