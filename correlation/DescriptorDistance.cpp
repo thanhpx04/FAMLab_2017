@@ -367,16 +367,3 @@ vector<Point> verifyDescriptors2(ptr_IntMatrix model, ptr_IntMatrix scene,
 	}
 	return result;
 }
-
-void TestSIFT(ptr_IntMatrix imgMatrix,vector<Point> lms)
-{
-		for (size_t i = 0; i < lms.size(); i++) {
-			Point p = lms.at(i);
-			vector<double> des = SIFTDescriptor(imgMatrix,p,9);
-			for (size_t k = 0; k < des.size(); k++) {
-				cout.precision(2);
-				cout<<"\t"<<des.at(k);
-			}
-			cout<<"\n";
-		}
-}

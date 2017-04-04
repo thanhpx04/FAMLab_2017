@@ -358,12 +358,174 @@ ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage, int low, int high)
 	}
 	return edgeMatrix;
 }
+// backup
+/*ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
+ {
+ int rows = binaryMatrix->getRows();
+ int cols = binaryMatrix->getCols();
+ ptr_IntMatrix result = new Matrix<int>(rows, cols, maxValue);
+ *result = *binaryMatrix;
+ Point left(0, 0), right(0, 0);
+ vector<Line> lines;
+ for (int r = 1; r < rows - 1; r++)
+ {
+ for (int c = 1; c < cols - 1; c++)
+ {
+ left.setX(0);
+ left.setY(0);
+ right.setX(0);
+ right.setY(0);
+ lines.clear();
+ int value = binaryMatrix->getAtPosition(r, c);
+ if (value == maxValue && binaryMatrix->getAtPosition(r, c - 1) == 0)
+ {
+ // xac dinh diem dau tien
+ left.setX(c - 1);
+ left.setY(r);
+ // xac dinh diem thu 2
+ for (int k = c; k < cols; k++)
+ {
+ if (binaryMatrix->getAtPosition(r, k) == 0
+ && binaryMatrix->getAtPosition(r, k - 1) == maxValue)
+ {
+ right.setX(k);
+ right.setY(r);
+ break;
+ }
+ }
+
+ // do dong truoc do neu ko phai den thi ko xet nua ???
+
+ if (right.getX() > left.getX())
+ {
+ for (int l = left.getX(); l <= right.getX(); l++)
+ {
+ if (binaryMatrix->getAtPosition(r - 1, l) == maxValue)
+ {
+ left.setX(0);
+ left.setY(0);
+ right.setX(0);
+ right.setY(0);
+
+ break;
+
+ }
+ }
+ }
+ if (left != 0 && right != 0 )
+ {
+ bool inhole(true);
+ int rnew = r;
+ int clnew = 0, crnew = 0;
+ lines.push_back(Line(left, right));
+ do
+ {
+ rnew += 1;
+ if (rnew == rows)
+ {
+ lines.clear();
+ inhole = false;
+ break;
+ }
+ clnew = 0;
+ crnew = 0;
+ inhole = false;
+ if (binaryMatrix->getAtPosition(rnew, left.getX()) == maxValue)
+ {
+ for (int l = left.getX(); l > 0; l--)
+ {
+ if (binaryMatrix->getAtPosition(rnew, l) == 0)
+ {
+ clnew = l;
+ break;
+ }
+ }
+ }
+ else
+ {
+ for (int l = left.getX(); l < cols; l++)
+ {
+ if (binaryMatrix->getAtPosition(rnew, l) == maxValue)
+ {
+ clnew = l - 1;
+ break;
+ }
+ }
+ }
+ if (binaryMatrix->getAtPosition(rnew, right.getX()) == maxValue)
+ {
+ for (int m = right.getX(); m < cols; m++)
+ {
+ if (binaryMatrix->getAtPosition(rnew, m) == 0)
+ {
+ crnew = m;
+ break;
+ }
+ }
+ }
+ else
+ {
+ for (int m = right.getX(); m > 0; m--)
+ {
+ if (binaryMatrix->getAtPosition(rnew, m) == maxValue)
+ {
+ crnew = m + 1;
+ break;
+ }
+ }
+ }
+ for (int n = clnew; n <= crnew; n++)
+ {
+ if (n < cols && rnew < rows
+ && binaryMatrix->getAtPosition(rnew, n) == maxValue)
+ {
+ inhole = true;
+ break;
+ }
+ }
+ if (clnew != 0 && crnew != 0)
+ {
+ left.setX(clnew);
+ left.setY(rnew);
+ right.setX(crnew);
+ right.setY(rnew);
+ lines.push_back(Line(left, right));
+ }
+ else
+ {
+ lines.clear();
+ inhole = false;
+ }
+
+ }
+ while (inhole);
+
+ for (size_t li = 0; li < lines.size(); li++)
+ {
+ Line line = lines.at(li);
+ if (line.getBegin().getY() == line.getEnd().getY())
+ {
+ for (int x = line.getBegin().getX(); x < line.getEnd().getX();
+ x++)
+ {
+ result->setAtPosition(line.getBegin().getY(), x, 0);
+ }
+ }
+ }
+ lines.clear();
+ }
+
+ }
+ }
+ }
+
+ return result;
+ }*/
 ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 {
 	int rows = binaryMatrix->getRows();
 	int cols = binaryMatrix->getCols();
-	ptr_IntMatrix result = new Matrix<int>(rows,cols,maxValue);
-	*result = *binaryMatrix;
+
 	Point left(0, 0), right(0, 0);
 	vector<Line> lines;
 	for (int r = 1; r < rows - 1; r++)
@@ -375,6 +537,7 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 			right.setX(0);
 			right.setY(0);
 			lines.clear();
+			// maxValue is background, 0 value is object pixels
 			int value = binaryMatrix->getAtPosition(r, c);
 			if (value == maxValue && binaryMatrix->getAtPosition(r, c - 1) == 0)
 			{
@@ -382,35 +545,36 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 				left.setX(c - 1);
 				left.setY(r);
 				// xac dinh diem thu 2
-				for (int k = left.getX(); k < cols; k++)
+				bool hasR = false;
+				int k1 = c;
+				while (!hasR && k1 < cols)
 				{
-					if (binaryMatrix->getAtPosition(r, k) == 0
-							&& binaryMatrix->getAtPosition(r, k - 1) == maxValue)
+					if (binaryMatrix->getAtPosition(r, k1) == 0
+						&& binaryMatrix->getAtPosition(r, k1 - 1) == maxValue)
 					{
-						right.setX(k);
+						right.setX(k1);
 						right.setY(r);
-						break;
+						hasR = true;
 					}
+					k1++;
 				}
 
 				// do dong truoc do neu ko phai den thi ko xet nua ???
-				if (right.getX() > left.getX())
+				int countValue = 0;
+				if (hasR)
 				{
-					for (int l = left.getX(); l < right.getX(); l++)
+					for (int l = left.getX(); l <= right.getX(); l++)
 					{
 						if (binaryMatrix->getAtPosition(r - 1, l) == maxValue)
 						{
-							left.setX(0);
-							left.setY(0);
-							right.setX(0);
-							right.setY(0);
-							break;
+							countValue += 1;
 						}
 					}
 				}
-				if (left != 0 && right != 0)
+
+				if (countValue == 0)
 				{
-					bool inhole(true);
+					bool inhole = true;
 					int rnew = r;
 					int clnew = 0, crnew = 0;
 					lines.push_back(Line(left, right));
@@ -423,66 +587,107 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 							inhole = false;
 							break;
 						}
+
 						clnew = 0;
 						crnew = 0;
-						inhole = false;
-						if (binaryMatrix->getAtPosition(rnew, left.getX())
-								== maxValue)
+						//inhole = false;
+						if (binaryMatrix->getAtPosition(rnew, left.getX()) == maxValue)
 						{
-							for (int l = left.getX(); l > 0; l--)
+							int l = left.getX();
+							bool lc = true;
+							while (lc && l >= 0)
 							{
 								if (binaryMatrix->getAtPosition(rnew, l) == 0)
 								{
 									clnew = l;
-									break;
+									lc = false;
 								}
+								l--;
 							}
+							/*for (int l = left.getX(); l > 0; l--)
+							 {
+							 if (binaryMatrix->getAtPosition(rnew, l) == 0)
+							 {
+							 clnew = l;
+							 break;
+							 }
+							 }*/
 						}
 						else
 						{
-							for (int l = left.getX(); l < cols; l++)
+							int l = left.getX();
+							bool lc = true;
+							while (lc)
 							{
 								if (binaryMatrix->getAtPosition(rnew, l) == maxValue)
 								{
 									clnew = l - 1;
-									break;
+									lc = false;
 								}
+								l++;
 							}
+							/*for (int l = left.getX(); l < right.getX(); l++)
+							 {
+							 if (binaryMatrix->getAtPosition(rnew, l) == maxValue)
+							 {
+							 clnew = l - 1;
+							 break;
+							 }
+							 }*/
 						}
-						if (binaryMatrix->getAtPosition(rnew, right.getX())
-								== maxValue)
+						if (binaryMatrix->getAtPosition(rnew, right.getX()) == maxValue)
 						{
-							for (int m = right.getX(); m < cols; m++)
+							int m = right.getX();
+							bool mc = true;
+							while (mc && m < cols)
 							{
 								if (binaryMatrix->getAtPosition(rnew, m) == 0)
 								{
 									crnew = m;
-									break;
+									mc = false;
 								}
+								m++;
 							}
+							/*for (int m = right.getX(); m < cols; m++)
+							 {
+							 if (binaryMatrix->getAtPosition(rnew, m) == 0)
+							 {
+							 crnew = m;
+							 break;
+							 }
+							 }*/
 						}
 						else
 						{
-							for (int m = right.getX(); m > 0; m--)
+							int m = right.getX();
+							bool mc = true;
+							while (mc && m < cols)
 							{
 								if (binaryMatrix->getAtPosition(rnew, m) == maxValue)
 								{
 									crnew = m + 1;
-									break;
+									mc = false;
 								}
+								m--;
 							}
+							/*for (int m = right.getX(); m >= left.getX(); m--)
+							 {
+							 if (binaryMatrix->getAtPosition(rnew, m) == maxValue)
+							 {
+							 crnew = m + 1;
+							 break;
+							 }
+							 }*/
 						}
+						int cValue = 0;
 						for (int n = clnew; n <= crnew; n++)
 						{
-							if (n < cols && rnew < rows
-									&& binaryMatrix->getAtPosition(rnew, n)
-											== maxValue)
+							if (binaryMatrix->getAtPosition(rnew, n) == maxValue)
 							{
-								inhole = true;
-								break;
+								cValue += 1;
 							}
 						}
-						if (clnew != 0 && crnew != 0)
+						if (cValue != 0)
 						{
 							left.setX(clnew);
 							left.setY(rnew);
@@ -492,7 +697,7 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 						}
 						else
 						{
-							lines.clear();
+							//lines.clear();
 							inhole = false;
 						}
 
@@ -504,11 +709,10 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 						Line line = lines.at(li);
 						if (line.getBegin().getY() == line.getEnd().getY())
 						{
-							for (int x = line.getBegin().getX();
-									x < line.getEnd().getX(); x++)
+							for (int x = line.getBegin().getX(); x <= line.getEnd().getX();
+								x++)
 							{
-								result->setAtPosition(
-										line.getBegin().getY(), x, 0);
+								binaryMatrix->setAtPosition(line.getBegin().getY(), x, 0);
 							}
 						}
 					}
@@ -517,28 +721,30 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 			}
 		}
 	}
-
+	ptr_IntMatrix result = new Matrix<int>(rows, cols, maxValue);
+	*result = *binaryMatrix;
 	return result;
 }
 // ========================== Process to find the edges in image =============================================
 ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	int highThreshold)
 {
-	ptr_IntMatrix binary2 = postProcess(binaryImage,255);
+	ptr_IntMatrix binary2 = postProcess(binaryImage, 255);
 	ptr_IntMatrix sobelFilter = sobelOperation(binary2);
+	//ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
 		highThreshold);
-	delete binary2;
+	//delete binary2;
 	delete sobelFilter;
 	delete nonMaxSuppress;
 
 	return thresholdImage;
 }
 ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
-	int highThreshold, ptr_IntMatrix &gradDirection,vector<Point> &edgePoints)
+	int highThreshold, ptr_IntMatrix &gradDirection, vector<Point> &edgePoints)
 {
-	ptr_IntMatrix binary2 = postProcess(binaryImage,255);
+	ptr_IntMatrix binary2 = postProcess(binaryImage, 255);
 	ptr_IntMatrix sobelFilter = sobelOperation(binary2);
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
@@ -557,7 +763,7 @@ ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
 		{
 			if (thresholdImage->getAtPosition(r, c) == 255)
 			{
-				edgePoints.push_back(Point(c,r));
+				edgePoints.push_back(Point(c, r));
 				angle = angles->getAtPosition(r, c);
 
 				if (angle < 0)
@@ -570,7 +776,7 @@ ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
 
 		}
 	}
-	cout << "\nTotal canny points: " << count<<endl;
+	cout << "\nTotal canny points: " << count << endl;
 	delete binary2;
 	delete sobelFilter;
 	delete nonMaxSuppress;

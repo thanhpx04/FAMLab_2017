@@ -35,7 +35,7 @@ public:
 	string getName();
 	void setMLandmarks(string);
 	void setRGBMatrix(ptr_RGBMatrix);
-	void setGrayMatrix(Matrix<int>);
+	void setGrayMatrix(ptr_IntMatrix);
 	void setAutoLandmarks(vector<Point>);
 	ptr_IntMatrix getGrayMatrix();
 	ptr_RGBMatrix getRGBMatrix();

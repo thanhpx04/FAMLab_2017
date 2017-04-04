@@ -186,7 +186,7 @@ void drawingLine(Matrix<RGB> &mat, Line line, RGB color)
 		if (p1.getX() >= 0 && p1.getX() < cols && p1.getY() >= 0
 				&& p1.getY() < rows)
 		{
-			mat.setAtPosition(p1.getY(), p1.getX(), p1.getColor());
+			mat.setAtPosition(p1.getY(), p1.getX(), color);
 		}
 	}
 }

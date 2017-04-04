@@ -315,5 +315,166 @@ vector<Point> test(Image modelImage, Image sceneImage,
 	}
 	return result;
 }
+ptr_IntMatrix RobertOperation(ptr_IntMatrix grayMatrix)
+{
+	int rows = grayMatrix->getRows();
+	int cols = grayMatrix->getCols();
+	ptr_IntMatrix dMatrix = new Matrix<int>(rows, cols, 0);
+	int v = 0, v1 = 0, v2 = 0;
+	int v3 = 0, v4 = 0;
+	int gx = 0, gy = 0, gxy = 0;
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			v1 = grayMatrix->getAtPosition(r, c);
+			if (r + 1 < rows)
+			{
+				v2 = grayMatrix->getAtPosition(r + 1, c);
+				if (c + 1 < cols)
+				{
+					v3 = grayMatrix->getAtPosition(r + 1, c + 1);
+				}
+			}
+			if (c + 1 < cols)
+			{
+				v4 = grayMatrix->getAtPosition(r, c + 1);
+			}
+			gx = v1 - v3;
+			gy = v4 - v2;
+			gxy = abs(gx) + abs(gy);
+			//gxy = pow(pow(gx, 2) + pow(gy, 2), 0.5);
+			dMatrix->setAtPosition(r, c, gxy);
+		}
+	}
+	return dMatrix;
+}
 
+ptr_IntMatrix SobelOperation(ptr_IntMatrix grayMatrix)
+{
+	int rows = grayMatrix->getRows();
+	int cols = grayMatrix->getCols();
+	ptr_IntMatrix dMatrix = new Matrix<int>(rows, cols, 0);
+	int v1 = 0, v2 = 0, v3 = 0;
+	int v4 = 0, v5 = 0, v6 = 0;
+	int v7 = 0, v8 = 0, v9 = 0;
+	int gx = 0, gy = 0, gxy = 0;
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			v1 = v2 = v3 = v4 = v5 = v6 = 0;
+			v7 = v8 = v9 = gx = gy = gxy = 0;
+
+			v5 = grayMatrix->getAtPosition(r, c);
+			if (r - 1 >= 0)
+			{
+				v2 = grayMatrix->getAtPosition(r - 1, c);
+				if (c - 1 >= 0)
+				{
+					v1 = grayMatrix->getAtPosition(r - 1, c - 1);
+				}
+				if (c + 1 < cols)
+				{
+					v3 = grayMatrix->getAtPosition(r - 1, c + 1);
+				}
+			}
+			if (r + 1 < rows)
+			{
+				v8 = grayMatrix->getAtPosition(r + 1, c);
+				if (c - 1 >= 0)
+				{
+					v7 = grayMatrix->getAtPosition(r + 1, c - 1);
+				}
+				if (c + 1 < cols)
+				{
+					v9 = grayMatrix->getAtPosition(r + 1, c + 1);
+				}
+			}
+			if (c - 1 >= 0)
+			{
+				v4 = grayMatrix->getAtPosition(r, c - 1);
+			}
+			if (c + 1 < cols)
+			{
+				v6 = grayMatrix->getAtPosition(r, c + 1);
+			}
+			gx = ((v7 + 2 * v8 + v9) - (v1 + 2 * v2 + v3)) / 4;
+			gy = ((v3 + 2 * v6 + v9) - (v1 + 2 * v4 + v7)) / 4;
+			gxy = abs(gx) + abs(gy);
+			dMatrix->setAtPosition(r, c, gxy);
+		}
+	}
+	return dMatrix;
+}
+
+ptr_IntMatrix getContour(ptr_IntMatrix grayMatrix)
+{
+
+	/*saveGrayScale("hbcMatrix.jpg",hMatrix);
+	 saveGrayScale("vbcMatrix.jpg",vMatrix);
+	 saveGrayScale("dbcMatrix.jpg",dMatrix);*/
+	return SobelOperation(grayMatrix);
+}
+
+vector<Edge> test2(Image image)
+{
+	ptr_RGBMatrix rgbmatrix = image.getRGBMatrix();
+	ptr_IntMatrix greenChannel = new Matrix<int>(rgbmatrix->getRows(),
+		rgbmatrix->getCols(), 0);
+	for (int r = 0; r < rgbmatrix->getRows(); r++)
+	{
+		for (int c = 0; c < rgbmatrix->getCols(); c++)
+		{
+			RGB color = rgbmatrix->getAtPosition(r, c);
+			greenChannel->setAtPosition(r, c, color.G);
+		}
+	}
+	getContour(greenChannel);
+	Image image2;
+	image2.setGrayMatrix(greenChannel);
+	vector<Edge> edges = image2.cannyAlgorithm();
+	return edges;
+}
 // ========================== histogram equalization =======================
+
+void binProjection(ptr_IntMatrix binImage, ptr_IntMatrix &hProjection,
+	ptr_IntMatrix &vProjection)
+{
+	int rows = binImage->getRows();
+	int cols = binImage->getCols();
+	hProjection = new Matrix<int>(rows, cols, 255);
+	vProjection = new Matrix<int>(rows, cols, 255);
+	int ri = 0, ci = 0;
+	for (int r = 0; r < rows; r++)
+	{
+		ri = 0;
+		for (int c = 0; c < cols; c++)
+		{
+			if (binImage->getAtPosition(r, c) == 0)
+			{
+				ri++;
+			}
+		}
+		for (int k = 0; k < ri; k++)
+		{
+			hProjection->setAtPosition(r, k, 0);
+		}
+	}
+	for (int c = 0; c < cols; c++)
+	{
+		ci = 0;
+		for (int r = 0; r < rows; r++)
+		{
+			if (binImage->getAtPosition(r, c) == 0)
+			{
+				ci++;
+			}
+		}
+		for (int k = 0; k < ci; k++)
+		{
+			vProjection->setAtPosition(rows - k -1, c, 0);
+		}
+	}
+}
+

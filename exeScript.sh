@@ -1,11 +1,11 @@
 #!/bin/bash
-MODELJPG="/home/linh/Desktop/editedImages/md_images/Md 054.JPG"
-MODELTPS="/home/linh/Desktop/editedImages/md_landmarks/Md 054.TPS"
-SCENEJPGFOLDER="/home/linh/Desktop/editedImages/md_images/*"
-SCENETPSFOLDER="/home/linh/Desktop/editedImages/md_landmarks/*"
+MODELJPG="/home/linh/Desktop/editedImages/mg_images/Mg 045.JPG"
+MODELTPS="/home/linh/Desktop/editedImages/mg_landmarks/Mg 045.TPS"
+SCENEJPGFOLDER="/home/linh/Desktop/editedImages/mg_images/*"
+SCENETPSFOLDER="/home/linh/Desktop/editedImages/mg_landmarks/*"
 #METHOD: 1 for template maching, 2 for SIFT
 METHOD="2"
-SAVEFOLDER="/home/linh/Desktop/results/2017/md/18mars/"
+SAVEFOLDER="/home/linh/Desktop/results/2017/mg/31mars/"
 FIRSTSIZE="9"
 SECONDSIZE="36"
 EXECUTE="./MAELab_CI"

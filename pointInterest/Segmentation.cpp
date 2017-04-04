@@ -50,7 +50,8 @@ ptr_IntMatrix Segmentation::threshold(int tValue, int maxValue)
 	*binaryMatrix = *(binaryThreshold(inputMatrix, tValue, maxValue));
 	ptr_IntMatrix result = new Matrix<int>(inputMatrix->getRows(),
 		inputMatrix->getCols(), maxValue);
-	*result = *(postProcess(binaryMatrix, maxValue));
+	//*result = *(postProcess(binaryMatrix, maxValue));
+	*result = *binaryMatrix;
 	delete binaryMatrix;
 	return result;
 	//return binaryThreshold(inputMatrix, tValue, maxValue);

@@ -112,7 +112,7 @@ Image::Image(std::string filePath)
 	grayMatrix = new Matrix<int>(rows,cols);
 	grayMatrix = convertRGBToGray(imgMatrix);
 
-	grayHistogram = new Matrix<int>(1, BIN_SIZE, 0);
+
 	calcGrayHistogram();
 
 	calThresholdValue();
@@ -157,9 +157,9 @@ void Image::setRGBMatrix(ptr_RGBMatrix rgbMatrix)
 {
 	imgMatrix = rgbMatrix;
 }
-void Image::setGrayMatrix(Matrix<int> graymatrix)
+void Image::setGrayMatrix(ptr_IntMatrix graymatrix)
 {
-	*grayMatrix = graymatrix;
+	grayMatrix = graymatrix;
 }
 void Image::setAutoLandmarks(vector<Point> eLandmarks)
 {
@@ -260,7 +260,6 @@ void Image::calcGrayHistogram()
 
 	if (grayMatrix->getCols() != 0)
 	{
-
 		float total = 0;
 		float pi = 0;
 		int array[BIN_SIZE] =
@@ -275,7 +274,7 @@ void Image::calcGrayHistogram()
 			}
 		}
 
-
+		grayHistogram = new Matrix<int>(1, BIN_SIZE, 0);
 
 		for (int k = 0; k < BIN_SIZE; k++)
 		{

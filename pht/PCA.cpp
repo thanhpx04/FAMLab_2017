@@ -451,14 +451,14 @@ vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 		result.at(i).setX(xnew);
 		result.at(i).setY(ynew);
 	}
-	for (size_t i = 0; i < result.size(); i++)
+	/*for (size_t i = 0; i < result.size(); i++)
 	{
 		Point mi = result.at(i);
 		Point ci = nearestPoint(scenePoints2, mi);	// find the closest point
 		result.at(i).setX(ci.getX());
 		result.at(i).setY(ci.getY());
-	}
-	//result = refine(scenePoints2, result);
+	}*/
+	result = refine(scenePoints2, result);
 	delete sceneGrandient;
 	return result;
 }

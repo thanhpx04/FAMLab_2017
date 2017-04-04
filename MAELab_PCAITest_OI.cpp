@@ -149,7 +149,7 @@ int main(int argc, char* argv[])
 	{
 		epk = estLandmarks.at(k);
 		Line line(epk, sceneManual.at(k));
-		inFile << epk.getX() << " " << rows - epk.getY() << "\n";
+		//inFile << epk.getX() << " " << rows - epk.getY() << "\n";
 		inFile << epk.getX() << " " << rows - epk.getY() << "\t" << line.getLength()
 			<< "\n";
 		distances.push_back(line.getLength());

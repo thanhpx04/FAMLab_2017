@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <float.h>
 using namespace std;
 
 #include <QtGui/QApplication>
@@ -500,21 +501,81 @@ void ImageViewer::about()
 void ImageViewer::testMethod()
 {
 	cout << "\nTest a method ..." << endl;
-	matImage->readManualLandmarks("data/landmarks/Md 054.TPS");
-	TestSIFT(matImage->getGrayMatrix(),matImage->getListOfManualLandmarks());
+	//matImage->readManualLandmarks("data/landmarks/Md 054.TPS");
+	ptr_IntMatrix rchannel = new Matrix<int>(matImage->getGrayMatrix()->getRows(),
+		matImage->getGrayMatrix()->getCols(), 0);
+	ptr_IntMatrix gchannel = new Matrix<int>(matImage->getGrayMatrix()->getRows(),
+		matImage->getGrayMatrix()->getCols(), 0);
+	for (int r = 0; r < matImage->getGrayMatrix()->getRows(); r++)
+	{
+		for (int c = 0; c < matImage->getGrayMatrix()->getCols(); c++)
+		{
+			RGB color = matImage->getRGBMatrix()->getAtPosition(r, c);
+			rchannel->setAtPosition(r, c, color.R);
+			gchannel->setAtPosition(r, c, color.G);
+		}
+	}
+	ptr_IntMatrix rcontours = getContour(rchannel);
+	ptr_IntMatrix gcontours = getContour(gchannel);
 
+	ptr_IntMatrix hMatrix = new Matrix<int>(matImage->getGrayMatrix()->getRows(),
+	 matImage->getGrayMatrix()->getCols(), 0);
+	int minValue = DBL_MAX, maxValue = DBL_MIN;
+	for (int r = 0; r < gcontours->getRows(); r++)
+	{
+		for (int c = 0; c < gcontours->getCols(); c++)
+		{
+			if (gcontours->getAtPosition(r, c) < minValue)
+				minValue = gcontours->getAtPosition(r, c);
+			if (gcontours->getAtPosition(r, c) > maxValue)
+				maxValue = gcontours->getAtPosition(r, c);
+		}
+	}
+	int mid = (minValue + maxValue) / 2;
+	cout << endl << "Min max in contours: " << minValue << "\t" << maxValue << "\t"<<mid
+		<< endl;
+
+
+	//vector<Edge> edges = test2(*matImage);
+	RGB color;
+	color.R = 255;
+	color.G = color.B = 0;
+	Edge edgei;
+	Point pi;
+	int rows = matImage->getGrayMatrix()->getRows();
+	int cols = matImage->getGrayMatrix()->getCols();
+	int count = 0;
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			if (gcontours->getAtPosition(r, c) > 3)
+			{
+				//matImage->getRGBMatrix()->setAtPosition(r, c, color);
+				hMatrix->setAtPosition(r,c,255);
+				count++;
+			}
+		}
+	}
+	cout<<endl<<count<<endl;
+	saveGrayScale("hbcMatrix.jpg", hMatrix);
+	vector<Point> corner = boundingBoxDetection(gchannel);
+	fillCircle(*matImage->getRGBMatrix(),corner.at(0),7,color);
+	fillCircle(*matImage->getRGBMatrix(),corner.at(1),7,color);
+	fillCircle(*matImage->getRGBMatrix(),corner.at(2),7,color);
+	fillCircle(*matImage->getRGBMatrix(),corner.at(3),7,color);
 	/*ptr_IntMatrix quant = quantization(matImage->getGrayMatrix(),3);
 
-	vector<Point> corners = boundingBoxDetection(matImage->getGrayMatrix());
-	Point p1 = corners.at(0), p2 = corners.at(1), p3 = corners.at(2), p4 =
-		corners.at(3);
-	RGB color;
-	color.R = color.G = 0;
-	color.B = 255;
-	drawingLine(*matImage->getRGBMatrix(), Line(p1, p2), color);
-	drawingLine(*matImage->getRGBMatrix(), Line(p1, p3), color);
-	drawingLine(*matImage->getRGBMatrix(), Line(p2, p4), color);
-	drawingLine(*matImage->getRGBMatrix(), Line(p3, p4), color);*/
+	 vector<Point> corners = boundingBoxDetection(matImage->getGrayMatrix());
+	 Point p1 = corners.at(0), p2 = corners.at(1), p3 = corners.at(2), p4 =
+	 corners.at(3);
+	 RGB color;
+	 color.R = color.G = 0;
+	 color.B = 255;
+	 drawingLine(*matImage->getRGBMatrix(), Line(p1, p2), color);
+	 drawingLine(*matImage->getRGBMatrix(), Line(p1, p3), color);
+	 drawingLine(*matImage->getRGBMatrix(), Line(p2, p4), color);
+	 drawingLine(*matImage->getRGBMatrix(), Line(p3, p4), color);*/
 
 	/*Image scene("data/md028.jpg");
 	 scene.readManualLandmarks("data/landmarks/Md 028.TPS");
@@ -529,14 +590,13 @@ void ImageViewer::testMethod()
 	 rslm.at(i).toString();
 	 fillCircle(*matImage->getRGBMatrix(), rslm.at(i), 5, color);
 	 }*/
-	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()), "Test");
-	this->show();
-
-
-	/*ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ptrIntToQImage(quant), "Quantization");
+	//this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()), "Test");
+	//this->show();
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
+		"Quantization");
 	other->move(x() - 40, y() - 40);
-	other->show();*/
+	other->show();
 
 	cout << "\nFinish.\n";
 	cout << "\n End test method!" << endl;
@@ -657,14 +717,6 @@ void ImageViewer::gScaleHistogram()
 		pend.setY(239 - (histogram->getAtPosition(0, c) * 230 / max));
 		drawingLine(*hDisplay, Line(pbegin, pend), color);
 	}
-	color.R = color.G = color.B = 0;
-	/*drawingLine(*hDisplay,Line(Point(histogram->getCols()/2,239),Point(histogram->getCols()/2,0)),color);
-	 Segmentation segment;
-	 segment.setRefImage(*matImage);
-	 int imin = segment.removePronotum();
-	 ptr_IntMatrix rsMatrix = segment.threshold(imin - 15, 255);
-	 this->loadImage(matImage, ptrIntToQImage(rsMatrix), "Threshold");*/
-	//segment.gridRemoveFolder();
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrRGBToQImage(hDisplay), "Histogram result");
 	other->move(x() - 40, y() - 40);
@@ -779,6 +831,15 @@ void ImageViewer::binThreshold()
 	tr.setRefImage(*matImage);
 	cout << "\ntValue: " << tValue << endl;
 	ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
+	rsMatrix = postProcess(rsMatrix,255);
+
+	//ptr_IntMatrix hProjection = new Matrix<int>(rsMatrix->getRows(),rsMatrix->getCols(),255);
+	//ptr_IntMatrix vProjection(hProjection);
+	//binProjection(rsMatrix,hProjection,vProjection);
+	//saveGrayScale("hProjection.jpg",hProjection);
+	//saveGrayScale("vProjection.jpg",vProjection);
+
+
 
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrIntToQImage(rsMatrix), "Thresholding result");
