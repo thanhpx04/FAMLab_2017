@@ -832,7 +832,7 @@ void ImageViewer::binThreshold()
 	cout << "\ntValue: " << tValue << endl;
 	ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
 	rsMatrix = postProcess(rsMatrix,255);
-
+	rsMatrix = removeLeg(rsMatrix);
 	//ptr_IntMatrix hProjection = new Matrix<int>(rsMatrix->getRows(),rsMatrix->getCols(),255);
 	//ptr_IntMatrix vProjection(hProjection);
 	//binProjection(rsMatrix,hProjection,vProjection);
