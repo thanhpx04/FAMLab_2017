@@ -21,13 +21,16 @@ using namespace std;
 #include "Thresholds.h"
 
 ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue,
-		int maxValue) {
+	int maxValue)
+{
 	int rows = inputMatrix->getRows();
 	int cols = inputMatrix->getCols();
 
 	ptr_IntMatrix result = new Matrix<int>(rows, cols, maxValue);
-	for (int r = 0; r < rows; r++) {
-		for (int c = 0; c < cols; c++) {
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
 			if (inputMatrix->getAtPosition(r, c) > tValue)
 				result->setAtPosition(r, c, maxValue);
 			else
@@ -204,7 +207,8 @@ ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue,
  }
  */
 
-ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue) {
+ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
+{
 	int rows = binaryMatrix->getRows();
 	int cols = binaryMatrix->getCols();
 	ptr_IntMatrix result = new Matrix<int>(rows, cols, maxValue);
@@ -212,8 +216,10 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue) {
 	Point left(0, 0), right(0, 0);
 	vector<Line> lines;
 
-	for (int r = 1; r < rows - 1; r++) {
-		for (int c = 1; c < cols - 1; c++) {
+	for (int r = 1; r < rows - 1; r++)
+	{
+		for (int c = 1; c < cols - 1; c++)
+		{
 			left.setX(0);
 			left.setY(0);
 			right.setX(0);
@@ -221,16 +227,19 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue) {
 			lines.clear();
 			int value = binaryMatrix->getAtPosition(r, c);
 			int valuel = binaryMatrix->getAtPosition(r, c - 1);
-			if (value == maxValue && valuel == 0) {
+			if (value == maxValue && valuel == 0)
+			{
 				// xac dinh diem dau tien
 				left.setX(c - 1);
 				left.setY(r);
-				if (left.getX() != 0) {
+				if (left.getX() != 0)
+				{
 					// xac dinh diem thu 2
-					for (int k = c; k < cols; k++) {
+					for (int k = c; k < cols; k++)
+					{
 						if (binaryMatrix->getAtPosition(r, k) == 0
-								&& binaryMatrix->getAtPosition(r, k - 1)
-										== maxValue) {
+							&& binaryMatrix->getAtPosition(r, k - 1) == maxValue)
+						{
 							right.setX(k);
 							right.setY(r);
 							goto checkbghole;
@@ -238,93 +247,92 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue) {
 					}
 				}
 				// kiem tra hole
-				checkbghole:
-				if (left != 0 && right != 0 && right.getX() > left.getX()) {
+				checkbghole: if (left != 0 && right != 0 && right.getX() > left.getX())
+				{
 					// do dong truoc do
 					bool beginHole = true;
 					if (r - 1 < 0 || r - 1 >= rows)
 						beginHole = false;
-					else {
-						for (int l = left.getX() + 1; l <= right.getX() - 1;
-								l++) {
-							if (binaryMatrix->getAtPosition(r - 1, l)
-									== maxValue) {
+					else
+					{
+						for (int l = left.getX() + 1; l <= right.getX() - 1; l++)
+						{
+							if (binaryMatrix->getAtPosition(r - 1, l) == maxValue)
+							{
 								beginHole = false;
 								goto resetValues;
 							}
 						}
 					}
-					resetValues:
-					if (!beginHole) {
+					resetValues: if (beginHole == false)
+					{
 						left.setX(0);
 						left.setY(0);
 						right.setX(0);
 						right.setY(0);
 					}
 				}
-				if (left != 0 && right != 0) {
+				if (left != 0 && right != 0)
+				{
 					bool inhole = true;
 					int rnew = r + 1;
 					int clnew = 0, crnew = 0;
 					lines.push_back(Line(left, right));
-					do {
+					do
+					{
 						clnew = 0;
 						crnew = 0;
-						if (rnew < rows) {
+						if (rnew < rows)
+						{
 							// check dong do
 							inhole = false;
-							for (int n = left.getX() + 1; n <= right.getX() - 1;
-									n++) {
+							for (int n = left.getX() + 1; n <= right.getX() - 1; n++)
+							{
 								if (n < cols && rnew < rows
-										&& binaryMatrix->getAtPosition(rnew, n)
-												== maxValue) {
+									&& binaryMatrix->getAtPosition(rnew, n) == maxValue)
+								{
 									inhole = true;
 									goto checkinhole;
 								}
 							}
-							checkinhole:
-							if (inhole) {
-								if (binaryMatrix->getAtPosition(rnew,
-										left.getX()) == maxValue) {
-									for (int l = left.getX(); l > 0; l--) {
-										if (binaryMatrix->getAtPosition(rnew, l)
-												== 0) {
+							checkinhole: if (inhole)
+							{
+								if (binaryMatrix->getAtPosition(rnew, left.getX()) == maxValue)
+								{
+									for (int l = left.getX(); l > 0; l--)
+									{
+										if (binaryMatrix->getAtPosition(rnew, l) == 0)
+										{
 											clnew = l;
 											goto checkright;
 										}
 									}
-								} else {
-									for (int l = left.getX(); l < right.getX();
-											l++) {
-										if (binaryMatrix->getAtPosition(rnew, l)
-												== maxValue) {
-											clnew = l - 1;
-											goto checkright;
-										}
-									}
 								}
-								checkright:
-								if (binaryMatrix->getAtPosition(rnew,
-										right.getX()) == maxValue) {
-									for (int m = right.getX(); m < cols; m++) {
-										if (binaryMatrix->getAtPosition(rnew, m)
-												== 0) {
+								checkright: if (binaryMatrix->getAtPosition(rnew, right.getX())
+									== maxValue)
+								{
+									for (int m = right.getX(); m > left.getX(); m--)
+									{
+										if (binaryMatrix->getAtPosition(rnew, m) == 0)
+										{
 											crnew = m;
 											goto checkandpush;
 										}
 									}
-								} else {
-									for (int m = right.getX(); m > left.getX();
-											m--) {
-										if (binaryMatrix->getAtPosition(rnew, m)
-												== maxValue) {
-											crnew = m + 1;
-											goto checkandpush;
+									/*if (crnew == 0)
+									{
+										for (int m = right.getX(); m < cols; m++)
+										{
+											if (binaryMatrix->getAtPosition(rnew, m) == 0)
+											{
+												crnew = m;
+												goto checkandpush;
+											}
 										}
-									}
+									}*/
 								}
-								checkandpush:
-								if (clnew != 0 && crnew != 0) {
+								checkandpush: if (clnew != 0 && crnew != 0)
+								{
 									left.setX(clnew);
 									left.setY(rnew);
 									right.setX(crnew);
@@ -332,21 +340,26 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue) {
 									lines.push_back(Line(left, right));
 								}
 							}
-
-						} else {
+						}
+						else
+						{
+							lines.clear();
 							inhole = false;
 						}
 						rnew++;
 
-					} while (inhole);
+					}
+					while (inhole);
 
-					for (size_t li = 0; li < lines.size(); li++) {
+					for (size_t li = 0; li < lines.size(); li++)
+					{
 						Line line = lines.at(li);
-						if (line.getBegin().getY() == line.getEnd().getY()) {
-							for (int x = line.getBegin().getX();
-									x < line.getEnd().getX(); x++) {
-								binaryMatrix->setAtPosition(
-										line.getBegin().getY(), x, 0);
+						if (line.getBegin().getY() == line.getEnd().getY())
+						{
+							for (int x = line.getBegin().getX(); x < line.getEnd().getX();
+								x++)
+							{
+								binaryMatrix->setAtPosition(line.getBegin().getY(), x, 0);
 							}
 						}
 					}
@@ -360,27 +373,35 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue) {
 	return binaryMatrix;
 }
 
-ptr_IntMatrix removeLeg(ptr_IntMatrix binaryImage) {
+ptr_IntMatrix removeLeg(ptr_IntMatrix binaryImage)
+{
 	int rows = binaryImage->getRows();
 	int cols = binaryImage->getCols();
 	int hcols = cols / 2;
 	ptr_IntMatrix result(binaryImage);
 	Point left(0, 0), right(0, 0);
-	for (int r = 0; r < rows; r++) {
-		for (int c = 0; c < hcols; c++) {
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < hcols; c++)
+		{
 			if (result->getAtPosition(r, c) == 0
-					&& (result->getAtPosition(r, c - 1) == 255 || c - 1 < 0)) {
+				&& (result->getAtPosition(r, c - 1) == 255 || c - 1 < 0))
+			{
 				left.setX(c - 1);
 				left.setY(r);
-				for (int k = c; k < hcols; k++) {
-					if (result->getAtPosition(r, k) == 255) {
+				for (int k = c; k < hcols; k++)
+				{
+					if (result->getAtPosition(r, k) == 255)
+					{
 						right.setX(k);
 						right.setY(r);
 						break;
 					}
 				}
-				if (left != 0 && right != 0) {
-					for (int l = left.getX(); l < right.getX(); l++) {
+				if (left != 0 && right != 0)
+				{
+					for (int l = left.getX(); l < right.getX(); l++)
+					{
 						result->setAtPosition(r, l, 255);
 					}
 					left.setX(0);

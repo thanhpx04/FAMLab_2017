@@ -831,27 +831,7 @@ void ImageViewer::binThreshold()
 	tr.setRefImage(*matImage);
 	cout << "\ntValue: " << tValue << endl;
 	ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
-
-	ofstream inFile("th.TPS");
-	int rows = rsMatrix->getRows();
-	int cols = rsMatrix->getCols();
-	for (int r = 0; r < rows; r++) {
-		for (int c = 0; c < cols; c++) {
-			int value = rsMatrix->getAtPosition(r,c);
-			if(value == 0)
-			{
-				inFile << "0";
-			}
-			else
-			{
-				inFile <<"1";
-			}
-		}
-		inFile<<"\n";
-	}
-	inFile.close();
-
-	//rsMatrix = postProcess(rsMatrix,255);
+	rsMatrix = postProcess(rsMatrix,255);
 	//rsMatrix = removeLeg(rsMatrix);
 	//ptr_IntMatrix hProjection = new Matrix<int>(rsMatrix->getRows(),rsMatrix->getCols(),255);
 	//ptr_IntMatrix vProjection(hProjection);
