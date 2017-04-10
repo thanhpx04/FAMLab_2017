@@ -44,7 +44,7 @@ Segmentation::~Segmentation()
 
 ptr_IntMatrix Segmentation::threshold(int tValue, int maxValue)
 {
-	getGaussianKernel(5,1);
+
 	ptr_IntMatrix inputMatrix = Treatments::refImage.getGrayMatrix();
 	ptr_IntMatrix binaryMatrix = new Matrix<int>(inputMatrix->getRows(),
 		inputMatrix->getCols(), maxValue);
