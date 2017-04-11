@@ -41,9 +41,9 @@ Matrix<double> getGaussianKernel(int ksize, double sigma) {
 	for (int i = 0; i < ksize; i++) {
 		for (int j = 0; j < ksize; j++) {
 			kernel.setAtPosition(i, j, kernel.getAtPosition(i, j) / sum);
-			cout << "\t" << kernel.getAtPosition(i, j);
+			//cout << "\t" << kernel.getAtPosition(i, j);
 		}
-		cout << endl;
+		//cout << endl;
 	}
 	return kernel;
 }

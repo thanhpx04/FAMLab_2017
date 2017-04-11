@@ -502,20 +502,33 @@ void ImageViewer::about()
 void ImageViewer::testMethod()
 {
 	cout << "\nTest a method ..." << endl;
-	Matrix<double> gauKernel = getGaussianKernel(5,1);
-	Matrix<int> result = gaussianBlur(*matImage->getGrayMatrix(),gauKernel);
-	int k = 0;
-	while(k<15)
-	{
-		result = gaussianBlur(result,gauKernel);
-		k++;
-	}
+	Matrix<double> gauKernel = getGaussianKernel(5, 1);
+	Matrix<int> result = gaussianBlur(*matImage->getGrayMatrix(), gauKernel);
+
+	ptr_IntMatrix binMatrix = binaryThreshold(&result,
+		matImage->getThresholdValue(), 255);
+	binMatrix = postProcess(binMatrix, 255);
+	result = *removeLeg(binMatrix);
+
+	ptr_IntMatrix hProjection = new Matrix<int>(binMatrix->getRows(),
+		binMatrix->getCols(), 255);
+	ptr_IntMatrix vProjection(hProjection);
+	binProjection(&result, hProjection, vProjection);
+	analysisHistogram(hProjection,0,15);
+
 	ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ptrIntToQImage(&result),
-		"Quantization");
+	other->loadImage(matImage, ptrIntToQImage(&result), "Quantization");
 	other->move(x() - 40, y() - 40);
 	other->show();
 
+	ImageViewer *hp = new ImageViewer;
+	hp->loadImage(matImage, ptrIntToQImage(hProjection), "H Projection");
+	hp->move(x() - 40, y() - 40);
+	hp->show();
+	ImageViewer *vp = new ImageViewer;
+	vp->loadImage(matImage, ptrIntToQImage(vProjection), "V Projection");
+	vp->move(x() - 40, y() - 40);
+	vp->show();
 	cout << "\nFinish.\n";
 	cout << "\n End test method!" << endl;
 }
@@ -749,15 +762,13 @@ void ImageViewer::binThreshold()
 	tr.setRefImage(*matImage);
 	cout << "\ntValue: " << tValue << endl;
 	ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
-	rsMatrix = postProcess(rsMatrix,255);
+	rsMatrix = postProcess(rsMatrix, 255);
 	//rsMatrix = removeLeg(rsMatrix);
 	//ptr_IntMatrix hProjection = new Matrix<int>(rsMatrix->getRows(),rsMatrix->getCols(),255);
 	//ptr_IntMatrix vProjection(hProjection);
 	//binProjection(rsMatrix,hProjection,vProjection);
 	//saveGrayScale("hProjection.jpg",hProjection);
 	//saveGrayScale("vProjection.jpg",vProjection);
-
-
 
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrIntToQImage(rsMatrix), "Thresholding result");

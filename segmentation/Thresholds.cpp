@@ -320,16 +320,16 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 										}
 									}
 									/*if (crnew == 0)
-									{
-										for (int m = right.getX(); m < cols; m++)
-										{
-											if (binaryMatrix->getAtPosition(rnew, m) == 0)
-											{
-												crnew = m;
-												goto checkandpush;
-											}
-										}
-									}*/
+									 {
+									 for (int m = right.getX(); m < cols; m++)
+									 {
+									 if (binaryMatrix->getAtPosition(rnew, m) == 0)
+									 {
+									 crnew = m;
+									 goto checkandpush;
+									 }
+									 }
+									 }*/
 								}
 								checkandpush: if (clnew != 0 && crnew != 0)
 								{
@@ -380,11 +380,13 @@ ptr_IntMatrix removeLeg(ptr_IntMatrix binaryImage)
 	int hcols = cols / 2;
 	ptr_IntMatrix result(binaryImage);
 	Point left(0, 0), right(0, 0);
+	// remove left
 	for (int r = 0; r < rows; r++)
 	{
+		bool first = true;
 		for (int c = 0; c < hcols; c++)
 		{
-			if (result->getAtPosition(r, c) == 0
+			if (first && result->getAtPosition(r, c) == 0
 				&& (result->getAtPosition(r, c - 1) == 255 || c - 1 < 0))
 			{
 				left.setX(c - 1);
@@ -408,9 +410,178 @@ ptr_IntMatrix removeLeg(ptr_IntMatrix binaryImage)
 					left.setY(0);
 					right.setX(0);
 					right.setY(0);
+					first = false;
 				}
 			}
+			if (!first)
+				break;
+		}
+	}
+	// remove right
+	for (int r = 0; r < rows; r++)
+	{
+		bool first = true;
+		for (int c = cols - 1; c > hcols; c--)
+		{
+			if (first && result->getAtPosition(r, c) == 0
+				&& (result->getAtPosition(r, c - 1) == 255 || c - 1 < 0))
+			{
+				left.setX(c - 1);
+				left.setY(r);
+				for (int k = c; k < hcols; k++)
+				{
+					if (result->getAtPosition(r, k) == 255)
+					{
+						right.setX(k);
+						right.setY(r);
+						break;
+					}
+				}
+				if (left != 0 && right != 0)
+				{
+					for (int l = left.getX(); l < right.getX(); l++)
+					{
+						result->setAtPosition(r, l, 255);
+					}
+					left.setX(0);
+					left.setY(0);
+					right.setX(0);
+					right.setY(0);
+					first = false;
+				}
+			}
+			if (!first)
+				break;
 		}
 	}
 	return result;
 }
+
+void analysisHistogram(ptr_IntMatrix &histogram, int type, int sizeRegion) // type = 0 - horizontal, 1 - vertical
+{
+	int rows = histogram->getRows();
+	int cols = histogram->getCols();
+	int cs = 0, ls = 0;
+	int arrSize = 0;
+	if (type == 0)
+	{
+		arrSize = rows;
+		ls = rows;
+		cs = cols;
+	}
+	else
+	{
+		arrSize = cols;
+		ls = cols;
+		cs = rows;
+	}
+	int array[arrSize];
+	for (int r = 0; r < ls; r++)
+	{
+		int count = 0;
+		for (int c = 0; c < cs; c++)
+		{
+			if (type == 0)
+			{
+				if (histogram->getAtPosition(r, c) == 0)
+					count++;
+			}
+			else
+			{
+				if (histogram->getAtPosition(c, r) == 0)
+					count++;
+			}
+		}
+		array[r] = count;
+		cout << "\t" << count;
+	}
+	// analysis the projection
+	vector<int> peakIndex;
+	vector<int> valleyIndex;
+	if (sizeRegion % 2 == 0)
+		sizeRegion += 1;
+	int hregion = sizeRegion / 2;
+	int peaks = 0, valley = 0;
+	for (int i = hregion; i < arrSize - hregion; i++)
+	{
+		int valuei = array[i];
+		int count1 = 0, count2 = 0;
+		for (int k = i - hregion; k <= i + hregion; k++)
+		{
+			if (k != i)
+			{
+				int valuek = 0;
+				if (k < 0 || k >= arrSize)
+				{
+					valuek = 0;
+				}
+				else
+				{
+					valuek = array[k];
+				}
+				if (valuek < valuei)
+				{
+					count1++;
+				}
+				if (valuek > valuei)
+				{
+					count2++;
+				}
+			}
+		}
+		if (count1 == 0 && count2 == sizeRegion - 1)
+		{
+			valley++;
+			valleyIndex.push_back(i);
+		}
+		if (count1 == sizeRegion - 1 && count2 == 0)
+		{
+			peaks++;
+			peakIndex.push_back(i);
+		}
+	}
+	cout << endl << "Number of peaks: " << peaks << endl;
+	cout << endl << "Number of valleys: " << valley << endl;
+	int maxDistance = 0, maxDistance2 = 0;
+	int index = 0, index2 = 0;
+	for (int i = 1; i < valleyIndex.size(); i++)
+	{
+		/*if (valleyIndex.at(i) < rows / 2)
+		 {
+		 int v1 = array[valleyIndex.at(i - 1)];
+		 int v2 = array[valleyIndex.at(i)];
+		 if (abs(v2 - v1) > maxDistance)
+		 {
+		 maxDistance = abs(v2 - v1);
+		 index = i - 1;
+		 }
+		 }
+		 else
+		 {
+		 int v1 = array[valleyIndex.at(i - 1)];
+		 int v2 = array[valleyIndex.at(i)];
+		 if (abs(v2 - v1) > maxDistance)
+		 {
+		 maxDistance2 = abs(v2 - v1);
+		 index2 = i - 1;
+		 }
+		 }*/
+		for (int r = 0; r < cs; r++)
+		{
+			histogram->setAtPosition(valleyIndex.at(i), r, 0);
+		}
+	}
+	/*for (int r = 0; r < cs; r++)
+	 {
+	 histogram->setAtPosition(valleyIndex.at(index), r, 0);
+	 histogram->setAtPosition(valleyIndex.at(index2), r, 0);
+	 }*/
+	/*for (int i = 0; i < peakIndex.size(); i++)
+	 {
+	 for (int r = 0; r < rows; r++)
+	 {
+	 histogram->setAtPosition(r, peakIndex.at(i), 0);
+	 }
+	 }*/
+}
+

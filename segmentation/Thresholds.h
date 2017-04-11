@@ -11,4 +11,5 @@
 ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue, int maxValue);
 ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue);
 ptr_IntMatrix removeLeg(ptr_IntMatrix binaryImage);
+void analysisHistogram(ptr_IntMatrix &histogram, int type, int sizeRegion);
 #endif /* THRESHOLDS_H_ */
