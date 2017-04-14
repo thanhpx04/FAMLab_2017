@@ -354,8 +354,11 @@ vector<Edge> Image::cannyAlgorithm()
 	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, (int) thresholdValue,
 		MAX_GRAY_VALUE);
 
+	/*ptr_IntMatrix cannyMatrix = cannyProcess(binMatrix, (int) thresholdValue,
+		3 * (int) thresholdValue);*/
+
 	ptr_IntMatrix cannyMatrix = cannyProcess(binMatrix, (int) thresholdValue,
-		3 * (int) thresholdValue);
+			3 * (int) thresholdValue);
 
 	vector<Edge> listOfEdges;
 	listOfEdges = suzuki(cannyMatrix);

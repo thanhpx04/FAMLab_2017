@@ -62,6 +62,12 @@ struct RGB
 			return true;
 		return false;
 	}
+	RGB operator=(const int value) const
+	{
+		RGB color;
+		color.R = color.G = color.B = value;
+		return color;
+	}
 };
 
 class Point

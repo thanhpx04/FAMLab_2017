@@ -195,6 +195,37 @@ void ImageViewer::createSegmentationMenu()
 	connect(lineSegmentationAct, SIGNAL(triggered()), this,
 		SLOT(lineSegmentation()));
 }
+
+void ImageViewer::createFilterMenu()
+{
+	gauAct = new QAction(tr("&Gaussian filter"), this);
+	gauAct->setEnabled(false);
+	connect(gauAct, SIGNAL(triggered()), this, SLOT(gauFilter()));
+
+	robertAct = new QAction(tr("&Robert filter"), this);
+	robertAct->setEnabled(false);
+	connect(robertAct, SIGNAL(triggered()), this, SLOT(robertFilter()));
+
+	sobelAct = new QAction(tr("&Sobel filter"), this);
+	sobelAct->setEnabled(false);
+	connect(sobelAct, SIGNAL(triggered()), this, SLOT(sobelFilter()));
+
+	erosionAct = new QAction(tr("&Erosion"), this);
+	erosionAct->setEnabled(false);
+	connect(erosionAct, SIGNAL(triggered()), this, SLOT(erosionOperation()));
+
+	dilationAct = new QAction(tr("&Dilation"), this);
+	dilationAct->setEnabled(false);
+	connect(dilationAct, SIGNAL(triggered()), this, SLOT(dilationOperation()));
+
+	openBinaryAct = new QAction(tr("&Open"), this);
+	openBinaryAct->setEnabled(false);
+	connect(openBinaryAct, SIGNAL(triggered()), this, SLOT(openOperation()));
+
+	closeBinaryAct = new QAction(tr("&Close"), this);
+	closeBinaryAct->setEnabled(false);
+	connect(closeBinaryAct, SIGNAL(triggered()), this, SLOT(closeOperation()));
+}
 void ImageViewer::createLandmarksMenu()
 {
 	/*phtAct = new QAction(tr("&Probabilistic Hough Transform"), this);
@@ -258,7 +289,7 @@ void ImageViewer::createActions()
 	createHelpMenu();
 	createSegmentationMenu();
 	createLandmarksMenu();
-	//createRegistrationMenu();
+	createFilterMenu();
 }
 void ImageViewer::createMenus()
 {
@@ -291,6 +322,17 @@ void ImageViewer::createMenus()
 	segmentationMenu->addAction(suzukiAct);
 	segmentationMenu->addAction(lineSegmentationAct);
 
+	processMenu = new QMenu(tr("&Process"), this);
+	QMenu* filterMenu = processMenu->addMenu(tr("Filter"));
+	filterMenu->addAction(gauAct);
+	filterMenu->addAction(robertAct);
+	filterMenu->addAction(sobelAct);
+	QMenu* binaryMenu = processMenu->addMenu(tr("Binary"));
+	binaryMenu->addAction(erosionAct);
+	binaryMenu->addAction(dilationAct);
+	binaryMenu->addAction(openBinaryAct);
+	binaryMenu->addAction(closeBinaryAct);
+
 	dominantPointMenu = new QMenu(tr("&Landmarks"), this);
 	//dominantPointMenu->addAction(phtAct);
 	dominantPointMenu->addAction(phtPointsAct);
@@ -312,6 +354,7 @@ void ImageViewer::createMenus()
 	menuBar()->addMenu(fileMenu);
 	menuBar()->addMenu(viewMenu);
 	menuBar()->addMenu(segmentationMenu);
+	menuBar()->addMenu(processMenu);
 	menuBar()->addMenu(dominantPointMenu);
 	//menuBar()->addMenu(registrationMenu);
 	menuBar()->addMenu(helpMenu);
@@ -349,6 +392,14 @@ void ImageViewer::activeFunction()
 	cannyAct->setEnabled(true);
 	suzukiAct->setEnabled(true);
 	lineSegmentationAct->setEnabled(true);
+
+	gauAct->setEnabled(true);
+	robertAct->setEnabled(true);
+	sobelAct->setEnabled(true);
+	erosionAct->setEnabled(true);
+	dilationAct->setEnabled(true);
+	openBinaryAct->setEnabled(true);
+	closeBinaryAct->setEnabled(true);
 
 	//phtAct->setEnabled(true);
 	phtPointsAct->setEnabled(true);
@@ -437,6 +488,14 @@ ImageViewer::~ImageViewer()
 	delete suzukiAct;
 	delete lineSegmentationAct;
 
+	delete gauAct;
+	delete robertAct;
+	delete sobelAct;
+	delete dilationAct;
+	delete erosionAct;
+	delete openBinaryAct;
+	delete closeBinaryAct;
+
 	//delete phtAct;
 	delete phtPointsAct;
 	delete autoLandmarksAct;
@@ -502,33 +561,45 @@ void ImageViewer::about()
 void ImageViewer::testMethod()
 {
 	cout << "\nTest a method ..." << endl;
+
+	// try to remove leg and other parts
 	Matrix<double> gauKernel = getGaussianKernel(5, 1);
 	Matrix<int> result = gaussianBlur(*matImage->getGrayMatrix(), gauKernel);
 
 	ptr_IntMatrix binMatrix = binaryThreshold(&result,
 		matImage->getThresholdValue(), 255);
 	binMatrix = postProcess(binMatrix, 255);
-	result = *removeLeg(binMatrix);
+	//result = *removeLeg(binMatrix);
 
-	ptr_IntMatrix hProjection = new Matrix<int>(binMatrix->getRows(),
+	/*ptr_IntMatrix hProjection = new Matrix<int>(binMatrix->getRows(),
 		binMatrix->getCols(), 255);
 	ptr_IntMatrix vProjection(hProjection);
-	binProjection(&result, hProjection, vProjection);
-	analysisHistogram(hProjection,0,15);
+	binProjection(binMatrix, hProjection, vProjection);
+
+	Matrix<int> result2 = splitImage(binMatrix, 150);
+	splitImageCols(&result2, 150);
+
+	for (int r = 0; r < binMatrix->getRows(); r += 150)
+	{
+		for (int c = 0; c < binMatrix->getCols(); c++)
+		{
+			binMatrix->setAtPosition(r, c, 0);
+		}
+	}*/
 
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrIntToQImage(&result), "Quantization");
 	other->move(x() - 40, y() - 40);
 	other->show();
 
-	ImageViewer *hp = new ImageViewer;
-	hp->loadImage(matImage, ptrIntToQImage(hProjection), "H Projection");
-	hp->move(x() - 40, y() - 40);
-	hp->show();
-	ImageViewer *vp = new ImageViewer;
-	vp->loadImage(matImage, ptrIntToQImage(vProjection), "V Projection");
-	vp->move(x() - 40, y() - 40);
-	vp->show();
+	/*ImageViewer *hp = new ImageViewer;
+	 hp->loadImage(matImage, ptrIntToQImage(hProjection), "H Projection");
+	 hp->move(x() - 40, y() - 40);
+	 hp->show();
+	 ImageViewer *vp = new ImageViewer;
+	 vp->loadImage(matImage, ptrIntToQImage(vProjection), "V Projection");
+	 vp->move(x() - 40, y() - 40);
+	 vp->show();*/
 	cout << "\nFinish.\n";
 	cout << "\n End test method!" << endl;
 }
@@ -763,12 +834,6 @@ void ImageViewer::binThreshold()
 	cout << "\ntValue: " << tValue << endl;
 	ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
 	rsMatrix = postProcess(rsMatrix, 255);
-	//rsMatrix = removeLeg(rsMatrix);
-	//ptr_IntMatrix hProjection = new Matrix<int>(rsMatrix->getRows(),rsMatrix->getCols(),255);
-	//ptr_IntMatrix vProjection(hProjection);
-	//binProjection(rsMatrix,hProjection,vProjection);
-	//saveGrayScale("hProjection.jpg",hProjection);
-	//saveGrayScale("vProjection.jpg",vProjection);
 
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrIntToQImage(rsMatrix), "Thresholding result");
@@ -866,6 +931,98 @@ void ImageViewer::lineSegmentation()
 
 	msgbox.setText("Finish");
 	msgbox.exec();
+}
+// ==================================================== Filter menu =========================================
+void ImageViewer::gauFilter()
+{
+	cout << "\n Gaussian filter." << endl;
+	Matrix<double> kernel = getGaussianKernel(3, 1);
+	Matrix<int> gsResult = gaussianBlur(*(matImage->getGrayMatrix()), kernel);
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrIntToQImage(&gsResult),
+		"Gaussian filter result");
+	other->move(x() - 40, y() - 40);
+	other->show();
+}
+
+void ImageViewer::robertFilter()
+{
+	cout << "\n Robert filter." << endl;
+	Matrix<int> rbResult = RobertOperation(matImage->getGrayMatrix());
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrIntToQImage(&rbResult), "Robert filter result");
+	other->move(x() - 40, y() - 40);
+	other->show();
+}
+
+void ImageViewer::sobelFilter()
+{
+	cout << "\n Sobel filter." << endl;
+	Matrix<int> sbResult = SobelOperation(matImage->getGrayMatrix());
+	sbResult = postSobel(sbResult);
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrIntToQImage(&sbResult), "Sobel filter result");
+	other->move(x() - 40, y() - 40);
+	other->show();
+}
+
+void ImageViewer::erosionOperation()
+{
+	cout << "\n Erosion operation." << endl;
+	Matrix<int> sbResult = SobelOperation(matImage->getGrayMatrix());
+	sbResult = postSobel(sbResult);
+
+	ptr_IntMatrix erResult = erode(&sbResult, 3);
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrIntToQImage(erResult),
+		"Erosion operation result");
+	other->move(x() - 40, y() - 40);
+	other->show();
+}
+
+void ImageViewer::dilationOperation()
+{
+	cout << "\n Dilation operation." << endl;
+	Matrix<int> sbResult = SobelOperation(matImage->getGrayMatrix());
+	sbResult = postSobel(sbResult);
+
+	ptr_IntMatrix dlResult = dilate(&sbResult, 3);
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrIntToQImage(dlResult),
+		"Dilation operation result");
+	other->move(x() - 40, y() - 40);
+	other->show();
+}
+
+void ImageViewer::openOperation()
+{
+	cout << "\n Open operation." << endl;
+	Matrix<int> sbResult = SobelOperation(matImage->getGrayMatrix());
+	sbResult = postSobel(sbResult);
+
+	ptr_IntMatrix dlResult = openBinary(&sbResult, 3);
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrIntToQImage(dlResult), "Open operation result");
+	other->move(x() - 40, y() - 40);
+	other->show();
+}
+
+void ImageViewer::closeOperation()
+{
+	cout << "\n Close operation." << endl;
+	Matrix<int> sbResult = SobelOperation(matImage->getGrayMatrix());
+	sbResult = postSobel(sbResult);
+
+	ptr_IntMatrix dlResult = closeBinary(&sbResult, 3);
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrIntToQImage(dlResult),
+		"Close operation result");
+	other->move(x() - 40, y() - 40);
+	other->show();
 }
 // ======================================================= Landmarks points ===============================
 void ImageViewer::gHoughTransform()

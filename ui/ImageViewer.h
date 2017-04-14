@@ -53,6 +53,14 @@ private slots:
 	void suzukiAlgorithm();
 	void lineSegmentation();
 
+	void gauFilter();
+	void robertFilter();
+	void sobelFilter();
+	void erosionOperation();
+	void dilationOperation();
+	void openOperation();
+	void closeOperation();
+
 	//void pHoughTransform();
 	void gHoughTransform();
 	void extractLandmarks();
@@ -74,8 +82,8 @@ private:
 	QMenu *fileMenu;
 	QMenu *viewMenu;
 	QMenu *segmentationMenu;
+	QMenu *processMenu;
 	QMenu *dominantPointMenu;
-	//QMenu *registrationMenu;
 	QMenu *helpMenu;
 
 	// toolbar
@@ -106,6 +114,14 @@ private:
 	QAction *suzukiAct;
 	QAction *lineSegmentationAct;
 
+	QAction *gauAct;
+	QAction *robertAct;
+	QAction *sobelAct;
+	QAction *erosionAct;
+	QAction *dilationAct;
+	QAction *openBinaryAct;
+	QAction *closeBinaryAct;
+
 	//QAction *phtAct;
 	QAction *phtPointsAct;
 	QAction *autoLandmarksAct;
@@ -130,7 +146,7 @@ private:
 	void createSegmentationMenu();
 	void createLandmarksMenu();
 	void createRegistrationMenu();
-
+	void createFilterMenu();
 	void activeFunction();
 	void viewMenuUpdateActions();
 	void scaleImage(double factor);

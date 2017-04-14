@@ -9,4 +9,11 @@
 #define FILTERS_H_
 Matrix<double> getGaussianKernel(int ksize, double sigma);
 Matrix<int> gaussianBlur(Matrix<int> inputMatrix, Matrix<double> kernel);
+Matrix<int> RobertOperation(ptr_IntMatrix grayMatrix);
+Matrix<int> SobelOperation(ptr_IntMatrix grayMatrix);
+Matrix<int> postSobel(Matrix<int> sobelResult);
+ptr_IntMatrix erode(ptr_IntMatrix binMatrix, int kernelSize);
+ptr_IntMatrix dilate(ptr_IntMatrix binMatrix, int kernelSize);
+ptr_IntMatrix openBinary(ptr_IntMatrix binMatrix, int kernelSize);
+ptr_IntMatrix closeBinary(ptr_IntMatrix binMatrix, int kernelSize);
 #endif /* FILTERS_H_ */

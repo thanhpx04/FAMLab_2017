@@ -23,6 +23,7 @@ using namespace std;
 #include "../io/Reader.h"
 #include "../utils/Converter.h"
 #include "Filters.h"
+#include "Thresholds.h"
 
 ptr_DoubleMatrix angles;
 const float LIMIT_ANGLE_1 = 22.5;
@@ -165,7 +166,7 @@ ptr_IntMatrix gySobelConvolution(ptr_IntMatrix inputMatrix)
 	int rows = inputMatrix->getRows();
 	int cols = inputMatrix->getCols();
 
-	ptr_IntMatrix gyConvol = new Matrix<int>(rows, cols, WHITE_VALUE);
+	ptr_IntMatrix gyConvol = new Matrix<int>(rows, cols, BLACK_VALUE);
 	for (int i = -ksize; i < rows - ksize; i++)
 	{
 		for (int j = -ksize; j < cols - ksize; j++)
@@ -190,7 +191,7 @@ ptr_IntMatrix gySobelConvolution(ptr_IntMatrix inputMatrix)
 	return gyConvol;
 }
 
-ptr_IntMatrix sobelOperation(ptr_IntMatrix gaussianImage)
+ptr_IntMatrix sobelOperationCanny(ptr_IntMatrix gaussianImage)
 {
 
 	int rows = gaussianImage->getRows();
@@ -360,14 +361,50 @@ ptr_IntMatrix doubleThreshold(ptr_IntMatrix nonMaxImage, int low, int high)
 	return edgeMatrix;
 }
 
-
+int threshCut(ptr_IntMatrix inputMatrix)
+{
+	int array[256] =
+	{ };
+	int rows = inputMatrix->getRows();
+	int cols = inputMatrix->getCols();
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			int value = inputMatrix->getAtPosition(r, c);
+			if (value >= 0 && value <= 255)
+			{
+				array[value] += 1;
+			}
+		}
+	}
+	int max = -1, imax = -1;
+	for (int i = 0; i < 256; ++i)
+	{
+		cout << "\t" << array[i];
+		if (array[i] > max)
+		{
+			max = array[i];
+			imax = i;
+		}
+	}
+	int min = max, imin = imax;
+	for (int i = imax; i < 256; ++i)
+	{
+		if (array[i] < min && array[i] != 0)
+		{
+			min = array[i];
+			imin = i;
+		}
+	}
+	return imin;
+}
 // ========================== Process to find the edges in image =============================================
 ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	int highThreshold)
 {
 	ptr_IntMatrix binary2 = postProcess(binaryImage, 255);
-	ptr_IntMatrix sobelFilter = sobelOperation(binary2);
-	//ptr_IntMatrix sobelFilter = sobelOperation(binaryImage);
+	ptr_IntMatrix sobelFilter = sobelOperationCanny(binary2);
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
 		highThreshold);
@@ -381,7 +418,7 @@ ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
 	int highThreshold, ptr_IntMatrix &gradDirection, vector<Point> &edgePoints)
 {
 	ptr_IntMatrix binary2 = postProcess(binaryImage, 255);
-	ptr_IntMatrix sobelFilter = sobelOperation(binary2);
+	ptr_IntMatrix sobelFilter = sobelOperationCanny(binary2);
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
 		highThreshold);
