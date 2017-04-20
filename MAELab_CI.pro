@@ -10,11 +10,11 @@ CONFIG       += console
 #RESOURCES     = Ipm.qrc
 QMAKE_CXXFLAGS += -fPIC -lpthread
 QMAKE_CFLAGS += -fPIC -lpthread
-HEADERS += io/*.h io/LibJpeg/*.h imageModel/Point.h imageModel/Line.h imageModel/Edge.h imageModel/Matrix.h imageModel/Image.h \
+HEADERS += io/*.h io/LibJpeg/*.h imageModel/*.h \
 			segmentation/*.h histograms/*.h pht/*.h \
 		  pointInterest/*.h correlation/*.h utils/*.h ui/*.h MAELab.h 
 	
-SOURCES += MAELab_CI.cpp io/*.cpp io/LibJpeg/*.c imageModel/Point.cpp imageModel/Line.cpp imageModel/Edge.cpp imageModel/Matrix.cpp imageModel/Image.cpp \
-		segmentation/*.cpp \
+SOURCES += io/*.cpp io/LibJpeg/*.c imageModel/*.cpp \
+		 segmentation/*.cpp \
 		 histograms/*.cpp pht/*.cpp pointInterest/*.cpp correlation/*.cpp \
-		 utils/*.cpp ui/*.cpp MAELab.cpp 
+		 utils/*.cpp ui/*.cpp MAELab.cpp MAELab_CI.cpp 

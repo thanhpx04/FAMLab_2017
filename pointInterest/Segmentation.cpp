@@ -60,7 +60,8 @@ ptr_IntMatrix Segmentation::threshold(int tValue, int maxValue)
 
 vector<Edge> Segmentation::canny()
 {
-	return Treatments::refImage.cannyAlgorithm();
+	vector<Point> cPoints;
+	return Treatments::refImage.cannyAlgorithm(cPoints);
 }
 vector<Line> Segmentation::segment()
 {

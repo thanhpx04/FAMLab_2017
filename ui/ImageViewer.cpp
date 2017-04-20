@@ -52,6 +52,7 @@ using namespace std;
 #include "../pht/SVD.h"
 
 #include "../histograms/ShapeHistogram.h"
+#include "../histograms/LBP.h"
 #include "../pointInterest/Treatments.h"
 #include "../pointInterest/Segmentation.h"
 #include "../pointInterest/ProHoughTransform.h"
@@ -249,6 +250,16 @@ void ImageViewer::createLandmarksMenu()
 	pcaiAct->setShortcut(tr("Ctrl+I"));
 	connect(pcaiAct, SIGNAL(triggered()), this, SLOT(pcaiMethodViewer()));
 
+	sobelAndSIFTAct = new QAction(tr("Sobel and SIFT method"), this);
+	sobelAndSIFTAct->setEnabled(false);
+	//sobelAndSIFTAct->setShortcut(tr("Ctrl+I"));
+	connect(sobelAndSIFTAct, SIGNAL(triggered()), this, SLOT(sobelAndSIFT()));
+
+	cannyAndSIFTAct = new QAction(tr("Canny and SIFT method"), this);
+	cannyAndSIFTAct->setEnabled(false);
+	//sobelAndSIFTAct->setShortcut(tr("Ctrl+I"));
+	connect(cannyAndSIFTAct, SIGNAL(triggered()), this, SLOT(cannyAndSIFT()));
+
 	measureMBaryAct = new QAction(tr("&Measure manual centroid"), this);
 	measureMBaryAct->setEnabled(false);
 	connect(measureMBaryAct, SIGNAL(triggered()), this, SLOT(measureMBary()));
@@ -338,6 +349,8 @@ void ImageViewer::createMenus()
 	dominantPointMenu->addAction(phtPointsAct);
 	dominantPointMenu->addAction(autoLandmarksAct);
 	dominantPointMenu->addAction(pcaiAct);
+	dominantPointMenu->addAction(sobelAndSIFTAct);
+	dominantPointMenu->addAction(cannyAndSIFTAct);
 	dominantPointMenu->addSeparator();
 	dominantPointMenu->addAction(measureMBaryAct);
 	dominantPointMenu->addAction(measureEBaryAct);
@@ -413,6 +426,8 @@ void ImageViewer::activeFunction()
 	dirGenerateDataAct->setEnabled(true);
 
 	pcaiAct->setEnabled(true);
+	sobelAndSIFTAct->setEnabled(true);
+	cannyAndSIFTAct->setEnabled(true);
 
 	testAct->setEnabled(true);
 
@@ -504,8 +519,8 @@ ImageViewer::~ImageViewer()
 	delete dirAutoLandmarksAct;
 	delete dirCentroidMeasureAct;
 	delete dirGenerateDataAct;
-
-	//delete icpAct;
+	delete sobelAndSIFTAct;
+	delete cannyAndSIFTAct;
 }
 
 void ImageViewer::loadImage(QString fn)
@@ -561,45 +576,34 @@ void ImageViewer::about()
 void ImageViewer::testMethod()
 {
 	cout << "\nTest a method ..." << endl;
+	QMessageBox msgbox;
+	msgbox.setText("Select the landmark file of scene image.");
+	msgbox.exec();
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+	matImage->readManualLandmarks(reflmPath.toStdString());
+	msgbox.setText("Select the model image.");
+	msgbox.exec();
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	cout << endl << fileName2.toStdString() << endl;
+	Image *modelImage = new Image(fileName2.toStdString());
 
-	// try to remove leg and other parts
-	Matrix<double> gauKernel = getGaussianKernel(5, 1);
-	Matrix<int> result = gaussianBlur(*matImage->getGrayMatrix(), gauKernel);
+	msgbox.setText("Select the landmark file of model image.");
+	msgbox.exec();
+	QString reflmPath2 = QFileDialog::getOpenFileName(this);
+	modelImage->readManualLandmarks(reflmPath2.toStdString());
 
-	ptr_IntMatrix binMatrix = binaryThreshold(&result,
-		matImage->getThresholdValue(), 255);
-	binMatrix = postProcess(binMatrix, 255);
-	//result = *removeLeg(binMatrix);
-
-	/*ptr_IntMatrix hProjection = new Matrix<int>(binMatrix->getRows(),
-		binMatrix->getCols(), 255);
-	ptr_IntMatrix vProjection(hProjection);
-	binProjection(binMatrix, hProjection, vProjection);
-
-	Matrix<int> result2 = splitImage(binMatrix, 150);
-	splitImageCols(&result2, 150);
-
-	for (int r = 0; r < binMatrix->getRows(); r += 150)
-	{
-		for (int c = 0; c < binMatrix->getCols(); c++)
-		{
-			binMatrix->setAtPosition(r, c, 0);
-		}
-	}*/
-
+	//testLBPDescriptor(matImage->getGrayMatrix(), matImage->getListOfManualLandmarks(), 64);
+	testLBPDescriptor2Images(matImage->getGrayMatrix(),
+		matImage->getListOfManualLandmarks(), modelImage->getGrayMatrix(),
+		modelImage->getListOfManualLandmarks(), 64);
 	ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ptrIntToQImage(&result), "Quantization");
+	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
+		"Quantization");
 	other->move(x() - 40, y() - 40);
 	other->show();
 
-	/*ImageViewer *hp = new ImageViewer;
-	 hp->loadImage(matImage, ptrIntToQImage(hProjection), "H Projection");
-	 hp->move(x() - 40, y() - 40);
-	 hp->show();
-	 ImageViewer *vp = new ImageViewer;
-	 vp->loadImage(matImage, ptrIntToQImage(vProjection), "V Projection");
-	 vp->move(x() - 40, y() - 40);
-	 vp->show();*/
 	cout << "\nFinish.\n";
 	cout << "\n End test method!" << endl;
 }
@@ -1373,38 +1377,7 @@ void ImageViewer::dirGenerateData()
 // ================================================ Registration ========================================
 void ImageViewer::pcaiMethodViewer()
 {
-	/*
-	 * QMessageBox msgbox;
-
-	 // extract list of points of model image by using canny
-	 msgbox.setText("Select the model image.");
-	 msgbox.exec();
-	 QString fileName2 = QFileDialog::getOpenFileName(this);
-	 if (fileName2.isEmpty())
-	 return;
-	 cout << endl << fileName2.toStdString() << endl;
-	 Image *modelImage = new Image(fileName2.toStdString());
-
-	 msgbox.setText("Select the landmark file of model image.");
-	 msgbox.exec();
-	 QString reflmPath = QFileDialog::getOpenFileName(this);
-	 modelImage->readManualLandmarks(reflmPath.toStdString());
-	 int rows = matImage->getGrayMatrix()->getRows();
-	 int cols = matImage->getGrayMatrix()->getCols();
-	 ProHoughTransform tr;
-	 tr.setRefImage(*modelImage);
-
-	 Point ePoint, mPoint;
-	 double angleDiff;
-
-	 //==================================================================
-	 LandmarkDetection lmDetect;
-	 lmDetect.setRefImage(*modelImage);
-	 vector<Point> estLandmarks = lmDetect.landmarksAutoDectect2(*matImage, 100,
-	 300);
-	 cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
-	 */
-	cout << "\nImage registration" << endl;
+	cout << "\nLandmarks with image registration" << endl;
 	QMessageBox msgbox;
 
 	// extract list of points of model image by using canny
@@ -1463,4 +1436,125 @@ void ImageViewer::pcaiMethodViewer()
 	delete modelImage;
 	msgbox.setText("Finish.");
 	msgbox.exec();
+}
+
+void ImageViewer::sobelAndSIFT()
+{
+	cout << "\nLandmarks with contours (Sobel) and SIFT" << endl;
+	QMessageBox msgbox;
+
+	// extract list of points of model image by using canny
+	msgbox.setText("Select the model image.");
+	msgbox.exec();
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	cout << endl << fileName2.toStdString() << endl;
+	Image *modelImage = new Image(fileName2.toStdString());
+	msgbox.setText("Select the landmark file of model image.");
+	msgbox.exec();
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+	modelImage->readManualLandmarks(reflmPath.toStdString());
+
+	// get the contours in the scene image
+	Matrix<double> kernel = getGaussianKernel(5, 2);
+	Matrix<int> gsResult = gaussianBlur(*(matImage->getGrayMatrix()), kernel);
+	Matrix<int> sbResult = SobelOperation(&gsResult);
+	int tValue = 6; //thresholdOtsu(sbResult);
+	cout << "\n Otsu threshold: " << tValue << endl;
+	vector<Point> contours;
+	for (int r = 0; r < sbResult.getRows(); r++)
+	{
+		for (int c = 0; c < sbResult.getCols(); c++)
+		{
+			int value = sbResult.getAtPosition(r, c);
+			if (value == 0)
+			{
+				sbResult.setAtPosition(r, c, 0);
+			}
+			else
+			{
+				if (value >= tValue)
+				{
+					sbResult.setAtPosition(r, c, 255);
+				}
+				else
+					sbResult.setAtPosition(r, c, 0);
+			}
+		}
+	}
+	ptr_IntMatrix dlResult = closeBinary(&sbResult, 3);
+	for (int r = 0; r < dlResult->getRows(); r++)
+	{
+		for (int c = 0; c < dlResult->getCols(); c++)
+		{
+			if (dlResult->getAtPosition(r, c) == 255)
+				contours.push_back(Point(c, r));
+		}
+	}
+	cout << "\nManual landmarks: "
+		<< modelImage->getListOfManualLandmarks().size() << endl;
+	vector<Point> estLandmarks = verifyDescriptors3(modelImage->getGrayMatrix(),
+		matImage->getGrayMatrix(), contours, modelImage->getListOfManualLandmarks(),
+		9);
+	cout << "\nNumber of estimated landmarks: " << estLandmarks.size() << endl;
+
+	RGB color;
+	color.R = 255;
+	color.G = 0;
+	color.B = 0;
+	Point lm;
+	for (size_t i = 0; i < estLandmarks.size(); i++)
+	{
+		lm = estLandmarks.at(i);
+		fillCircle(*(matImage->getRGBMatrix()), lm, 7, color);
+	}
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
+		"Sobel and SIFT");
+	other->move(x() - 40, y() - 40);
+	other->show();
+}
+void ImageViewer::cannyAndSIFT()
+{
+	cout << "\nLandmarks with contours (Sobel) and SIFT" << endl;
+	QMessageBox msgbox;
+
+	// extract list of points of model image by using canny
+	msgbox.setText("Select the model image.");
+	msgbox.exec();
+	QString fileName2 = QFileDialog::getOpenFileName(this);
+	if (fileName2.isEmpty())
+		return;
+	cout << endl << fileName2.toStdString() << endl;
+	Image *modelImage = new Image(fileName2.toStdString());
+	msgbox.setText("Select the landmark file of model image.");
+	msgbox.exec();
+	QString reflmPath = QFileDialog::getOpenFileName(this);
+	modelImage->readManualLandmarks(reflmPath.toStdString());
+
+	vector<Point> cPoints;
+	matImage->cannyAlgorithm(cPoints);
+	cout << "\nNumber of points on contours: " << cPoints.size() << endl;
+	vector<Point> estLandmarks = verifyDescriptors4(modelImage->getGrayMatrix(),
+		matImage->getGrayMatrix(), cPoints, modelImage->getListOfManualLandmarks(),
+		63);
+	cout << "\nNumber of estimated landmarks: " << estLandmarks.size() << endl;
+	RGB color;
+	color.R = 255;
+	color.G = 0;
+	color.B = 0;
+	Point lm;
+	for (size_t i = 0; i < estLandmarks.size(); i++)
+	{
+		lm = estLandmarks.at(i);
+		fillCircle(*(matImage->getRGBMatrix()), lm, 7, color);
+	}
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
+		"Canny and SIFT");
+	other->move(x() - 40, y() - 40);
+	other->show();
 }

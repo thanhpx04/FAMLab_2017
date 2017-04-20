@@ -367,3 +367,139 @@ vector<Point> verifyDescriptors2(ptr_IntMatrix model, ptr_IntMatrix scene,
 	}
 	return result;
 }
+
+// estimated the landmarks on list of points belong to the contours
+vector<Point> verifyDescriptors3(ptr_IntMatrix model, ptr_IntMatrix scene,
+	vector<Point> contourPoints, vector<Point> manualLM, int patchSize)
+{
+	vector<Point> result;
+	int width = model->getCols();
+	int height = model->getRows();
+	Point mpi(0, 0), epi(0, 0), minPoint(0, 0);
+
+	for (int i = 0; i < manualLM.size(); i++)
+	{
+		mpi = manualLM.at(i);
+		minPoint.reset();
+		double minDistance = DBL_MAX;
+		vector<double> mHistogram = SIFTDescriptor(model, mpi, patchSize);
+		for (int j = 0; j < contourPoints.size(); j++)
+		{
+			epi = contourPoints.at(j);
+			vector<double> sHistogram = SIFTDescriptor(scene, epi, patchSize);
+			double distance = l2Distance(mHistogram, sHistogram);
+			if (distance < minDistance)
+			{
+				minDistance = distance;
+				minPoint.setX(epi.getX());
+				minPoint.setY(epi.getY());
+			}
+		}
+		result.push_back(minPoint);
+	}
+	return result;
+}
+
+double bhatScore(ptr_IntMatrix patch1, ptr_IntMatrix patch2)
+{
+	int rows1 = patch1->getRows();
+	int cols1 = patch1->getCols();
+	int rows2 = patch2->getRows();
+	int cols2 = patch2->getCols();
+	if (rows1 != rows2 || cols1 != cols2)
+		return 0;
+	double values1 = 0, values2 = 0;
+	for (int r = 0; r < rows1; r++)
+	{
+		for (int c = 0; c < cols1; c++)
+		{
+			values1 += patch1->getAtPosition(r, c);
+		}
+	}
+	for (int r = 0; r < rows2; r++)
+	{
+		for (int c = 0; c < cols2; c++)
+		{
+			values2 += patch2->getAtPosition(r, c);
+		}
+	}
+	for (int r = 0; r < rows2; r++)
+	{
+		for (int c = 0; c < cols2; c++)
+		{
+			values2 += patch2->getAtPosition(r, c);
+		}
+	}
+	double distance = 0;
+	for (int r = 0; r < rows1; r++)
+	{
+		for (int c = 0; c < cols1; c++)
+		{
+			double value_1 = sqrt(patch1->getAtPosition(r, c) / values1);
+			double value_2 = sqrt(patch2->getAtPosition(r, c) / values2);
+			distance += value_1 * value_2;
+		}
+	}
+	return distance;
+}
+
+ptr_IntMatrix extractPatch(ptr_IntMatrix grayImage, int pSize, Point center)
+{
+	if(pSize % 2 ==0)
+		pSize += 1;
+	int hSize = pSize/2;
+	ptr_IntMatrix patch = new Matrix<int>(pSize,pSize,0);
+	int rows = grayImage->getRows();
+	int cols = grayImage->getCols();
+	int rbelow = center.getY() - hSize;
+	int rabow = center.getY() + hSize;
+	int	cleft = center.getX() - hSize;
+	int cright = center.getX() + hSize;
+	if( rbelow < 0 || rabow >=rows || cleft < 0 || cright >= cols)
+		return patch;
+
+	int i =0, j=0;
+	for (int r = rbelow; r <= rabow; r++) {
+		j = 0;
+		for (int c = cleft; c <= cright; c++) {
+			int value = grayImage->getAtPosition(r,c);
+			patch->setAtPosition(i,j,value);
+			j++;
+		}
+		i++;
+	}
+	return patch;
+}
+
+vector<Point> verifyDescriptors4(ptr_IntMatrix model, ptr_IntMatrix scene,
+	vector<Point> contourPoints, vector<Point> manualLM, int patchSize)
+{
+	vector<Point> result;
+	int width = model->getCols();
+	int height = model->getRows();
+	Point mpi(0, 0), epi(0, 0), minPoint(0, 0);
+
+	for (int i = 0; i < manualLM.size(); i++)
+	{
+		mpi = manualLM.at(i);
+		minPoint.reset();
+		double maxDistance = -1;
+		ptr_IntMatrix mPatch = extractPatch(model,patchSize,mpi);
+
+		for (int j = 0; j < contourPoints.size(); j++)
+		{
+			epi = contourPoints.at(j);
+			ptr_IntMatrix sPatch = extractPatch(scene,patchSize,epi);
+
+			double distance = bhatScore(mPatch, sPatch);
+			if (distance > maxDistance)
+			{
+				maxDistance = distance;
+				minPoint.setX(epi.getX());
+				minPoint.setY(epi.getY());
+			}
+		}
+		result.push_back(minPoint);
+	}
+	return result;
+}

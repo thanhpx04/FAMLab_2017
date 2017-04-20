@@ -185,13 +185,11 @@ Matrix<int> postSobel(Matrix<int> sobelResult)
 	/*
 	 * Inverse the result
 	 */
-	int values = 0;
 	for (int r = 0; r < rows; r++)
 	{
 		for (int c = 0; c < cols; c++)
 		{
 			int value = sobelResult.getAtPosition(r, c);
-			values += value;
 			if (value == 0)
 			{
 				sobelResult.setAtPosition(r, c, 0);
@@ -228,6 +226,74 @@ Matrix<int> postSobel(Matrix<int> sobelResult)
 	 }
 	 }*/
 	return sobelResult;
+}
+
+double intraClasses(double pro[256], int threshold)
+{
+	double weight1 = 0, weight2 = 0;
+	for (int i = 0; i < 256; i++)
+	{
+		double p = pro[i];
+		if (i < threshold)
+		{
+			weight1 += p;
+		}
+		else
+		{
+			weight2 += p;
+		}
+	}
+	//cout<<"\nWeights: "<<weight1<<"\t"<<weight2<<endl;
+	double muy1 = 0, muy2 = 0;
+	for (int i = 0; i < 256; i++)
+	{
+		double p = pro[i];
+		if (i < threshold)
+		{
+			muy1 += (i *(p/weight1));
+		}
+		else
+		{
+			muy2 += (i *(p/weight2));
+		}
+	}
+	double sigma = weight1 * weight2 * pow((muy1 - muy2),2);
+	return sigma;
+}
+
+int thresholdOtsu(Matrix<int> sobelResult)
+{
+	int rows = sobelResult.getRows();
+	int cols = sobelResult.getCols();
+	int values = rows * cols;
+	int hist[256] =
+	{ };
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			int value = sobelResult.getAtPosition(r, c);
+			hist[value] += 1;
+		}
+	}
+	double pro[256] =
+	{ };
+
+	for (int i = 0; i < 256; i++)
+	{
+		pro[i] = (double)hist[i] / (double)values;
+	}
+	double sigmaMax = 0;
+	int index = 0;
+	for (int i = 0; i < 256; i++) {
+		double sigma = intraClasses(pro,i);
+		if(sigma > sigmaMax)
+		{
+			sigmaMax = sigma;
+			index = i;
+		}
+	}
+	return index;
 }
 
 // =================================== Some binary operations =============================

@@ -47,7 +47,7 @@ public:
 	vector<Point> getListOfManualLandmarks();
 	vector<Point> getListOfAutoLandmarks();
 
-	vector<Edge> cannyAlgorithm();
+	vector<Edge> cannyAlgorithm(vector<Point> &cPoints);
 	vector<Line> getApproximateLines(double minDistance);
 	vector<Point> readManualLandmarks(string fileName);
 

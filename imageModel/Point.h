@@ -113,6 +113,7 @@ public:
 	RGB getColor();
 	void setColor(RGB rgb);
 	void toString();
+	void reset();
 	bool operator<(const Point &cPoint);
 	bool operator>(const Point &cPoint);
 	bool operator==(const Point &cPoint);

@@ -5,6 +5,7 @@
  *      Author: linh
  */
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <cmath>
 #include <fstream>
@@ -14,7 +15,7 @@
 #include <string>
 #include <algorithm>
 #include <pthread.h>
-
+#include <stdlib.h>
 using namespace std;
 
 #include "../imageModel/Point.h"
@@ -27,6 +28,7 @@ using namespace std;
 
 #include "../io/Reader.h"
 #include "../segmentation/Thresholds.h"
+
 #include "SVD.h"
 
 struct pDescriptor
@@ -341,7 +343,8 @@ vector<Edge> test2(Image image)
 	//getContour(greenChannel);
 	Image image2;
 	image2.setGrayMatrix(greenChannel);
-	vector<Edge> edges = image2.cannyAlgorithm();
+	vector<Point> cPoints;
+	vector<Edge> edges = image2.cannyAlgorithm(cPoints);
 	return edges;
 }
 // ========================== Test method =======================
@@ -415,3 +418,29 @@ ptr_IntMatrix splitChannel(ptr_RGBMatrix inputImage, int channel) // 0 = R, 1 = 
 	return result;
 }
 
+Matrix<RGB> extractAPatch(ptr_RGBMatrix rgbMatrix, int wpatch, int hpatch,
+	Point center)
+{
+	RGB color;
+	color.R = color.G = color.B = 0;
+	return rgbMatrix->extractPatch(wpatch, hpatch, center.getY(), center.getX(),
+		color);
+}
+void extractPatches(ptr_RGBMatrix rgbMatrix, int wpatch, int hpatch,
+	string foldersave)
+{
+	int rows = rgbMatrix->getRows();
+	int cols = rgbMatrix->getCols();
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			Matrix<RGB> onePatch = extractAPatch(rgbMatrix, wpatch, hpatch,
+				Point(c, r));
+			stringstream sname;
+			sname << "patch_" << r << "_" << c << ".jpg";
+			string name = sname.str();
+			saveRGB((foldersave + name).c_str(), &onePatch);
+		}
+	}
+}

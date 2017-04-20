@@ -43,6 +43,11 @@ void Point::toString()
 {
 	cout << "\n" << x << "\t" << y << endl;
 }
+
+void Point::reset()
+{
+	x = y = 0;
+}
 bool Point::operator<(const Point &cPoint)
 {
 	if (this->x < cPoint.x && this->y < cPoint.y)
@@ -63,15 +68,15 @@ bool Point::operator==(const Point &cPoint)
 }
 bool Point::operator!=(int value)
 {
-	if(this->x != value && this->y  != value)
+	if (this->x != value && this->y != value)
 		return true;
 	return false;
 }
 Point Point::operator-(const Point cPoint)
 {
-	return Point(this->x - cPoint.x,this->y - cPoint.y);
+	return Point(this->x - cPoint.x, this->y - cPoint.y);
 }
 Point Point::operator+(const Point cPoint)
 {
-	return Point(this->x + cPoint.x,this->y + cPoint.y);
+	return Point(this->x + cPoint.x, this->y + cPoint.y);
 }

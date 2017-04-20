@@ -232,6 +232,34 @@ Matrix<T> Matrix<T>::multiply(Matrix<T> object, T defaultValue)
 	}
 }
 
+template<typename T>
+Matrix<T> Matrix<T>::extractPatch(int width, int height, int rowIndex, int colIndex, T initValue)
+{
+	Matrix<T> result(height,width);
+	result.InitWithValue(initValue);
+	Point lleft, lright;
+	int wh = width / 2;
+	int hh = height / 2;
+	int i = 0, j = 0;
+
+	for (int r = rowIndex - hh; r < rowIndex + hh; r++)
+	{
+		j = 0;
+		for (int c = colIndex - wh; c < colIndex + wh; c++)
+		{
+			T value = initValue;
+			if (r >= 0 && c >= 0 && r < rows && c < cols)
+			{
+				value = data[r][c];
+			}
+			result.data[i][j] = value;
+			j++;
+		}
+		i++;
+	}
+	return result;
+}
+
 template class Matrix<int> ;
 template class Matrix<double> ;
 template class Matrix<float> ;

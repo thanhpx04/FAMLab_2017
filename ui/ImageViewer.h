@@ -69,6 +69,8 @@ private slots:
 	void dirAutoLandmarks();
 	void dirCentroidMeasure();
 	void dirGenerateData();
+	void sobelAndSIFT();
+	void cannyAndSIFT();
 
 	void pcaiMethodViewer();
 
@@ -130,7 +132,8 @@ private:
 	QAction *dirAutoLandmarksAct;
 	QAction *dirCentroidMeasureAct;
 	QAction *dirGenerateDataAct;
-
+	QAction *sobelAndSIFTAct;
+	QAction *cannyAndSIFTAct;
 
 	// Action registration
 	QAction *pcaiAct;

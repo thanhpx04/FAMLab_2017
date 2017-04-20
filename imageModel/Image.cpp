@@ -205,7 +205,8 @@ float Image::getThresholdValue()
 
 vector<Line> Image::getApproximateLines(double minDistance)
 {
-	vector<Edge> listOfEdges = cannyAlgorithm();
+	vector<Point> cPoints;
+	vector<Edge> listOfEdges = cannyAlgorithm(cPoints);
 	vector<Line> totalLines;
 
 	Edge ed;
@@ -346,19 +347,15 @@ void Image::calThresholdValue()
 	thresholdValue = (mid1 + mid2) / 2;
 }
 
-vector<Edge> Image::cannyAlgorithm()
+vector<Edge> Image::cannyAlgorithm(vector<Point> &cPoints)
 {
 	if (thresholdValue == 0)
 		calThresholdValue();
 
 	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, (int) thresholdValue,
 		MAX_GRAY_VALUE);
-
-	/*ptr_IntMatrix cannyMatrix = cannyProcess(binMatrix, (int) thresholdValue,
-		3 * (int) thresholdValue);*/
-
 	ptr_IntMatrix cannyMatrix = cannyProcess(binMatrix, (int) thresholdValue,
-			3 * (int) thresholdValue);
+			3 * (int) thresholdValue,cPoints);
 
 	vector<Edge> listOfEdges;
 	listOfEdges = suzuki(cannyMatrix);

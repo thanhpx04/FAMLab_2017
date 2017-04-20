@@ -16,4 +16,5 @@ ptr_IntMatrix erode(ptr_IntMatrix binMatrix, int kernelSize);
 ptr_IntMatrix dilate(ptr_IntMatrix binMatrix, int kernelSize);
 ptr_IntMatrix openBinary(ptr_IntMatrix binMatrix, int kernelSize);
 ptr_IntMatrix closeBinary(ptr_IntMatrix binMatrix, int kernelSize);
+int thresholdOtsu(Matrix<int> sobelResult);
 #endif /* FILTERS_H_ */

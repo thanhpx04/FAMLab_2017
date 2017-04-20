@@ -545,5 +545,4 @@ void LandmarkDetection::landmarksOnDir4(string modelName, string folderScene,
 		estLandmarks.clear();
 
 	}
-
 }

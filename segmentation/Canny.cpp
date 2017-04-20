@@ -401,7 +401,7 @@ int threshCut(ptr_IntMatrix inputMatrix)
 }
 // ========================== Process to find the edges in image =============================================
 ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
-	int highThreshold)
+	int highThreshold, vector<Point> &contourPoints)
 {
 	ptr_IntMatrix binary2 = postProcess(binaryImage, 255);
 	ptr_IntMatrix sobelFilter = sobelOperationCanny(binary2);
@@ -409,6 +409,18 @@ ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
 		highThreshold);
 	//delete binary2;
+	int rows = thresholdImage->getRows();
+	int cols = thresholdImage->getCols();
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			if (thresholdImage->getAtPosition(r, c) == 255)
+			{
+				contourPoints.push_back(Point(c, r));
+			}
+		}
+	}
 	delete sobelFilter;
 	delete nonMaxSuppress;
 
