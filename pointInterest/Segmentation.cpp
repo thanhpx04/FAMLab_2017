@@ -70,7 +70,7 @@ vector<Line> Segmentation::segment()
 int Segmentation::removePronotum()
 {
 	Image image = Treatments::refImage;
-	ptr_IntMatrix histogram = image.getHistogram();
+	ptr_IntMatrix histogram = image.getGrayHistogram();
 	ptr_IntMatrix grayScale = image.getGrayMatrix();
 	int histCols = histogram->getCols();
 	int max = -1, imax = -1;

@@ -45,6 +45,7 @@ private slots:
 	void normalSize();
 	void fitToWindow();
 	void gScaleHistogram();
+	void rgbHistogramCalc();
 	void displayManualLandmarks();
 	void displayAutoLandmarks();
 
@@ -105,6 +106,7 @@ private:
 	QAction *normalSizeAct;
 	QAction *fitToWindowAct;
 	QAction *gHistogramAct;
+	QAction *rgbHistogramAct;
 	QAction *displayMLandmarksAct;
 	QAction *displayALandmarksAct;
 

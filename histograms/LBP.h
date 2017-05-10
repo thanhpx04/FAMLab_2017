@@ -12,4 +12,7 @@ void testLBPDescriptor(ptr_IntMatrix grayImage, vector<Point> landmarks, int sPa
 void testLBPDescriptor2Images(ptr_IntMatrix grayImage1,
 	vector<Point> landmarks1, ptr_IntMatrix grayImage2, vector<Point> landmarks2,
 	int sPatch);
+vector<Point> testLBPDescriptor2ImagesContours(ptr_IntMatrix grayImage1,
+	vector<Point> landmarks1, ptr_IntMatrix grayImage2, vector<Point> gray2Contours,
+	int sPatch);
 #endif /* LBP_H_ */

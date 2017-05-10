@@ -445,25 +445,27 @@ double bhatScore(ptr_IntMatrix patch1, ptr_IntMatrix patch2)
 
 ptr_IntMatrix extractPatch(ptr_IntMatrix grayImage, int pSize, Point center)
 {
-	if(pSize % 2 ==0)
+	if (pSize % 2 == 0)
 		pSize += 1;
-	int hSize = pSize/2;
-	ptr_IntMatrix patch = new Matrix<int>(pSize,pSize,0);
+	int hSize = pSize / 2;
+	ptr_IntMatrix patch = new Matrix<int>(pSize, pSize, 0);
 	int rows = grayImage->getRows();
 	int cols = grayImage->getCols();
 	int rbelow = center.getY() - hSize;
 	int rabow = center.getY() + hSize;
-	int	cleft = center.getX() - hSize;
+	int cleft = center.getX() - hSize;
 	int cright = center.getX() + hSize;
-	if( rbelow < 0 || rabow >=rows || cleft < 0 || cright >= cols)
+	if (rbelow < 0 || rabow >= rows || cleft < 0 || cright >= cols)
 		return patch;
 
-	int i =0, j=0;
-	for (int r = rbelow; r <= rabow; r++) {
+	int i = 0, j = 0;
+	for (int r = rbelow; r <= rabow; r++)
+	{
 		j = 0;
-		for (int c = cleft; c <= cright; c++) {
-			int value = grayImage->getAtPosition(r,c);
-			patch->setAtPosition(i,j,value);
+		for (int c = cleft; c <= cright; c++)
+		{
+			int value = grayImage->getAtPosition(r, c);
+			patch->setAtPosition(i, j, value);
 			j++;
 		}
 		i++;
@@ -484,12 +486,12 @@ vector<Point> verifyDescriptors4(ptr_IntMatrix model, ptr_IntMatrix scene,
 		mpi = manualLM.at(i);
 		minPoint.reset();
 		double maxDistance = -1;
-		ptr_IntMatrix mPatch = extractPatch(model,patchSize,mpi);
+		ptr_IntMatrix mPatch = extractPatch(model, patchSize, mpi);
 
 		for (int j = 0; j < contourPoints.size(); j++)
 		{
 			epi = contourPoints.at(j);
-			ptr_IntMatrix sPatch = extractPatch(scene,patchSize,epi);
+			ptr_IntMatrix sPatch = extractPatch(scene, patchSize, epi);
 
 			double distance = bhatScore(mPatch, sPatch);
 			if (distance > maxDistance)
@@ -502,4 +504,25 @@ vector<Point> verifyDescriptors4(ptr_IntMatrix model, ptr_IntMatrix scene,
 		result.push_back(minPoint);
 	}
 	return result;
+}
+
+vector<Point> test(ptr_RGBMatrix model, vector<Point> mLandmarks,
+	ptr_RGBMatrix scene, int pSize)
+{
+	vector<Point> result;
+	int cols = model->getCols();
+	int rows = model->getRows();
+	for (int i = 0; i < mLandmarks.size(); i++) {
+		Point pi = mLandmarks.at(i);
+		ptr_RGBMatrix mPatch = extractAPatch(model,pSize,pSize,pi);
+		for (int r = 0; r < rows; r++) {
+			for (int c = 0; c < cols; c++) {
+				RGB vColor = scene->getAtPosition(r,c);
+				if(vColor.R !=0 || vColor.G != 0 || vColor.B != 0)
+				{
+
+				}
+			}
+		}
+	}
 }

@@ -123,9 +123,13 @@ void ImageViewer::createViewMenu()
 	fitToWindowAct->setShortcut(tr("Ctrl+J"));
 	connect(fitToWindowAct, SIGNAL(triggered()), this, SLOT(fitToWindow()));
 
-	gHistogramAct = new QAction(tr("&Histogram"), this);
+	gHistogramAct = new QAction(tr("&Gray-scale Histogram"), this);
 	gHistogramAct->setEnabled(false);
 	connect(gHistogramAct, SIGNAL(triggered()), this, SLOT(gScaleHistogram()));
+
+	rgbHistogramAct = new QAction(tr("&RGB Histogram"), this);
+	rgbHistogramAct->setEnabled(false);
+	connect(rgbHistogramAct, SIGNAL(triggered()), this, SLOT(rgbHistogramCalc()));
 
 	displayMLandmarksAct = new QAction(tr("&Display manual landmarks"), this);
 	displayMLandmarksAct->setEnabled(false);
@@ -320,6 +324,7 @@ void ImageViewer::createMenus()
 	viewMenu->addAction(fitToWindowAct);
 	viewMenu->addSeparator();
 	viewMenu->addAction(gHistogramAct);
+	viewMenu->addAction(rgbHistogramAct);
 	viewMenu->addAction(displayMLandmarksAct);
 	viewMenu->addAction(displayALandmarksAct);
 
@@ -397,6 +402,7 @@ void ImageViewer::activeFunction()
 	fitToWindowAct->setEnabled(true);
 	normalSizeAct->setEnabled(true);
 	gHistogramAct->setEnabled(true);
+	rgbHistogramAct->setEnabled(true);
 	displayMLandmarksAct->setEnabled(true);
 	if (matImage->getListOfAutoLandmarks().size() > 0)
 		displayALandmarksAct->setEnabled(true);
@@ -595,9 +601,26 @@ void ImageViewer::testMethod()
 	modelImage->readManualLandmarks(reflmPath2.toStdString());
 
 	//testLBPDescriptor(matImage->getGrayMatrix(), matImage->getListOfManualLandmarks(), 64);
-	testLBPDescriptor2Images(matImage->getGrayMatrix(),
-		matImage->getListOfManualLandmarks(), modelImage->getGrayMatrix(),
-		modelImage->getListOfManualLandmarks(), 64);
+
+	/*testLBPDescriptor2Images(matImage->getGrayMatrix(),
+	 matImage->getListOfManualLandmarks(), modelImage->getGrayMatrix(),
+	 modelImage->getListOfManualLandmarks(), 64);*/
+
+	vector<Point> contourPoints;
+	matImage->cannyAlgorithm(contourPoints);
+	vector<Point> rs = testLBPDescriptor2ImagesContours(
+		modelImage->getGrayMatrix(), modelImage->getListOfManualLandmarks(),
+		matImage->getGrayMatrix(), contourPoints, 64);
+
+	RGB color;
+	color.R = 255;
+	color.G = color.B = 0;
+	for (int i = 0; i < rs.size(); i++)
+	{
+		Point p = rs.at(i);
+		fillCircle(*matImage->getRGBMatrix(), p, 5, color);
+	}
+
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
 		"Quantization");
@@ -702,7 +725,7 @@ void ImageViewer::fitToWindow()
 void ImageViewer::gScaleHistogram()
 {
 	cout << "\n Gray scale histogram." << endl;
-	ptr_IntMatrix histogram = matImage->getHistogram();
+	ptr_IntMatrix histogram = matImage->getGrayHistogram();
 	int max = -1;
 	for (int c = 0; c < histogram->getCols(); c++)
 	{
@@ -720,7 +743,7 @@ void ImageViewer::gScaleHistogram()
 		pbegin.setX(c);
 		pbegin.setY(239);
 		pend.setX(c);
-		pend.setY(239 - (histogram->getAtPosition(0, c) * 230 / max));
+		pend.setY(239 - (histogram->getAtPosition(0, c) * 239 / max));
 		drawingLine(*hDisplay, Line(pbegin, pend), color);
 	}
 	ImageViewer *other = new ImageViewer;
@@ -729,6 +752,79 @@ void ImageViewer::gScaleHistogram()
 	other->show();
 	cout << "\nFinished." << endl;
 }
+
+void ImageViewer::rgbHistogramCalc()
+{
+	cout << "\n RGB histogram." << endl;
+
+	ptr_RGBMatrix histogram = matImage->getRGBHistogram();
+	double totalPixels = matImage->getGrayMatrix()->getRows() * matImage->getGrayMatrix()->getCols();
+	ptr_RGBMatrix result = colorThreshold(matImage->getRGBMatrix(),histogram);
+
+
+	double maxR = -1, maxG = -1, maxB = -1;
+	for (int c = 0; c < histogram->getCols(); c++)
+	{
+		RGB color = histogram->getAtPosition(0, c);
+		if (color.R > maxR)
+			maxR = color.R;
+		if (color.G > maxG)
+			maxG = color.G;
+		if (color.B > maxB)
+			maxB = color.B;
+	}
+	int cols = histogram->getCols();
+	RGB color;
+	color.R = color.G = color.B =0;
+	ptr_RGBMatrix redDisplay = new Matrix<RGB>(240, 300, color);
+	ptr_RGBMatrix greenDisplay = new Matrix<RGB>(240, 300, color);
+	ptr_RGBMatrix blueDisplay = new Matrix<RGB>(240, 300, color);
+	Point pbegin, pend;
+	for (int c = 0; c < histogram->getCols(); c++)
+	{
+		RGB cvalue = histogram->getAtPosition(0, c);
+		pbegin.setX(c);
+		pbegin.setY(239);
+		pend.setX(c);
+		pend.setY(239 - ((double)((cvalue.R * 239) / maxR)));
+		color.R = 255;
+		color.G = color.B = 0;
+		drawingLine(*redDisplay, Line(pbegin, pend), color);
+
+		pend.setX(c);
+		pend.setY(239 - ((double)((cvalue.G * 239) / maxG)));
+		color.G = 255;
+		color.R = color.B = 0;
+		drawingLine(*greenDisplay, Line(pbegin, pend), color);
+
+		pend.setX(c);
+		pend.setY(239 - ((double)((cvalue.B * 239) / maxB)));
+		color.B = 255;
+		color.R = color.G = 0;
+		drawingLine(*blueDisplay, Line(pbegin, pend), color);
+	}
+
+	ImageViewer *other = new ImageViewer;
+	other->loadImage(matImage, ptrRGBToQImage(result),
+		"RGB Histogram result - Red channel");
+	other->move(x() - 40, y() - 40);
+	other->show();
+
+	/*ImageViewer *other2 = new ImageViewer;
+	other2->loadImage(matImage, ptrRGBToQImage(greenDisplay),
+		"RGB Histogram result - Green channel");
+	other2->move(x() - 60, y() - 60);
+	other2->show();
+
+	ImageViewer *other3 = new ImageViewer;
+	other3->loadImage(matImage, ptrRGBToQImage(blueDisplay),
+		"RGB Histogram result - Blue Channel");
+	other3->move(x() - 80, y() - 80);
+	other3->show();*/
+
+	cout << "\nFinished." << endl;
+}
+
 void ImageViewer::displayManualLandmarks()
 {
 	cout << "\n Display the manual landmarks.\n";
@@ -871,6 +967,9 @@ void ImageViewer::cannyAlgorithm()
 				matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
 			}
 		}
+		cout<<"\nNumber of points in edge: "<< edgei.getPoints().size();
+		if(i==2)
+			break;
 	}
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
@@ -930,7 +1029,7 @@ void ImageViewer::lineSegmentation()
 	}
 
 	this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-		"Landmarks result");
+		"Line segmentation result");
 	this->show();
 
 	msgbox.setText("Finish");

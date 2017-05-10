@@ -107,11 +107,10 @@ Image::Image(std::string filePath)
 
 	fileName = filePath;
 	int rows = 0, cols = 0;
-	imgMatrix = readJPGToRGB(filePath.c_str(),rows, cols);
+	imgMatrix = readJPGToRGB(filePath.c_str(), rows, cols);
 
-	grayMatrix = new Matrix<int>(rows,cols);
+	grayMatrix = new Matrix<int>(rows, cols);
 	grayMatrix = convertRGBToGray(imgMatrix);
-
 
 	calcGrayHistogram();
 
@@ -135,15 +134,15 @@ string Image::getName()
 {
 	size_t found1 = fileName.find_last_of("/");
 	size_t found2 = fileName.find_last_of(".");
-	string str = fileName.substr(found1+1,found2 - found1-1);
+	string str = fileName.substr(found1 + 1, found2 - found1 - 1);
 	size_t len = str.length();
-	size_t i =0;
-	while(i<len)
+	size_t i = 0;
+	while (i < len)
 	{
 		char c = str.at(i);
-		if(c == ' ')
+		if (c == ' ')
 		{
-			str.replace(i,1,"_");
+			str.replace(i, 1, "_");
 		}
 		i++;
 	}
@@ -186,9 +185,13 @@ float Image::getMedianHistogram()
 	return medianHistogram;
 
 }
-ptr_IntMatrix Image::getHistogram()
+ptr_IntMatrix Image::getGrayHistogram()
 {
-		return grayHistogram;
+	return grayHistogram;
+}
+ptr_RGBMatrix Image::getRGBHistogram()
+{
+	return rgbHistogram;
 }
 float Image::getMeanHistogram()
 {
@@ -266,27 +269,46 @@ void Image::calcGrayHistogram()
 		int array[BIN_SIZE] =
 		{ 0 };
 
-		for (int c = 0; c < grayMatrix->getRows(); c++)
+		int redArray[BIN_SIZE] = {0};
+		int greenArray[BIN_SIZE] = {0};
+		int blueArray[BIN_SIZE] = {0};
+		RGB color;
+		color.R = color.G = color.B = 0;
+		for (int r = 0; r < grayMatrix->getRows(); r++)
 		{
-			for (int r = 0; r < grayMatrix->getCols(); r++)
+			for (int c = 0; c < grayMatrix->getCols(); c++)
 			{
-				int k = grayMatrix->getAtPosition(c, r);
+				int k = grayMatrix->getAtPosition(r, c);
 				array[k]++;
+
+				RGB ccolor = imgMatrix->getAtPosition(r,c);
+				int red = ccolor.R;
+				redArray[red]++;
+				greenArray[ccolor.G]++;
+				blueArray[ccolor.B]++;
 			}
 		}
 
 		grayHistogram = new Matrix<int>(1, BIN_SIZE, 0);
+		color.R = color.G = color.B = 0;
+		rgbHistogram = new Matrix<RGB>(1,BIN_SIZE,color);
 
 		for (int k = 0; k < BIN_SIZE; k++)
 		{
+			// save and calculate the mean of gray histogram
 			grayHistogram->setAtPosition(0, k, array[k]);
 			total += array[k];
 			pi += (k * array[k]);
+
+			// save the rgb histogram
+			color.R = redArray[k];
+			color.G = greenArray[k];
+			color.B = blueArray[k];
+			rgbHistogram->setAtPosition(0,k,color);
 		}
 
 		// calculate the mean of histogram
 		meanHistogram = (pi / total);
-
 		// calculate the median of histogram
 		float avm = total / 2;
 		float temp = 0;
@@ -355,7 +377,7 @@ vector<Edge> Image::cannyAlgorithm(vector<Point> &cPoints)
 	ptr_IntMatrix binMatrix = binaryThreshold(grayMatrix, (int) thresholdValue,
 		MAX_GRAY_VALUE);
 	ptr_IntMatrix cannyMatrix = cannyProcess(binMatrix, (int) thresholdValue,
-			3 * (int) thresholdValue,cPoints);
+		3 * (int) thresholdValue, cPoints);
 
 	vector<Edge> listOfEdges;
 	listOfEdges = suzuki(cannyMatrix);

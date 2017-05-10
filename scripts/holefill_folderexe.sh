@@ -2,7 +2,7 @@
 # Fill hole in binary images
 #path:  /home/linh/Datasets/resize_256x192/tete/
 FOLDER="/home/linh/Datasets/Morphometrics/pronotum/Images_without_grid_2/*"
-SAVEFOLDER="/home/linh/Desktop/results/2017/pronotum/removeleg/"
+SAVEFOLDER="/home/linh/Desktop/results/2017/pronotum/colorThreshold/"
 JPGARRAY=(${FOLDER})
 TOTAL=${#JPGARRAY[@]}
 EXECUTE="./MAELab_CI"

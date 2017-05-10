@@ -10,4 +10,5 @@
 
 ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue, int maxValue);
 ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue);
+ptr_RGBMatrix colorThreshold(ptr_RGBMatrix rgbImage, ptr_RGBMatrix colorHistogram);
 #endif /* THRESHOLDS_H_ */

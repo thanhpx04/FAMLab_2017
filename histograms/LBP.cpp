@@ -288,3 +288,54 @@ void testLBPDescriptor2Images(ptr_IntMatrix grayImage1,
 		}
 	}
 }
+
+vector<Point> testLBPDescriptor2ImagesContours(ptr_IntMatrix grayImage1,
+	vector<Point> landmarks1, ptr_IntMatrix grayImage2,
+	vector<Point> gray2Contours, int sPatch)
+{
+	vector<Point> result;
+	for (int i = 6; i < landmarks1.size(); i++)
+	{
+		Point pi = landmarks1.at(i);
+		Matrix<int> patch = grayImage1->extractPatch(sPatch, sPatch, pi.getY(),
+			pi.getX(), 0);
+		ptr_DoubleMatrix contrast = new Matrix<double>(patch.getRows(),
+			patch.getCols(), 0.0);
+		ptr_IntMatrix lbp1 = LBPDescriptor(&patch, contrast);
+		ptr_IntMatrix ctQuan = quantizier(contrast);
+		ptr_IntMatrix hist1 = LBPContrastHistogram(lbp1, ctQuan);
+		double minDistance = DBL_MAX;
+		Point cpoint(0, 0);
+		for (int j = 0; j < gray2Contours.size(); j++)
+		{
+			Point pk = gray2Contours.at(j);
+			Matrix<int> patch2 = grayImage2->extractPatch(sPatch, sPatch, pk.getY(),
+				pk.getX(), 0);
+			ptr_DoubleMatrix contrast2 = new Matrix<double>(patch2.getRows(),
+				patch2.getCols(), 0.0);
+			ptr_IntMatrix lbp2 = LBPDescriptor(&patch2, contrast2);
+			ptr_IntMatrix ctQuan2 = quantizier(contrast2);
+			ptr_IntMatrix hist2 = LBPContrastHistogram(lbp2, ctQuan2);
+			double dist = measureDistance2(hist1, hist2);
+			if (dist < minDistance)
+			{
+				cpoint.setX(pk.getX());
+				cpoint.setY(pk.getY());
+				minDistance = dist;
+			}
+			delete lbp2;
+			delete ctQuan2;
+			delete hist2;
+			//cout << "\n Pair: " << i << " - " << j << ": " << dist << endl;
+		}
+		delete lbp1;
+		delete ctQuan;
+		delete hist1;
+		cpoint.toString();
+		result.push_back(cpoint);
+		break;
+	}
+	return result;
+}
+
+

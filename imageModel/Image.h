@@ -18,6 +18,7 @@ private:
 	ptr_IntMatrix grayMatrix;
 	ptr_RGBMatrix imgMatrix;
 	ptr_IntMatrix grayHistogram;
+	ptr_RGBMatrix rgbHistogram;
 	float medianHistogram;
 	float meanHistogram;
 	float thresholdValue;
@@ -39,7 +40,8 @@ public:
 	void setAutoLandmarks(vector<Point>);
 	ptr_IntMatrix getGrayMatrix();
 	ptr_RGBMatrix getRGBMatrix();
-	ptr_IntMatrix getHistogram();
+	ptr_IntMatrix getGrayHistogram();
+	ptr_RGBMatrix getRGBHistogram();
 	float getMedianHistogram();
 	float getMeanHistogram();
 	float getThresholdValue();

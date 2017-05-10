@@ -9,9 +9,9 @@
 #define POINT_H_
 struct RGB
 {
-	unsigned short int R;
-	unsigned short int G;
-	unsigned short int B;
+	unsigned long int R;
+	unsigned long int G;
+	unsigned long int B;
 	RGB operator+(const RGB& color) const
 	{
 		RGB result;

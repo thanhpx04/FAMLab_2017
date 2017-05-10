@@ -18,6 +18,7 @@ using namespace std;
 #include "../imageModel/Line.h"
 #include "../imageModel/Edge.h"
 #include "../imageModel/Matrix.h"
+
 #include "Filters.h"
 
 #include "Thresholds.h"
@@ -303,7 +304,7 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 								{
 									if (binaryMatrix->getAtPosition(rnew, l) == 0)
 									{
-										if(abs(left.getX() - l) < mindist)
+										if (abs(left.getX() - l) < mindist)
 										{
 											clnew = l;
 											mindist = abs(left.getX() - l);
@@ -317,7 +318,7 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 								{
 									if (binaryMatrix->getAtPosition(rnew, m) == 0)
 									{
-										if(abs(right.getX() - m) < mindist)
+										if (abs(right.getX() - m) < mindist)
 										{
 											crnew = m;
 											mindist = abs(right.getX() - m);
@@ -379,4 +380,87 @@ ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue)
 	}
 
 	return binaryMatrix;
+}
+
+int meanHistogram(Matrix<double> channel, double totalPixels, int &maxPosition)
+{
+	double total = 0;
+	maxPosition = -1;
+	double maxValue = -1;
+	for (int c = 0; c < channel.getCols(); c++)
+	{
+		double cValue = channel.getAtPosition(0, c);
+		total += (c * cValue);
+		if (cValue > maxValue)
+		{
+			maxValue = cValue;
+			maxPosition = c;
+		}
+	}
+	return total / totalPixels;
+}
+
+ptr_RGBMatrix colorThreshold(ptr_RGBMatrix rgbImage,
+	ptr_RGBMatrix colorHistogram)
+{
+	//ptr_RGBMatrix rgbImage = inputImage.getRGBMatrix();
+	int rows = rgbImage->getRows();
+	int cols = rgbImage->getCols();
+	double totalPixels = rows * cols;
+
+	//ptr_RGBMatrix colorHistogram = inputImage.getRGBHistogram(); // matrix with 1 row
+	Matrix<double> redHistogram(1, colorHistogram->getCols(), 0);
+	Matrix<double> greenHistogram(1, colorHistogram->getCols(), 0);
+	Matrix<double> blueHistogram(1, colorHistogram->getCols(), 0);
+	for (int c = 0; c < colorHistogram->getCols(); c++)
+	{
+		RGB color = colorHistogram->getAtPosition(0, c);
+		redHistogram.setAtPosition(0, c, color.R);
+		greenHistogram.setAtPosition(0, c, color.G);
+		blueHistogram.setAtPosition(0, c, color.B);
+	}
+	int maxRed = -1, maxGreen = -1, maxBlue = -1;
+	int meanRed = meanHistogram(redHistogram, totalPixels, maxRed);
+	int meanGreen = meanHistogram(greenHistogram, totalPixels, maxGreen);
+	int meanBlue = meanHistogram(blueHistogram, totalPixels, maxBlue);
+	cout << "\nMean Red - Max Red: " << meanRed << "\t" << maxRed;
+	cout << "\nMean Green - Max Green: " << meanGreen << "\t" << maxGreen;
+	cout << "\nMean Blue - Max Blue: " << meanBlue << "\t" << maxBlue;
+
+	int tRed = 0, tBlue = 0;
+	int tGreen = meanGreen;
+	tRed = maxRed - (maxRed * 0.2);
+	tBlue = maxBlue - (maxBlue * 0.2);
+	tGreen = maxGreen - (maxGreen * 0.2);
+	cout << "\nThreshold: " << tRed << "\t" << tGreen << "\t" << tBlue << endl;
+	RGB color;
+	color.R = color.G = color.B = 0;
+	ptr_RGBMatrix thresh = new Matrix<RGB>(rows, cols, color);
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			color = rgbImage->getAtPosition(r, c);
+			if (color.R >= tRed)
+				color.R = 0;
+			if (color.G >= tGreen)
+				color.G = 0;
+			if (color.B >= tBlue)
+				color.B = 0;
+			thresh->setAtPosition(r, c, color);
+		}
+	}
+	ptr_RGBMatrix result(rgbImage);
+	RGB bck;
+	bck.R = bck.G = bck.B = 0;
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			color = thresh->getAtPosition(r, c);
+			if (color == 0)
+				result->setAtPosition(r, c, bck);
+		}
+	}
+	return result;
 }

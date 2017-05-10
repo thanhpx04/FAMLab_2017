@@ -44,7 +44,7 @@ ptr_IntMatrix holeFill(string filename, string savename)
 	ptr_IntMatrix binMatrix = binaryThreshold(&result, image.getThresholdValue(),
 		255);
 	binMatrix = postProcess(binMatrix, 255);
-	saveGrayScale(savename.c_str(),binMatrix);
+	saveGrayScale(savename.c_str(), binMatrix);
 	return binMatrix;
 }
 
@@ -58,13 +58,23 @@ Matrix<int> removelegMain(string filename, string savename)
 
 void getProjections(string filename, string savename)
 {
-	Matrix<int> binMatrix = removelegMain(filename,savename);
+	Matrix<int> binMatrix = removelegMain(filename, savename);
 	ptr_IntMatrix hProjection = new Matrix<int>(binMatrix.getRows(),
 		binMatrix.getCols(), 255);
 	ptr_IntMatrix vProjection(hProjection);
 	binProjection(&binMatrix, hProjection, vProjection);
-	analysisHistogram(hProjection,0,20);
+	analysisHistogram(hProjection, 0, 20);
 	saveGrayScale(savename.c_str(), hProjection);
+}
+
+void colorThreshold(string filename, string savename)
+{
+	Image matImage(filename);
+	ptr_RGBMatrix histogram = matImage.getRGBHistogram();
+	double totalPixels = matImage.getGrayMatrix()->getRows()
+		* matImage.getGrayMatrix()->getCols();
+	ptr_RGBMatrix result = colorThreshold(matImage.getRGBMatrix(), histogram);
+	saveRGB(savename.c_str(),result);
 }
 
 int main(int argc, char* argv[])
@@ -87,6 +97,7 @@ int main(int argc, char* argv[])
 		savename = argv[2];
 	}
 	//holeFill(filename,savename);
-	removelegMain(filename, savename);
+	//removelegMain(filename, savename);
 	//getProjections(filename,savename);
+	colorThreshold(filename, savename);
 }
