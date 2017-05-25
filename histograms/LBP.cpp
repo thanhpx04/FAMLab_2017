@@ -338,4 +338,3 @@ vector<Point> testLBPDescriptor2ImagesContours(ptr_IntMatrix grayImage1,
 	return result;
 }
 
-

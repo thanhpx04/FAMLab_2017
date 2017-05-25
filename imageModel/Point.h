@@ -50,6 +50,12 @@ struct RGB
 			return true;
 		return false;
 	}
+	bool operator!=(const int i) const
+	{
+		if (R != i && G != i && B != i)
+			return true;
+		return false;
+	}
 	bool operator>(const int i) const
 	{
 		if (R > i && G > i && B > i)

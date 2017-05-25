@@ -233,19 +233,24 @@ Matrix<T> Matrix<T>::multiply(Matrix<T> object, T defaultValue)
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::extractPatch(int width, int height, int rowIndex, int colIndex, T initValue)
+Matrix<T> Matrix<T>::extractPatch(int width, int height, int rowIndex,
+	int colIndex, T initValue)
 {
-	Matrix<T> result(height,width);
+	Matrix<T> result(height, width);
 	result.InitWithValue(initValue);
 	Point lleft, lright;
+	if (width % 2 == 0)
+		width += 1;
+	if (height % 2 == 0)
+		height += 1;
 	int wh = width / 2;
 	int hh = height / 2;
 	int i = 0, j = 0;
 
-	for (int r = rowIndex - hh; r < rowIndex + hh; r++)
+	for (int r = rowIndex - hh; r <= rowIndex + hh; r++)
 	{
 		j = 0;
-		for (int c = colIndex - wh; c < colIndex + wh; c++)
+		for (int c = colIndex - wh; c <= colIndex + wh; c++)
 		{
 			T value = initValue;
 			if (r >= 0 && c >= 0 && r < rows && c < cols)

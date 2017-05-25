@@ -443,7 +443,7 @@ double bhatScore(ptr_IntMatrix patch1, ptr_IntMatrix patch2)
 	return distance;
 }
 
-ptr_IntMatrix extractPatch(ptr_IntMatrix grayImage, int pSize, Point center)
+ptr_IntMatrix extractPatchGray(ptr_IntMatrix grayImage, int pSize, Point center)
 {
 	if (pSize % 2 == 0)
 		pSize += 1;
@@ -486,12 +486,12 @@ vector<Point> verifyDescriptors4(ptr_IntMatrix model, ptr_IntMatrix scene,
 		mpi = manualLM.at(i);
 		minPoint.reset();
 		double maxDistance = -1;
-		ptr_IntMatrix mPatch = extractPatch(model, patchSize, mpi);
+		ptr_IntMatrix mPatch = extractPatchGray(model, patchSize, mpi);
 
 		for (int j = 0; j < contourPoints.size(); j++)
 		{
 			epi = contourPoints.at(j);
-			ptr_IntMatrix sPatch = extractPatch(scene, patchSize, epi);
+			ptr_IntMatrix sPatch = extractPatchGray(scene, patchSize, epi);
 
 			double distance = bhatScore(mPatch, sPatch);
 			if (distance > maxDistance)
@@ -506,23 +506,108 @@ vector<Point> verifyDescriptors4(ptr_IntMatrix model, ptr_IntMatrix scene,
 	return result;
 }
 
-vector<Point> test(ptr_RGBMatrix model, vector<Point> mLandmarks,
-	ptr_RGBMatrix scene, int pSize)
+vector<double> mergeDescriptors(vector<double> red, vector<double> green,
+	vector<double> blue)
+{
+	vector<double> result;
+	if (red.size() == green.size() == blue.size())
+	{
+		for (int i = 0; i < red.size(); i++)
+		{
+			double value = red.at(i) + green.at(i) + blue.at(i);
+			result.push_back(value);
+		}
+	}
+	return result;
+}
+vector<Point> testSIFTOnRGB(ptr_RGBMatrix model, vector<Point> mLandmarks,
+	ptr_RGBMatrix scene, vector<Point> contourPoints, int pSize)
 {
 	vector<Point> result;
 	int cols = model->getCols();
 	int rows = model->getRows();
-	for (int i = 0; i < mLandmarks.size(); i++) {
-		Point pi = mLandmarks.at(i);
-		ptr_RGBMatrix mPatch = extractAPatch(model,pSize,pSize,pi);
-		for (int r = 0; r < rows; r++) {
-			for (int c = 0; c < cols; c++) {
-				RGB vColor = scene->getAtPosition(r,c);
-				if(vColor.R !=0 || vColor.G != 0 || vColor.B != 0)
-				{
 
-				}
-			}
+	ptr_IntMatrix mRed = new Matrix<int>(rows, cols, 0);
+	ptr_IntMatrix mGreen = new Matrix<int>(rows, cols, 0);
+	ptr_IntMatrix mBlue = new Matrix<int>(rows, cols, 0);
+	ptr_IntMatrix sRed = new Matrix<int>(rows, cols, 0);
+	ptr_IntMatrix sGreen = new Matrix<int>(rows, cols, 0);
+	ptr_IntMatrix sBlue = new Matrix<int>(rows, cols, 0);
+
+	for (int r = 0; r < rows; r++)
+	{
+		for (int c = 0; c < cols; c++)
+		{
+			RGB mcolor = model->getAtPosition(r, c);
+			RGB scolor = scene->getAtPosition(r, c);
+			mRed->setAtPosition(r, c, mcolor.R);
+			mGreen->setAtPosition(r, c, mcolor.G);
+			mBlue->setAtPosition(r, c, mcolor.B);
+
+			sRed->setAtPosition(r, c, scolor.R);
+			sGreen->setAtPosition(r, c, scolor.G);
+			sBlue->setAtPosition(r, c, scolor.B);
 		}
 	}
+	cout << "\nFinish split !" << endl;
+	Point minPoint;
+	for (int i = 1; i < mLandmarks.size(); i++)
+	{
+		Point mi = mLandmarks.at(i);
+		vector<double> mRedHistogram = SIFTDescriptor(mRed, mi, pSize);
+		vector<double> mGreenHistogram = SIFTDescriptor(mGreen, mi, pSize);
+		vector<double> mBlueHistogram = SIFTDescriptor(mBlue, mi, pSize);
+		vector<double> modelHistogram = mergeDescriptors(mRedHistogram,
+			mGreenHistogram, mBlueHistogram);
+		double minDistance = DBL_MAX;
+		minPoint.reset();
+
+		for (int k = 0; k < contourPoints.size(); k++)
+		{
+			Point pk = contourPoints.at(k);
+			vector<double> sRedHistogram = SIFTDescriptor(sRed, pk, pSize);
+			vector<double> sGreenHistogram = SIFTDescriptor(sGreen, pk, pSize);
+			vector<double> sBlueHistogram = SIFTDescriptor(sBlue, pk, pSize);
+			vector<double> sceneHistogram = mergeDescriptors(sRedHistogram,
+				sGreenHistogram, sBlueHistogram);
+			double distance = l2Distance(modelHistogram, sceneHistogram);
+			if (distance < minDistance)
+			{
+				minDistance = distance;
+				minPoint.setX(pk.getX());
+				minPoint.setY(pk.getY());
+			}
+		}
+
+		/*for (int r = 65; r < rows; r++)
+		{
+			for (int c = 1; c < cols - 1; c++)
+			{
+				RGB scolor = scene->getAtPosition(r, c);
+				RGB pcolor = scene->getAtPosition(r, c - 1);
+				RGB ncolor = scene->getAtPosition(r, c + 1);
+				if (scolor != 0 && (pcolor == 0 || ncolor == 0))
+				{
+					Point pi(c, r);
+					vector<double> sRedHistogram = SIFTDescriptor(sRed, pi, pSize);
+					vector<double> sGreenHistogram = SIFTDescriptor(sGreen, pi, pSize);
+					vector<double> sBlueHistogram = SIFTDescriptor(sBlue, pi, pSize);
+					vector<double> sceneHistogram = mergeDescriptors(sRedHistogram,
+						sGreenHistogram, sBlueHistogram);
+					double distance = l2Distance(modelHistogram, sceneHistogram);
+					if (distance < minDistance)
+					{
+						minDistance = distance;
+						minPoint.setX(pi.getX());
+						minPoint.setY(pi.getY());
+					}
+				}
+			}
+		}*/
+		minPoint.toString();
+		result.push_back(minPoint);
+		if (i == 4)
+			break;
+	}
+	return result;
 }

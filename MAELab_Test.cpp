@@ -4,6 +4,7 @@
  * Test file
  */
 #include <iostream>
+#include <sstream>
 #include <math.h>
 #include <cmath>
 #include <stdlib.h>
@@ -14,6 +15,9 @@
 #include <time.h>
 #include <cstdlib>
 #include <dirent.h>
+#include <string>
+#include <algorithm>
+#include <pthread.h>
 
 using namespace std;
 
@@ -74,7 +78,33 @@ void colorThreshold(string filename, string savename)
 	double totalPixels = matImage.getGrayMatrix()->getRows()
 		* matImage.getGrayMatrix()->getCols();
 	ptr_RGBMatrix result = colorThreshold(matImage.getRGBMatrix(), histogram);
-	saveRGB(savename.c_str(),result);
+	saveRGB(savename.c_str(), result);
+}
+
+void extractLandmarkPatch(string image_file, string landmark_file, int width,
+	int height, string save_folder)
+{
+	Image matImage(image_file);
+	matImage.readManualLandmarks(landmark_file);
+	vector<Point> landmarks = matImage.getListOfManualLandmarks();
+	string name = matImage.getName();
+	size_t found2 = name.find_last_of(".");
+	string sname = name.substr(0, found2);
+
+	RGB color;
+	color.R = color.G = color.B = 0;
+	for (int i = 0; i < landmarks.size(); i++)
+	{
+		Point pi = landmarks.at(i);
+		Matrix<int> patch = matImage.getGrayMatrix()->extractPatch(width, height,
+			pi.getY(), pi.getX(), 0);
+		std::stringstream ssname;
+		ssname << sname;
+		ssname << "_p" << i << ".jpg";
+		string savename = save_folder + "/" + ssname.str();
+		saveGrayScale(savename.c_str(), &patch);
+	}
+
 }
 
 int main(int argc, char* argv[])
@@ -83,21 +113,32 @@ int main(int argc, char* argv[])
 
 	// ================================================================ Test hole fill =================================================
 	cout << endl << "\n Hole fill" << endl;
-	string filename, savename;
+	string filename, savename, lm_file;
+	int width, height;
+	string save_folder;
 	if (argc == 1)
 	{
 		cout << "\nWithout parameters !!" << endl;
 		filename = "data/md028.jpg";
 		savename = "results/md028.jpg";
+		lm_file = "data/landmarks/Md 028.TPS";
+		width = 121;
+		height = 121;
+		save_folder = "results";
 	}
 	else
 	{
 		cout << "\nWith parameters !!" << endl;
 		filename = argv[1];
-		savename = argv[2];
+		//savename = argv[2];
+		lm_file = argv[2];
+		width = atoi(argv[3]);
+		height = atoi(argv[4]);
+		save_folder = argv[5];
 	}
 	//holeFill(filename,savename);
 	//removelegMain(filename, savename);
 	//getProjections(filename,savename);
-	colorThreshold(filename, savename);
+	//colorThreshold(filename, savename);
+	extractLandmarkPatch(filename, lm_file, width, height, save_folder);
 }

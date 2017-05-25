@@ -18,4 +18,6 @@ vector<Point> verifyDescriptors3(ptr_IntMatrix model, ptr_IntMatrix scene,
 	vector<Point> contourPoints, vector<Point> manualLM, int patchSize);
 vector<Point> verifyDescriptors4(ptr_IntMatrix model, ptr_IntMatrix scene,
 	vector<Point> contourPoints, vector<Point> manualLM, int patchSize);
+vector<Point> testSIFTOnRGB(ptr_RGBMatrix model, vector<Point> mLandmarks,
+	ptr_RGBMatrix scene,vector<Point> contourPoints, int pSize);
 #endif /* DESCRIPTORDISTANCE_H_ */

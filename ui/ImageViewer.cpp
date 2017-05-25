@@ -582,7 +582,10 @@ void ImageViewer::about()
 void ImageViewer::testMethod()
 {
 	cout << "\nTest a method ..." << endl;
-	QMessageBox msgbox;
+	RGB df;
+	df.R = df.G = df.B = 0;
+	Matrix<RGB> patch = matImage->getRGBMatrix()->extractPatch(501,501,676,2746,df);
+	/*QMessageBox msgbox;
 	msgbox.setText("Select the landmark file of scene image.");
 	msgbox.exec();
 	QString reflmPath = QFileDialog::getOpenFileName(this);
@@ -602,15 +605,22 @@ void ImageViewer::testMethod()
 
 	//testLBPDescriptor(matImage->getGrayMatrix(), matImage->getListOfManualLandmarks(), 64);
 
-	/*testLBPDescriptor2Images(matImage->getGrayMatrix(),
-	 matImage->getListOfManualLandmarks(), modelImage->getGrayMatrix(),
-	 modelImage->getListOfManualLandmarks(), 64);*/
+	//testLBPDescriptor2Images(matImage->getGrayMatrix(),
+	 //matImage->getListOfManualLandmarks(), modelImage->getGrayMatrix(),
+	 //modelImage->getListOfManualLandmarks(), 64);
 
 	vector<Point> contourPoints;
-	matImage->cannyAlgorithm(contourPoints);
-	vector<Point> rs = testLBPDescriptor2ImagesContours(
-		modelImage->getGrayMatrix(), modelImage->getListOfManualLandmarks(),
-		matImage->getGrayMatrix(), contourPoints, 64);
+	 matImage->cannyAlgorithm(contourPoints);
+	 //vector<Point> rs = testLBPDescriptor2ImagesContours(
+	 //modelImage->getGrayMatrix(), modelImage->getListOfManualLandmarks(),
+	 //matImage->getGrayMatrix(), contourPoints, 64);
+	ptr_RGBMatrix shistogram = matImage->getRGBHistogram();
+	ptr_RGBMatrix sresult = colorThreshold(matImage->getRGBMatrix(), shistogram);
+
+	ptr_RGBMatrix mhistogram = modelImage->getRGBHistogram();
+	ptr_RGBMatrix mresult = colorThreshold(matImage->getRGBMatrix(), mhistogram);
+
+	vector<Point> rs = testSIFTOnRGB(mresult, modelImage->getListOfManualLandmarks(),sresult,contourPoints, 64);
 
 	RGB color;
 	color.R = 255;
@@ -619,11 +629,11 @@ void ImageViewer::testMethod()
 	{
 		Point p = rs.at(i);
 		fillCircle(*matImage->getRGBMatrix(), p, 5, color);
-	}
+	}*/
 
 	ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-		"Quantization");
+	other->loadImage(matImage, ptrRGBToQImage(&patch),
+		"Test a method");
 	other->move(x() - 40, y() - 40);
 	other->show();
 
@@ -758,9 +768,7 @@ void ImageViewer::rgbHistogramCalc()
 	cout << "\n RGB histogram." << endl;
 
 	ptr_RGBMatrix histogram = matImage->getRGBHistogram();
-	double totalPixels = matImage->getGrayMatrix()->getRows() * matImage->getGrayMatrix()->getCols();
-	ptr_RGBMatrix result = colorThreshold(matImage->getRGBMatrix(),histogram);
-
+	ptr_RGBMatrix result = colorThreshold(matImage->getRGBMatrix(), histogram);
 
 	double maxR = -1, maxG = -1, maxB = -1;
 	for (int c = 0; c < histogram->getCols(); c++)
@@ -775,7 +783,7 @@ void ImageViewer::rgbHistogramCalc()
 	}
 	int cols = histogram->getCols();
 	RGB color;
-	color.R = color.G = color.B =0;
+	color.R = color.G = color.B = 0;
 	ptr_RGBMatrix redDisplay = new Matrix<RGB>(240, 300, color);
 	ptr_RGBMatrix greenDisplay = new Matrix<RGB>(240, 300, color);
 	ptr_RGBMatrix blueDisplay = new Matrix<RGB>(240, 300, color);
@@ -786,19 +794,19 @@ void ImageViewer::rgbHistogramCalc()
 		pbegin.setX(c);
 		pbegin.setY(239);
 		pend.setX(c);
-		pend.setY(239 - ((double)((cvalue.R * 239) / maxR)));
+		pend.setY(239 - ((double) ((cvalue.R * 239) / maxR)));
 		color.R = 255;
 		color.G = color.B = 0;
 		drawingLine(*redDisplay, Line(pbegin, pend), color);
 
 		pend.setX(c);
-		pend.setY(239 - ((double)((cvalue.G * 239) / maxG)));
+		pend.setY(239 - ((double) ((cvalue.G * 239) / maxG)));
 		color.G = 255;
 		color.R = color.B = 0;
 		drawingLine(*greenDisplay, Line(pbegin, pend), color);
 
 		pend.setX(c);
-		pend.setY(239 - ((double)((cvalue.B * 239) / maxB)));
+		pend.setY(239 - ((double) ((cvalue.B * 239) / maxB)));
 		color.B = 255;
 		color.R = color.G = 0;
 		drawingLine(*blueDisplay, Line(pbegin, pend), color);
@@ -811,16 +819,16 @@ void ImageViewer::rgbHistogramCalc()
 	other->show();
 
 	/*ImageViewer *other2 = new ImageViewer;
-	other2->loadImage(matImage, ptrRGBToQImage(greenDisplay),
-		"RGB Histogram result - Green channel");
-	other2->move(x() - 60, y() - 60);
-	other2->show();
+	 other2->loadImage(matImage, ptrRGBToQImage(greenDisplay),
+	 "RGB Histogram result - Green channel");
+	 other2->move(x() - 60, y() - 60);
+	 other2->show();
 
-	ImageViewer *other3 = new ImageViewer;
-	other3->loadImage(matImage, ptrRGBToQImage(blueDisplay),
-		"RGB Histogram result - Blue Channel");
-	other3->move(x() - 80, y() - 80);
-	other3->show();*/
+	 ImageViewer *other3 = new ImageViewer;
+	 other3->loadImage(matImage, ptrRGBToQImage(blueDisplay),
+	 "RGB Histogram result - Blue Channel");
+	 other3->move(x() - 80, y() - 80);
+	 other3->show();*/
 
 	cout << "\nFinished." << endl;
 }
@@ -967,9 +975,7 @@ void ImageViewer::cannyAlgorithm()
 				matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
 			}
 		}
-		cout<<"\nNumber of points in edge: "<< edgei.getPoints().size();
-		if(i==2)
-			break;
+		cout << "\nNumber of points in edge: " << edgei.getPoints().size();
 	}
 	ImageViewer *other = new ImageViewer;
 	other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
