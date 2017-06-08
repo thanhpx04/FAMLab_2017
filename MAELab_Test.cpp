@@ -33,6 +33,7 @@ using namespace std;
 #include "segmentation/Canny.h"
 #include "segmentation/Filters.h"
 #include "segmentation/Projection.h"
+#include "correlation/DescriptorDistance.h"
 
 /**
  * This function is used to fill the hole inside the object (pronotum)
@@ -104,7 +105,15 @@ void extractLandmarkPatch(string image_file, string landmark_file, int width,
 		string savename = save_folder + "/" + ssname.str();
 		saveGrayScale(savename.c_str(), &patch);
 	}
+}
 
+void calculateSIFTDescriptor(string image_file, Point point, int patchsize)
+{
+	Image matImage(image_file);
+	vector<double> SIFTVector = SIFTDescriptor(matImage.getGrayMatrix(), point, patchsize);
+	for (size_t i = 0; i < SIFTVector.size(); ++i) {
+		cout<<endl<<SIFTVector.at(i);
+	}
 }
 
 int main(int argc, char* argv[])
@@ -140,5 +149,7 @@ int main(int argc, char* argv[])
 	//removelegMain(filename, savename);
 	//getProjections(filename,savename);
 	//colorThreshold(filename, savename);
-	extractLandmarkPatch(filename, lm_file, width, height, save_folder);
+	//extractLandmarkPatch(filename, lm_file, width, height, save_folder);
+	calculateSIFTDescriptor(filename,Point(1592,1175),9);
+
 }

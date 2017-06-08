@@ -584,7 +584,7 @@ void ImageViewer::testMethod()
 	cout << "\nTest a method ..." << endl;
 	RGB df;
 	df.R = df.G = df.B = 0;
-	Matrix<RGB> patch = matImage->getRGBMatrix()->extractPatch(501,501,676,2746,df);
+	Matrix<int> patch = matImage->getGrayMatrix()->extractPatch(501,501,676,2746,0);
 	/*QMessageBox msgbox;
 	msgbox.setText("Select the landmark file of scene image.");
 	msgbox.exec();
@@ -632,7 +632,7 @@ void ImageViewer::testMethod()
 	}*/
 
 	ImageViewer *other = new ImageViewer;
-	other->loadImage(matImage, ptrRGBToQImage(&patch),
+	other->loadImage(matImage, ptrIntToQImage(&patch),
 		"Test a method");
 	other->move(x() - 40, y() - 40);
 	other->show();

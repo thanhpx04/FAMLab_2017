@@ -78,6 +78,9 @@ Matrix<double> createDescriptor(ptr_IntMatrix mImage, Point lefttop,
 
 	return orientation;
 }
+
+// Compute the vector descriptor for a small patch 4x4
+// Output: the vector with 8-dimensions of the descriptor
 vector<double> orientHist4(Matrix<double> gradient, Matrix<double> orientation,
 	int rbegin, int cbegin, int size) // default size = 4
 {
@@ -100,6 +103,8 @@ vector<double> orientHist4(Matrix<double> gradient, Matrix<double> orientation,
 	}
 	return histograms;
 }
+
+// Compute the descriptor for whole the patch (includes many 4x4 patches)
 vector<double> orientHist16(Matrix<double> gradient, Matrix<double> orientation,
 	int subsize)
 {
@@ -140,6 +145,8 @@ vector<double> orientHist16(Matrix<double> gradient, Matrix<double> orientation,
 	}
 	return histograms;
 }
+
+// Compute the L2 distance between two vectors
 double l2Distance(vector<double> sourceTarget, vector<double> targetHist)
 {
 	double distance = 0;
@@ -155,6 +162,9 @@ double l2Distance(vector<double> sourceTarget, vector<double> targetHist)
 	}
 	return distance;
 }
+
+// Extract a patch in a int_matrix with psize and center point at center
+// The method return the top-left and bottom-right corner of patch
 Point createPatch(ptr_IntMatrix imageMatrix, int psize, Point center,
 	Point &right)
 {
@@ -181,6 +191,8 @@ Point createPatch(ptr_IntMatrix imageMatrix, int psize, Point center,
 	right.setY(ry);
 	return left;
 }
+
+// Find the point in lsPoints that nearest with p
 Point nearestPoint(vector<Point> lsPoints, Point p)
 {
 	double minDistance = DBL_MAX;
@@ -207,7 +219,7 @@ vector<double> SIFTDescriptor(ptr_IntMatrix imgMatrix, Point center, int size)
 		mright.getX() - mleft.getX() + 1, 0.0);
 	Matrix<double> mOrient = createDescriptor(imgMatrix, mleft, mright,
 		mgradient);
-	vector<double> mHistogram = orientHist16(mgradient, mOrient, size);
+	vector<double> mHistogram = orientHist16(mgradient, mOrient, 3);
 	return mHistogram;
 }
 

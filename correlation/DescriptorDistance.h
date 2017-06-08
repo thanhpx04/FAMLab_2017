@@ -8,6 +8,7 @@
 #ifndef DESCRIPTORDISTANCE_H_
 #define DESCRIPTORDISTANCE_H_
 Point nearestPoint(vector<Point> lsPoints, Point p);
+vector<double> SIFTDescriptor(ptr_IntMatrix imgMatrix, Point center, int size);
 vector<Point> verifyDescriptors(ptr_IntMatrix model, ptr_IntMatrix scene,
 	vector<Point> manualLM, vector<Point> esLandmarks, int templSize,
 	int sceneSize);
