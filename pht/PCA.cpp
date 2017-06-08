@@ -459,7 +459,7 @@ vector<Point> PCAI(vector<Point> modelPoints, Image &sceneGray,
 		result.at(i).setY(ci.getY());
 	}*/
 	result = refine(scenePoints2, result);
-	delete sceneGrandient;
+	//delete sceneGrandient;
 	return result;
 }
 vector<Point> PCAI(Image modelGray, Image &sceneGray, vector<Point> mnLandmarks)
@@ -476,8 +476,8 @@ vector<Point> PCAI(Image modelGray, Image &sceneGray, vector<Point> mnLandmarks)
 	*sceneGrandient = *(getGradientDMatrix(sceneGray, scenePoints));
 	vector<Point> result = PCAI(modelPoints, sceneGray, mnLandmarks);
 
-	delete modelGrandient;
-	delete sceneGrandient;
+	//delete modelGrandient;
+	//delete sceneGrandient;
 	return result;
 }
 /*void pcaiFolder(string folderScene, vector<string> sceneImages, Image model,

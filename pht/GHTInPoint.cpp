@@ -24,6 +24,7 @@ using namespace std;
 #include "GHTInPoint.h"
 
 ptr_IntMatrix getGradientDMatrix(Image grayImage, vector<Point> &edgePoints) {
+
 	int rows = grayImage.getGrayMatrix()->getRows();
 	int cols = grayImage.getGrayMatrix()->getCols();
 	ptr_IntMatrix mMatrix = new Matrix<int>(rows, cols, 0);
@@ -35,9 +36,9 @@ ptr_IntMatrix getGradientDMatrix(Image grayImage, vector<Point> &edgePoints) {
 	ptr_IntMatrix mcannyMatrix = new Matrix<int>(
 			*cannyProcess2(mbinMatrix, mThresholdValue, 3 * mThresholdValue,
 					mgradirection, edgePoints));
-	delete mMatrix;
-	delete mbinMatrix;
-	delete mcannyMatrix;
+	//delete mMatrix;
+	//delete mbinMatrix;
+//	delete mcannyMatrix;
 	return mgradirection;
 }
 double angleVector(Point p1, Point p2, Point q1, Point q2) {

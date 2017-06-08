@@ -44,31 +44,31 @@ struct RGB
 		result.B = color.B + B;
 		return result;
 	}
-	bool operator==(const int i) const
+	bool operator==(const unsigned long int i) const
 	{
 		if (R == i && G == i && B == i)
 			return true;
 		return false;
 	}
-	bool operator!=(const int i) const
+	bool operator!=(const unsigned long int i) const
 	{
 		if (R != i && G != i && B != i)
 			return true;
 		return false;
 	}
-	bool operator>(const int i) const
+	bool operator>(const unsigned long int i) const
 	{
 		if (R > i && G > i && B > i)
 			return true;
 		return false;
 	}
-	bool operator>=(const int i) const
+	bool operator>=(const unsigned long int i) const
 	{
 		if (R >= i && G >= i && B >= i)
 			return true;
 		return false;
 	}
-	RGB operator=(const int value) const
+	RGB operator=(const unsigned long int value) const
 	{
 		RGB color;
 		color.R = color.G = color.B = value;
