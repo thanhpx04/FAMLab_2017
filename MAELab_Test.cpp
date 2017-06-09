@@ -144,7 +144,6 @@ int main(int argc, char* argv[]) {
 	cout << "\n Test a function !!!" << endl;
 
 	// ================================================================ Test hole fill =================================================
-	cout << endl << "\n Hole fill" << endl;
 	string filename, savename, lm_file;
 	int width, height;
 	string save_folder;
