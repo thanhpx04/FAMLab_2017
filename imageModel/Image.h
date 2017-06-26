@@ -52,7 +52,7 @@ public:
 	vector<Edge> cannyAlgorithm(vector<Point> &cPoints);
 	vector<Line> getApproximateLines(double minDistance);
 	vector<Point> readManualLandmarks(string fileName);
-
+	vector<Matrix<int> > splitChannels();
 	/*ptr_DoubleMatrix getRotationMatrix2D(Point center, double angle,
 		double scale);*/
 	void rotate(Point center, double angle, double scale);

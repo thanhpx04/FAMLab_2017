@@ -3,12 +3,14 @@
 # THE OUTPUT IS A MATRIX 9X8 FOR EACH LANDMARK ( DEFAULT SIZE 9X9 -> 9 X(3X3))
 SCENEJPGFOLDER="/home/linh/Datasets/Morphometrics/pronotum/Images_without_grid_2/*"
 SCENETPSFOLDER="/home/linh/Datasets/Morphometrics/pronotum/landmarks/*"
-SAVEFOLDER="/home/linh/Desktop/results/2017/pronotum/SIFT/siftPatches_9x9_color/green"
-PATCHSIZE="9"
+SAVEFOLDER="/home/linh/Desktop/results/2017/pronotum/landmarks_256x192/"
+XRATIO=12.75
+YRATIO=12.75
 EXECUTE="./MAELab_CI"
 jpgarray=(${SCENEJPGFOLDER})
 tpsarray=(${SCENETPSFOLDER})
 total=${#jpgarray[@]}
+rpby="_"
 for (( i=0; i< $total; i++))
 do
 	SCENEJPG="${jpgarray[$i]}"
@@ -19,8 +21,9 @@ do
 	SCENETPS="${tpsarray[$i]}"	
 	#tps=${SCENETPS:${#tpspath}-10}
 	#SAVETPS="$SAVEFOLDER$tps"
-	#echo ${tpsarray[$i]}
-	$EXECUTE "$SCENEJPG" "$SCENETPS" "$PATCHSIZE" "0" "$SAVEFOLDER"
+	saveTPS="$SAVEFOLDER$(basename "${tpsarray[$i]}"/)"
+	saveTPS2=${saveTPS/ /$rpby}
+	$EXECUTE "$SCENEJPG" "$SCENETPS" "$PATCHSIZE" "0" "$saveTPS2"
 done
 
 #EXECUTE="./MAELab_CI"

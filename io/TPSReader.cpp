@@ -25,7 +25,7 @@ std::vector<Point> readTPS(const char* filename)
 	{
 		getline(openFile, lineText);
 		size_t poseq = lineText.find_first_of("=");
-		string nop = lineText.substr(poseq + 1, lineText.size() - 1 - poseq - 1);
+		string nop = lineText.substr(poseq + 1, lineText.size() - 1 - poseq);
 
 		int nPoints = atoi(nop.c_str());
 		//cout<<"\n number points: "<<nPoints;
@@ -57,7 +57,7 @@ std::vector<Point> readTPSWithDifference(const char* filename,
 	{
 		getline(openFile, lineText);
 		size_t poseq = lineText.find_first_of("=");
-		string nop = lineText.substr(poseq + 1, lineText.size() - 1 - poseq - 1);
+		string nop = lineText.substr(poseq + 1, lineText.size() - 1 - poseq);
 
 		int nPoints = atoi(nop.c_str());
 		int i = 0;

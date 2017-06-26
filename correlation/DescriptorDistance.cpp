@@ -140,9 +140,22 @@ vector<double> orientHist16(Matrix<double> gradient, Matrix<double> orientation,
 		for (size_t i = 0; i < histograms.size(); i++)
 		{
 			histograms.at(i) /= totalValue2;
-			//cout << "\t" << histograms.at(i);
 		}
 	}
+	/*double histMax = -1;
+	 for (size_t i = 0; i < histograms.size(); i++)
+	 {
+	 if (histograms.at(i) >= histMax)
+	 {
+	 histMax = histograms.at(i);
+	 }
+	 }
+	 for (size_t i = 0; i < histograms.size(); i++)
+	 {
+	 double newValue = (histograms.at(i)/histMax) * 255;
+	 histograms.at(i) = newValue;
+	 }*/
+
 	return histograms;
 }
 

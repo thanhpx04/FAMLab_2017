@@ -492,6 +492,26 @@ void Image::rotate(Point center, double angle, double scale)
 	//delete rgbDest;
 	//return result;
 }
-
+vector<Matrix<int> > Image::splitChannels()
+{
+	vector<Matrix<int> > channels;
+	int rows = imgMatrix->getRows();
+	int cols = imgMatrix->getCols();
+	Matrix<int> red_Channel(rows,cols,0);
+	Matrix<int> green_Channel(rows,cols,0);
+	Matrix<int> blue_Channel(rows,cols,0);
+	for (int r = 0; r < rows; r++) {
+		for (int c = 0; c < cols; c++) {
+			RGB color = imgMatrix->getAtPosition(r,c);
+			red_Channel.setAtPosition(r,c,color.R);
+			green_Channel.setAtPosition(r,c,color.G);
+			blue_Channel.setAtPosition(r,c,color.B);
+		}
+	}
+	channels.push_back(red_Channel);
+	channels.push_back(green_Channel);
+	channels.push_back(blue_Channel);
+	return channels;
+}
 //================================================ End private methods =====================================================
 
