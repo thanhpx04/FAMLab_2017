@@ -403,8 +403,11 @@ int threshCut(ptr_IntMatrix inputMatrix)
 ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	int highThreshold, vector<Point> &contourPoints)
 {
-	ptr_IntMatrix binary2 = postProcess(binaryImage, 255);
-	ptr_IntMatrix sobelFilter = sobelOperationCanny(binary2);
+//	ptr_IntMatrix binary2 = postProcess(binaryImage, 255);
+//  ptr_IntMatrix sobelFilter = sobelOperationCanny(binary2);
+    //Thanh - ignore postProcess
+    ptr_IntMatrix sobelFilter = sobelOperationCanny(binaryImage);
+    //--------
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
 		highThreshold);

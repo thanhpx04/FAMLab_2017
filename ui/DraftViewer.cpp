@@ -62,7 +62,7 @@ using namespace std;
 
 DraftViewer::DraftViewer()
 {
-    imageLabel = new QLabel;
+    imageLabel = new ImageLabel;
     imageLabel->setBackgroundRole(QPalette::Base);
     imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     imageLabel->setScaledContents(true);
@@ -83,6 +83,7 @@ DraftViewer::DraftViewer()
     setWindowIcon(QIcon("./resources/ico/ip.ico"));
     //parameterPanel = NULL;
 
+    connect(this->imageLabel,SIGNAL(sendMouseLocation(int,int)),this,SLOT(extractObject(int,int)));
 }
 
 DraftViewer::~DraftViewer()
@@ -557,7 +558,6 @@ void DraftViewer::binThreshold()
     tr.setRefImage(*matImage);
     cout << "\ntValue: " << tValue << endl;
     ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
-    rsMatrix = postProcess(rsMatrix, 255);
 
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrIntToQImage(rsMatrix), "Thresholding result");
@@ -1244,6 +1244,94 @@ void DraftViewer::pcaiMethodViewer()
     delete modelImage;
     msgbox.setText("Finish.");
     msgbox.exec();
+}
+
+void DraftViewer::extractObject(int x, int y)
+{
+    cout << "Extract object from the point: "<<x<<"  "<<y << endl;
+
+        float tValue = matImage->getThresholdValue();
+        Segmentation tr;
+        tr.setRefImage(*matImage);
+        cout << endl << "tValue: " << tValue << endl;
+
+        int rows = matImage->getRGBMatrix()->getRows();
+        int cols = matImage->getRGBMatrix()->getCols();
+
+        // copy grayMatrix of image to process
+        ptr_IntMatrix grayMatrix = new Matrix<int>(rows, cols);
+        grayMatrix->setData(matImage->getGrayMatrix()->getData());
+
+        // to determine the rectangle of object
+        int minX=x, maxX=x, minY=y, maxY=y;
+
+        // list of points to be checked.
+        vector<Point> seedPoints;
+        RGB color;
+        Point startPoint(x,y,color);
+        seedPoints.push_back(startPoint);
+        // label start Point is checked by value 256
+        grayMatrix->setAtPosition(y,x,256);
+        while(!seedPoints.empty())
+        {
+            // Pop a point from seedPoints (remove it from the list)
+            Point checkingPoint = seedPoints.back();
+            seedPoints.pop_back();
+
+            vector<Point> tempList = tr.growRegion(grayMatrix,tValue,checkingPoint,minX,maxX,minY,maxY);
+            seedPoints.insert(seedPoints.end(),tempList.begin(),tempList.end());
+        }
+
+        // fix the rectangel of object
+        rows = maxY-minY+4;
+        cols = maxX-minX+4;
+        ptr_RGBMatrix srcMatrix = matImage->getRGBMatrix();
+        // set the background is black => it can be use alpha channel
+        ptr_RGBMatrix objectRGBMatrix = new Matrix<RGB>(rows, cols);
+        ptr_IntMatrix objectBinMatrix = new Matrix<int>(rows, cols, 255);
+        for (int r = 2; r < rows; r++)
+        {
+            for (int c = 2; c < cols; c++)
+            {
+                int grayValue = grayMatrix->getAtPosition(r-2+minY,c-2+minX);
+                // check position of object only
+                if(grayValue == 256)
+                {
+                    objectRGBMatrix->setAtPosition(r,c,srcMatrix->getAtPosition(r-2+minY,c-2+minX));
+                    objectBinMatrix->setAtPosition(r,c,0);
+                }
+            }
+        }
+
+        // implement canny to detect boundary and suzuky to get list edges to draw it
+        vector<Point> cPoints;
+        ptr_IntMatrix cannyMatrix = cannyProcess(objectBinMatrix, (int) tValue,
+            3 * (int) tValue, cPoints);
+
+        vector<Edge> listOfEdges;
+        listOfEdges = suzuki(cannyMatrix);
+
+        for (size_t i = 0; i < listOfEdges.size(); i++)
+        {
+            Edge edgei = listOfEdges.at(i);
+            for (size_t k = 0; k < edgei.getPoints().size(); k++)
+            {
+                Point pi = edgei.getPoints().at(k);
+                if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+                    && pi.getY() < rows)
+                {
+                    RGB red;
+                    red.R = 255;
+                    red.G = red.B = 0;
+                    objectRGBMatrix->setAtPosition(pi.getY(), pi.getX(), red);
+                }
+            }
+            cout << "Number of points in edge: " << edgei.getPoints().size() << endl;
+        }
+
+        DraftViewer *other1 = new DraftViewer;
+        other1->loadImage(matImage, ptrRGBToQImage(objectRGBMatrix), "Object color result");
+        other1->show();
 }
 //================================================================================
 

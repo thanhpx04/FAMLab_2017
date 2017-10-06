@@ -18,6 +18,8 @@ public:
 	vector<Edge> canny();
 	int removePronotum();
 	void gridRemoveFolder();
+    //Thanh
+    vector<Point> growRegion(ptr_IntMatrix mask, float thresholdValue, Point checkingPoint, int &minX, int &maxX, int &minY, int &maxY);
 };
 
 #endif /* SEGMENTATION_H_ */

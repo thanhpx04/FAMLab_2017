@@ -114,5 +114,50 @@ void Segmentation::gridRemoveFolder()
 		int t = removePronotum();
 		ptr_IntMatrix vl = threshold(t,255);
 		saveGrayScale((saveFolder+"/"+sceneName).c_str(),vl);
-	}
+    }
+}
+
+vector<Point> Segmentation::growRegion(ptr_IntMatrix mask, float thresholdValue, Point checkingPoint, int &minX, int &maxX, int &minY, int &maxY)
+{
+    RGB colorNull;
+        vector<Point> tempList;
+        int x = checkingPoint.getX(), y = checkingPoint.getY();
+        // checking the top
+        if(mask->getAtPosition(y-1, x) < thresholdValue)
+        {
+            // label point by value 256
+            mask->setAtPosition(y-1, x, 256);
+            Point point(x,y-1,colorNull);
+            tempList.push_back(point);
+            minY = y-1 < minY ? y-1 : minY;
+        }
+        // checking the bottom
+        if(mask->getAtPosition(y+1, x) < thresholdValue)
+        {
+            // label point by value 256
+            mask->setAtPosition(y+1, x, 256);
+            Point point(x,y+1,colorNull);
+            tempList.push_back(point);
+            maxY = y+1 > maxY ? y+1 : maxY;
+        }
+        // checking the left
+        if(mask->getAtPosition(y, x-1) < thresholdValue)
+        {
+            // label point by value 256
+            mask->setAtPosition(y, x-1, 256);
+            Point point(x-1,y,colorNull);
+            tempList.push_back(point);
+            minX = x-1 < minX ? x-1 : minX;
+        }
+        // checking the right
+        if(mask->getAtPosition(y, x+1) < thresholdValue)
+        {
+            // label point by value 256
+            mask->setAtPosition(y, x+1, 256);
+            Point point(x+1,y,colorNull);
+            tempList.push_back(point);
+            maxX = x+1 > maxX ? x+1 : maxX;
+        }
+
+        return tempList;
 }

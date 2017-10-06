@@ -6,6 +6,7 @@
 #include <QtGui/qscrollarea.h>
 #include <QtGui/QMainWindow>
 #include <QtGui/QPrinter>
+#include "ImageLabel.h"
 
 class Image;
 
@@ -65,12 +66,14 @@ private slots:
     void dirGenerateData();
     void sobelAndSIFT();
     void cannyAndSIFT();
-
     void pcaiMethodViewer();
+
+    //Thanh
+    void extractObject(int x, int y);
 
 private:
 
-    QLabel *imageLabel;
+    ImageLabel *imageLabel;
     QScrollArea *scrollArea;
     double scaleFactor;
 
