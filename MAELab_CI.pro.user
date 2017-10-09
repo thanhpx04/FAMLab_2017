@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.3.1, 2017-10-06T09:53:33. -->
+<!-- Written by QtCreator 4.3.1, 2017-10-09T19:17:18. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -250,7 +250,7 @@
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">MAELab_CI.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory"></value>
-    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory.default">/home/xuanthanh/workplace/MEALab/build-MAELab_CI-Qt_4_8_7_in_PATH_System-Debug</value>
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory.default">/home/xuanthanh/workplace/MEALab/MAELab_2016</value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
