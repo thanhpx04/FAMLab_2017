@@ -132,7 +132,7 @@ DraftViewer::~DraftViewer()
     delete suzukiAct;
     delete lineSegmentationAct;
     //Thanh
-//    delete detectObjectAct;
+    //    delete detectObjectAct;
     delete process4QuaterAct;
     delete openFragmentScreenAct;
     //==========
@@ -531,7 +531,7 @@ void DraftViewer::binThreshold()
     ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
 
     // Thanh: ignore postProcess function which is filling the hole
-//    rsMatrix = postProcess(rsMatrix, 255);
+    //    rsMatrix = postProcess(rsMatrix, 255);
 
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrIntToQImage(rsMatrix), "Thresholding result");
@@ -1223,8 +1223,8 @@ void DraftViewer::pcaiMethodViewer()
 /**
  * Thanh
  * Extract chosen object with the coordinates from mouse event double click.
- * The algorithm is region growing + using binary matrix as mask for growing criteria.
- * @param the coordinates.
+ * The algorithm is region growing on gray matrix using threshold value for growing criteria.
+ * @param the coordinates of mouse click.
 */
 void DraftViewer::extractObject(int x, int y)
 {
@@ -1314,102 +1314,61 @@ void DraftViewer::extractObject(int x, int y)
     other1->show();
 }
 
-///**
-// * Thanh
-// * Detect objects based on binary mask
-// * which is a binary matrix created by thresholding
-// */
-//void DraftViewer::detectObjects()
-//{
-//    cout << "Detect Objects" << endl;
-//    float tValue = matImage->getThresholdValue();
-
-//    Segmentation tr; // = new Segmentation();
-//    tr.setRefImage(*matImage);
-//    cout << "\ntValue: " << tValue << endl;
-//    ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
-//    ptr_RGBMatrix exMatrix = extractByBinaryThreshold(matImage->getRGBMatrix(),rsMatrix);
-
-//    DraftViewer *other = new DraftViewer;
-//    other->loadImage(matImage, ptrRGBToQImage(exMatrix), "Detect objects result");
-//    other->show();
-//}
-
 void DraftViewer::process4Quater()
 {
-    cout << "Local threshold" << endl;
-        float tValue = matImage->getThresholdValue();
-        Segmentation tr;
-        tr.setRefImage(*matImage);
-        cout << endl << "tValue: " << tValue << endl;
+    Segmentation tr;
+    tr.setRefImage(*matImage);
 
-        int fullrows = matImage->getRGBMatrix()->getRows();
-        int fullcols = matImage->getRGBMatrix()->getCols();
-        // top right quater
-        int rows = fullrows/2;
-        int cols = fullcols/2;
+    // declare
+    ptr_IntMatrix grayHistogram;
+    float medianHistogram;
+    float meanHistogram;
+    float thresholdValue;
+    ptr_IntMatrix aQuaterGrayMatrix;
 
-    //    ptr_RGBMatrix firstQuaterRGBMatrix = copyRGBMatrix(matImage->getRGBMatrix(),0,rows,0,cols);
-        ptr_IntMatrix firstQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),0,rows,0,cols);
-    //    ptr_RGBMatrix secondQuaterRGBMatrix = copyRGBMatrix(matImage->getRGBMatrix(),0,rows,cols,fullcols);
-        ptr_IntMatrix secondQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),0,rows,cols,fullcols);
-    //    ptr_RGBMatrix thirdQuaterRGBMatrix = copyRGBMatrix(matImage->getRGBMatrix(),rows,fullrows,0,cols);
-        ptr_IntMatrix thirdQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),rows,fullrows,0,cols);
-    //    ptr_RGBMatrix fourthQuaterRGBMatrix = copyRGBMatrix(matImage->getRGBMatrix(),rows,fullrows,cols,fullcols);
-        ptr_IntMatrix fourthQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),rows,fullrows,cols,fullcols);
+    int rows = matImage->getRGBMatrix()->getRows();
+    int cols = matImage->getRGBMatrix()->getCols();
+    int halfRows = rows/2;
+    int halfCols = cols/2;
 
-        // compute histogram
-        ptr_IntMatrix grayHistogram= new Matrix<int>(1, 256, 0);
-    //    RGB color;
-    //    color.R = color.G = color.B = 0;
-    //    ptr_RGBMatrix rgbHistogram = new Matrix<RGB>(1,256,color);
+    // compute on 1st quater
+    aQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),0,halfRows,0,halfCols);
+    grayHistogram = calculateHistogram(aQuaterGrayMatrix, medianHistogram, meanHistogram, thresholdValue);
+    thresholdValue = calculateMAELabThreshold(medianHistogram,meanHistogram,grayHistogram);
+    cout << "1st Quater threshold value: " << thresholdValue << endl;
+    ptr_IntMatrix firstQuaterBinaryMatrix = binaryThreshold(aQuaterGrayMatrix,thresholdValue,255);
 
-        float medianHistogram;
-        float meanHistogram;
-        float thresholdValue;
+    // compute on 2nd quater
+    aQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),0,halfRows,halfCols,cols);
+    grayHistogram = calculateHistogram(aQuaterGrayMatrix, medianHistogram, meanHistogram, thresholdValue);
+    thresholdValue = calculateMAELabThreshold(medianHistogram,meanHistogram,grayHistogram);
+    cout << "2nd Quater threshold value: " << thresholdValue << endl;
+    ptr_IntMatrix secondQuaterBinaryMatrix = binaryThreshold(aQuaterGrayMatrix,thresholdValue,255);
 
-        //1st quater
-        calculateHistogram(firstQuaterGrayMatrix, grayHistogram, medianHistogram, meanHistogram, thresholdValue);
-        // compute threshold value
-        calculateThreshold(medianHistogram,meanHistogram,thresholdValue,grayHistogram);
-        cout << "1st Quater threshold value: " << thresholdValue << endl;
+    // compute on 3rd quater
+    aQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),halfRows,rows,0,halfCols);
+    grayHistogram = calculateHistogram(aQuaterGrayMatrix, medianHistogram, meanHistogram, thresholdValue);
+    thresholdValue = calculateMAELabThreshold(medianHistogram,meanHistogram,grayHistogram);
+    cout << "3rd Quater threshold value: " << thresholdValue << endl;
+    ptr_IntMatrix thirdQuaterBinaryMatrix = binaryThreshold(aQuaterGrayMatrix,thresholdValue,255);
 
-        ptr_IntMatrix firstQuaterBinaryMatrix = binaryThreshold(firstQuaterGrayMatrix,thresholdValue,255);
+    // compute on 4th quater
+    aQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),halfRows,rows,halfCols,cols);
+    grayHistogram = calculateHistogram(aQuaterGrayMatrix, medianHistogram, meanHistogram, thresholdValue);
+    thresholdValue = calculateMAELabThreshold(medianHistogram,meanHistogram,grayHistogram);
+    cout << "4th Quater threshold value: " << thresholdValue << endl;
+    ptr_IntMatrix fourthQuaterBinaryMatrix = binaryThreshold(aQuaterGrayMatrix,thresholdValue,255);
 
-        // 2nd quater
-        calculateHistogram(secondQuaterGrayMatrix, grayHistogram, medianHistogram, meanHistogram, thresholdValue);
-        // compute threshold value
-        calculateThreshold(medianHistogram,meanHistogram,thresholdValue,grayHistogram);
-        cout << "2nd Quater threshold value: " << thresholdValue << endl;
+    // copy 1st quater to imageGray
+    ptr_IntMatrix binaryImageMatrix = new Matrix<int>(rows,cols);
+    copySmallToBigIntMatrix(firstQuaterBinaryMatrix,binaryImageMatrix,0,0);
+    copySmallToBigIntMatrix(secondQuaterBinaryMatrix,binaryImageMatrix,0,halfCols);
+    copySmallToBigIntMatrix(thirdQuaterBinaryMatrix,binaryImageMatrix,halfRows,0);
+    copySmallToBigIntMatrix(fourthQuaterBinaryMatrix,binaryImageMatrix,halfRows,halfCols);
 
-        ptr_IntMatrix secondQuaterBinaryMatrix = binaryThreshold(secondQuaterGrayMatrix,thresholdValue,255);
-
-        // 3rd quater
-        calculateHistogram(thirdQuaterGrayMatrix, grayHistogram, medianHistogram, meanHistogram, thresholdValue);
-        // compute threshold value
-        calculateThreshold(medianHistogram,meanHistogram,thresholdValue,grayHistogram);
-        cout << "3rd Quater threshold value: " << thresholdValue << endl;
-
-        ptr_IntMatrix thirdQuaterBinaryMatrix = binaryThreshold(thirdQuaterGrayMatrix,thresholdValue,255);
-
-        // 4th quater
-        calculateHistogram(fourthQuaterGrayMatrix, grayHistogram, medianHistogram, meanHistogram, thresholdValue);
-        // compute threshold value
-        calculateThreshold(medianHistogram,meanHistogram,thresholdValue,grayHistogram);
-        cout << "4th Quater threshold value: " << thresholdValue << endl;
-
-        ptr_IntMatrix fourthQuaterBinaryMatrix = binaryThreshold(fourthQuaterGrayMatrix,thresholdValue,255);
-
-        // copy 1st quater to imageGray
-        ptr_IntMatrix binaryImageMatrix = new Matrix<int>(fullrows,fullcols);
-        copySmallToBigIntMatrix(firstQuaterBinaryMatrix,binaryImageMatrix,0,0);
-        copySmallToBigIntMatrix(secondQuaterBinaryMatrix,binaryImageMatrix,0,cols);
-        copySmallToBigIntMatrix(thirdQuaterBinaryMatrix,binaryImageMatrix,rows,0);
-        copySmallToBigIntMatrix(fourthQuaterBinaryMatrix,binaryImageMatrix,rows,cols);
-
-        DraftViewer *other = new DraftViewer;
-        other->loadImage(matImage, ptrIntToQImage(binaryImageMatrix), "4 Quater");
-        other->show();
+    DraftViewer *other = new DraftViewer;
+    other->loadImage(matImage, ptrIntToQImage(binaryImageMatrix), "4 Quater");
+    other->show();
 }
 
 void DraftViewer::openFragmentScreen()
@@ -1493,7 +1452,7 @@ void DraftViewer::createMenus()
     //Thanh
     pluginMenu = new QMenu(tr("&Plugin"), this);
     QMenu* extractObjectMenu = pluginMenu->addMenu(tr("Extract Object"));
-//    extractObjectMenu->addAction(detectObjectAct);
+    //    extractObjectMenu->addAction(detectObjectAct);
     extractObjectMenu->addAction(process4QuaterAct);
     pluginMenu->addAction(openFragmentScreenAct);
     //===============
@@ -1724,9 +1683,9 @@ void DraftViewer::createFilterMenu()
 
 void DraftViewer::createPluginMenu()
 {
-//    detectObjectAct = new QAction(tr("&Based on Binary threshold"), this);
-//    detectObjectAct->setEnabled(false);
-//    connect(detectObjectAct, SIGNAL(triggered()), this, SLOT(detectObjects()));
+    //    detectObjectAct = new QAction(tr("&Based on Binary threshold"), this);
+    //    detectObjectAct->setEnabled(false);
+    //    connect(detectObjectAct, SIGNAL(triggered()), this, SLOT(detectObjects()));
 
     process4QuaterAct = new QAction(tr("&Process 4 Quater"), this);
     process4QuaterAct->setEnabled(false);
@@ -1759,7 +1718,7 @@ void DraftViewer::activeFunction()
     suzukiAct->setEnabled(true);
     lineSegmentationAct->setEnabled(true);
     //Thanh
-//    detectObjectAct->setEnabled(true);
+    //    detectObjectAct->setEnabled(true);
     process4QuaterAct->setEnabled(true);
     //==========
 

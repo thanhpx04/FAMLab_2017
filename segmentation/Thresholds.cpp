@@ -466,6 +466,11 @@ ptr_RGBMatrix colorThreshold(ptr_RGBMatrix rgbImage,
     return result;
 }
 
+/**
+  Display value of Matrix on console screen for debuging.
+
+  @param Matrix pointer type Int.
+*/
 void showMatrix(ptr_IntMatrix intMatrix)
 {
     int rows = intMatrix->getRows();
@@ -481,6 +486,16 @@ void showMatrix(ptr_IntMatrix intMatrix)
     }
 }
 
+/**
+  Return a copy of a part of Gray Matrix.
+
+  @param Gray Matrix pointer.
+  @param index of the beginning row.
+  @param index of the ending row.
+  @param index of the beginning column.
+  @param index of the ending column.
+  @return Gray Matrix pointer.
+*/
 ptr_IntMatrix copyGrayMatrix(ptr_IntMatrix grayMatrix, int fromRow, int toRow, int fromCol, int toCol)
 {
     int rows = toRow - fromRow;
@@ -497,6 +512,16 @@ ptr_IntMatrix copyGrayMatrix(ptr_IntMatrix grayMatrix, int fromRow, int toRow, i
     return result;
 }
 
+/**
+  Return a copy of a part of RGB Matrix.
+
+  @param RGB Matrix pointer.
+  @param index of the beginning row.
+  @param index of the ending row.
+  @param index of the beginning column.
+  @param index of the ending column.
+  @return RGB Matrix pointer.
+*/
 ptr_RGBMatrix copyRGBMatrix(ptr_RGBMatrix RGBMatrix, int fromRow, int toRow, int fromCol, int toCol)
 {
     int rows = toRow - fromRow;
@@ -513,8 +538,20 @@ ptr_RGBMatrix copyRGBMatrix(ptr_RGBMatrix RGBMatrix, int fromRow, int toRow, int
     return result;
 }
 
-void calculateHistogram(ptr_IntMatrix grayMatrix, ptr_IntMatrix grayHistogram, float &medianHistogram, float &meanHistogram, float &thresholdValue)
+/**
+  Compute Gray Histogram base on Gray Matrix.
+  And calculate median, mean and threshold value.
+
+  @param Gray Matrix pointer.
+  @param Address memory of median variable.
+  @param Address memory of mean variable.
+  @param Address memory of threhold variable.
+  @return Gray Histogram Matrix pointer.
+*/
+ptr_IntMatrix calculateHistogram(ptr_IntMatrix grayMatrix, float &medianHistogram, float &meanHistogram, float &thresholdValue)
 {
+    ptr_IntMatrix grayHistogram = new Matrix<int>(1, BIN_SIZE, 0);
+
     if (grayMatrix->getCols() != 0)
     {
         float total = 0;
@@ -554,8 +591,17 @@ void calculateHistogram(ptr_IntMatrix grayMatrix, ptr_IntMatrix grayHistogram, f
             }
         }
     }
+    return grayHistogram;
 }
 
+/**
+  Return an index of the max value in range of Gray Histogram.
+
+  @param Gray Matrix pointer.
+  @param The begin index.
+  @param The end index.
+  @return The index of the max value.
+*/
 int indexMaxInRangeOfGrayHistogram(ptr_IntMatrix grayHistogram, int from, int to)
 {
     int indexMax = from, max = grayHistogram->getAtPosition(0, from);
@@ -571,6 +617,14 @@ int indexMaxInRangeOfGrayHistogram(ptr_IntMatrix grayHistogram, int from, int to
     return indexMax;
 }
 
+/**
+  Return an index of the min value in range of Gray Histogram.
+
+  @param Gray Matrix pointer.
+  @param The begin index.
+  @param The end index.
+  @return The index of the min value.
+*/
 int indexMinInRangeOfGrayHistogram(ptr_IntMatrix grayHistogram, int from, int to)
 {
     int indexMin = from, min = grayHistogram->getAtPosition(0, from);
@@ -586,7 +640,15 @@ int indexMinInRangeOfGrayHistogram(ptr_IntMatrix grayHistogram, int from, int to
     return indexMin;
 }
 
-void calculateThreshold(float &medianHistogram, float &meanHistogram, float &thresholdValue, ptr_IntMatrix grayHistogram)
+/**
+  Calculate threshold value base on the algorithm of MAELab.
+
+  @param Gray Histogram Matrix pointer.
+  @param Address memory of median variable.
+  @param Address memory of mean variable.
+  @return The threshold value.
+*/
+float calculateMAELabThreshold(float medianHistogram, float meanHistogram, ptr_IntMatrix grayHistogram)
 {
     // limit1 is the small value between meanHistogram and medianHistogram
     // then compare with 120 to choose a suitable of limit1
@@ -611,7 +673,8 @@ void calculateThreshold(float &medianHistogram, float &meanHistogram, float &thr
     cout << "indexMax2:\t" << indexMax2 << endl;
     float mid1 = (indexMin + indexMax1) / 2;
     float mid2 = (indexMin + indexMax2) / 2;
-    thresholdValue = (mid1 + mid2) / 2;
+    //the thresholdValue = (mid1 + mid2) / 2;
+    return (mid1 + mid2) / 2;
 }
 
 void copySmallToBigIntMatrix(ptr_IntMatrix intSmallMatrix, ptr_IntMatrix intBigMatrix, int fromRow, int fromCol)
