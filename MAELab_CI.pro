@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += "/usr/local/include"
-LIBS += -L"/usr/lib" \
+LIBS += -lpng -L"/usr/lib"
 	
 
 QT           += opengl
@@ -18,3 +18,6 @@ SOURCES += io/*.cpp io/LibJpeg/*.c imageModel/*.cpp \
 		 segmentation/*.cpp \
 		 histograms/*.cpp pht/*.cpp pointInterest/*.cpp correlation/*.cpp \
                  utils/*.cpp ui/*.cpp MAELab.cpp MAELab_CI.cpp
+
+FORMS += \
+    ui/TestWindow.ui

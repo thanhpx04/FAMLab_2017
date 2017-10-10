@@ -36,6 +36,7 @@ using namespace std;
 #include <QtGui/QApplication>
 #include "ui/ImageViewer.h"
 #include "ui/DraftViewer.h"
+#include "io/Reader.h"
 
 #include "MAELab.h"
 

@@ -59,6 +59,7 @@ using namespace std;
 #include "../MAELab.h"
 
 #include "DraftViewer.h"
+#include "TestWindow.h"
 
 DraftViewer::DraftViewer()
 {
@@ -101,6 +102,9 @@ DraftViewer::~DraftViewer()
     delete segmentationMenu;
     delete dominantPointMenu;
     delete helpMenu;
+    //Thanh
+    delete pluginMenu;
+    //========
 
     // toolbar
     delete fileToolBar;
@@ -127,6 +131,11 @@ DraftViewer::~DraftViewer()
     delete cannyAct;
     delete suzukiAct;
     delete lineSegmentationAct;
+    //Thanh
+//    delete detectObjectAct;
+    delete process4QuaterAct;
+    delete openFragmentScreenAct;
+    //==========
 
     delete gauAct;
     delete robertAct;
@@ -150,6 +159,13 @@ DraftViewer::~DraftViewer()
 
 void DraftViewer::loadImage(QString fn)
 {
+    //test call PNG decompress
+    //    string filePath = fn.toStdString();
+    //    int rows = 0, cols = 0;
+    //    cout << filePath << endl;
+    //    cout << filePath.c_str() << endl;
+    //    ptrRGBAMatrix test = readPNGToRGBA(filePath.c_str(), rows, cols);
+
     matImage = new Image(fn.toStdString());
     qImage.load(fn);
 
@@ -160,7 +176,7 @@ void DraftViewer::loadImage(QString fn)
     activeFunction();
 
     this->fileName = fn;
-    setWindowTitle(tr("Image Viewer - ") + fileName);
+    setWindowTitle(tr("Draft Viewer - ") + fileName);
     statusBar()->showMessage(tr("File loaded"), 2000);
 }
 
@@ -183,9 +199,9 @@ void DraftViewer::loadImage(Image *_matImage, QImage _qImage, QString tt)
 void DraftViewer::about()
 {
     QMessageBox::about(this, tr("About MAELab"),
-        tr(
-            "<p><b>MAELab</b> is a software in Computer Vision. It provides the function to "
-            "segmentation and detection dominant points.</p>"));
+                       tr(
+                           "<p><b>MAELab</b> is a software in Computer Vision. It provides the function to "
+                           "segmentation and detection dominant points.</p>"));
 }
 
 void DraftViewer::testMethod()
@@ -194,55 +210,10 @@ void DraftViewer::testMethod()
     RGB df;
     df.R = df.G = df.B = 0;
     Matrix<int> patch = matImage->getGrayMatrix()->extractPatch(501,501,676,2746,0);
-    /*QMessageBox msgbox;
-    msgbox.setText("Select the landmark file of scene image.");
-    msgbox.exec();
-    QString reflmPath = QFileDialog::getOpenFileName(this);
-    matImage->readManualLandmarks(reflmPath.toStdString());
-    msgbox.setText("Select the model image.");
-    msgbox.exec();
-    QString fileName2 = QFileDialog::getOpenFileName(this);
-    if (fileName2.isEmpty())
-        return;
-    cout << endl << fileName2.toStdString() << endl;
-    Image *modelImage = new Image(fileName2.toStdString());
-
-    msgbox.setText("Select the landmark file of model image.");
-    msgbox.exec();
-    QString reflmPath2 = QFileDialog::getOpenFileName(this);
-    modelImage->readManualLandmarks(reflmPath2.toStdString());
-
-    //testLBPDescriptor(matImage->getGrayMatrix(), matImage->getListOfManualLandmarks(), 64);
-
-    //testLBPDescriptor2Images(matImage->getGrayMatrix(),
-     //matImage->getListOfManualLandmarks(), modelImage->getGrayMatrix(),
-     //modelImage->getListOfManualLandmarks(), 64);
-
-    vector<Point> contourPoints;
-     matImage->cannyAlgorithm(contourPoints);
-     //vector<Point> rs = testLBPDescriptor2ImagesContours(
-     //modelImage->getGrayMatrix(), modelImage->getListOfManualLandmarks(),
-     //matImage->getGrayMatrix(), contourPoints, 64);
-    ptr_RGBMatrix shistogram = matImage->getRGBHistogram();
-    ptr_RGBMatrix sresult = colorThreshold(matImage->getRGBMatrix(), shistogram);
-
-    ptr_RGBMatrix mhistogram = modelImage->getRGBHistogram();
-    ptr_RGBMatrix mresult = colorThreshold(matImage->getRGBMatrix(), mhistogram);
-
-    vector<Point> rs = testSIFTOnRGB(mresult, modelImage->getListOfManualLandmarks(),sresult,contourPoints, 64);
-
-    RGB color;
-    color.R = 255;
-    color.G = color.B = 0;
-    for (int i = 0; i < rs.size(); i++)
-    {
-        Point p = rs.at(i);
-        fillCircle(*matImage->getRGBMatrix(), p, 5, color);
-    }*/
 
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrIntToQImage(&patch),
-        "Test a method");
+                     "Test a method");
     other->move(x() - 40, y() - 40);
     other->show();
 
@@ -253,7 +224,7 @@ void DraftViewer::testMethod()
 void DraftViewer::open()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
-        QDir::currentPath());
+                                                    QDir::currentPath());
     cout << fileName.toStdString() << endl;
     if (!fileName.isEmpty())
     {
@@ -261,7 +232,7 @@ void DraftViewer::open()
         if (image.isNull())
         {
             QMessageBox::information(this, tr("MAELab"),
-                tr("Cannot load %1.").arg(fileName));
+                                     tr("Cannot load %1.").arg(fileName));
             return;
         }
         if (!this->fileName.isEmpty())
@@ -281,7 +252,7 @@ void DraftViewer::open()
 void DraftViewer::save()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save image"), ".",
-        tr("Image Files (*.jpg)"));
+                                                    tr("Image Files (*.jpg)"));
     if (fileName.isEmpty())
     {
         cout << "\nCan not save the image !!";
@@ -305,7 +276,7 @@ void DraftViewer::save()
 void DraftViewer::saveAs()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save image"), ".",
-        tr("Image Files (*.jpg)"));
+                                                    tr("Image Files (*.jpg)"));
     if (fileName.isEmpty())
     {
         cout << "\nCan not save the image !!";
@@ -430,7 +401,7 @@ void DraftViewer::rgbHistogramCalc()
 
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrRGBToQImage(result),
-        "RGB Histogram result - Red channel");
+                     "RGB Histogram result - Red channel");
     other->move(x() - 40, y() - 40);
     other->show();
 
@@ -497,7 +468,7 @@ void DraftViewer::displayManualLandmarks()
     }
 
     this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-        "Display manual landmarks.");
+                    "Display manual landmarks.");
     this->show();
     cout << "\nFinish.\n";
 }
@@ -509,7 +480,7 @@ void DraftViewer::displayAutoLandmarks()
     if (autoLM.size() <= 0)
     {
         message.setText(
-            "Automatic landmarks do not exists. You need to compute them.");
+                    "Automatic landmarks do not exists. You need to compute them.");
         message.exec();
     }
     else
@@ -545,7 +516,7 @@ void DraftViewer::displayAutoLandmarks()
             }
         }
         this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-            "Display estimated landmarks.");
+                        "Display estimated landmarks.");
     }
 }
 
@@ -558,6 +529,9 @@ void DraftViewer::binThreshold()
     tr.setRefImage(*matImage);
     cout << "\ntValue: " << tValue << endl;
     ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
+
+    // Thanh: ignore postProcess function which is filling the hole
+//    rsMatrix = postProcess(rsMatrix, 255);
 
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrIntToQImage(rsMatrix), "Thresholding result");
@@ -586,7 +560,7 @@ void DraftViewer::cannyAlgorithm()
         {
             pi = edgei.getPoints().at(k);
             if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-                && pi.getY() < rows)
+                    && pi.getY() < rows)
             {
                 matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
             }
@@ -595,7 +569,7 @@ void DraftViewer::cannyAlgorithm()
     }
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-        "Canny result");
+                     "Canny result");
     other->move(x() - 40, y() - 40);
     other->show();
 }
@@ -622,7 +596,7 @@ void DraftViewer::suzukiAlgorithm()
         {
             pi = edgei.getPoints().at(k);
             if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-                && pi.getY() < rows)
+                    && pi.getY() < rows)
             {
                 matImage->getRGBMatrix()->setAtPosition(pi.getY(), pi.getX(), color);
             }
@@ -630,7 +604,7 @@ void DraftViewer::suzukiAlgorithm()
     }
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-        "Canny result");
+                     "Canny result");
     other->move(x() - 40, y() - 40);
     other->show();
 }
@@ -653,7 +627,7 @@ void DraftViewer::lineSegmentation()
     }
 
     this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-        "Line segmentation result");
+                    "Line segmentation result");
     this->show();
 
     msgbox.setText("Finish");
@@ -667,7 +641,7 @@ void DraftViewer::gauFilter()
     Matrix<int> gsResult = gaussianBlur(*(matImage->getGrayMatrix()), kernel);
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrIntToQImage(&gsResult),
-        "Gaussian filter result");
+                     "Gaussian filter result");
     other->move(x() - 40, y() - 40);
     other->show();
 }
@@ -703,7 +677,7 @@ void DraftViewer::erosionOperation()
 
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrIntToQImage(erResult),
-        "Erosion operation result");
+                     "Erosion operation result");
     other->move(x() - 40, y() - 40);
     other->show();
 }
@@ -718,7 +692,7 @@ void DraftViewer::dilationOperation()
 
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrIntToQImage(dlResult),
-        "Dilation operation result");
+                     "Dilation operation result");
     other->move(x() - 40, y() - 40);
     other->show();
 }
@@ -747,7 +721,7 @@ void DraftViewer::closeOperation()
 
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrIntToQImage(dlResult),
-        "Close operation result");
+                     "Close operation result");
     other->move(x() - 40, y() - 40);
     other->show();
 }
@@ -793,10 +767,10 @@ void DraftViewer::gHoughTransform()
     {
         lm = estLandmarks.at(i);
         cout << "Landmarks " << i + 1 << ":\t" << lm.getX() << "\t" << lm.getY()
-            << endl;
+             << endl;
         //fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
         if (lm.getX() >= 0 && lm.getX() < matImage->getRGBMatrix()->getCols()
-            && lm.getY() >= 0 && lm.getY() < matImage->getRGBMatrix()->getRows())
+                && lm.getY() >= 0 && lm.getY() < matImage->getRGBMatrix()->getRows())
         {
             qpainter.drawEllipse(lm.getX(), lm.getY(), 4, 4);
             qpainter.drawText(lm.getX() + 6, lm.getY(), QString::number((int) i));
@@ -806,9 +780,9 @@ void DraftViewer::gHoughTransform()
     Point ebary;
     double mCentroid = measureCentroidPoint(estLandmarks, ebary);
     msgbox.setText(
-        "<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
-            + QString::number(ebary.getY()) + ")</p>"
-                "<p>Centroid value: " + QString::number(mCentroid) + "</p");
+                "<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
+                + QString::number(ebary.getY()) + ")</p>"
+                                                  "<p>Centroid value: " + QString::number(mCentroid) + "</p");
     msgbox.exec();
 
     this->loadImage(matImage, qImage, "Landmarks result");
@@ -842,7 +816,7 @@ void DraftViewer::extractLandmarks()
     Point ePoint;
     double angleDiff;
     vector<Point> lms = tr.landmarksAutoDectect(*matImage, Degree, 500, 400, 500,
-        ePoint, angleDiff);
+                                                ePoint, angleDiff);
     cout << "\nNumber of the landmarks: " << lms.size() << endl;
     RGB color;
     color.R = 255;
@@ -860,7 +834,7 @@ void DraftViewer::extractLandmarks()
     displayALandmarksAct->setChecked(true);
     measureEBaryAct->setEnabled(true);
     this->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-        "Landmarks result");
+                    "Landmarks result");
     this->show();
 
     msgbox.setText("Finish");
@@ -877,9 +851,9 @@ void DraftViewer::measureMBary()
         double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
         qmessage.setText(
-            "<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
-                + QString::number(ebary.getY()) + ")</p>"
-                    "<p>Centroid value: " + QString::number(mCentroid) + "</p");
+                    "<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
+                    + QString::number(ebary.getY()) + ")</p>"
+                                                      "<p>Centroid value: " + QString::number(mCentroid) + "</p");
     }
     else
     {
@@ -898,9 +872,9 @@ void DraftViewer::measureEBary()
         double mCentroid = measureCentroidPoint(mLandmarks, ebary);
 
         qmessage.setText(
-            "<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
-                + QString::number(ebary.getY()) + ")</p>"
-                    "<p>Centroid value: " + QString::number(mCentroid) + "</p");
+                    "<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
+                    + QString::number(ebary.getY()) + ")</p>"
+                                                      "<p>Centroid value: " + QString::number(mCentroid) + "</p");
     }
     else
     {
@@ -943,11 +917,11 @@ void DraftViewer::dirAutoLandmarks()
         Image sceneimage(fileName);
 
         esLandmarks = tr.landmarksAutoDectect(sceneimage, Degree, 500, 400, 500,
-            ePoint, angleDiff);
+                                              ePoint, angleDiff);
         if (savefolder != NULL || savefolder != "")
         {
             string saveFile = savefolder.toStdString() + "/" + fileNames.at(i)
-                + ".TPS";
+                    + ".TPS";
             ofstream inFile(saveFile.c_str());
             inFile << "LM=" << esLandmarks.size() << "\n";
             for (size_t k = 0; k < esLandmarks.size(); k++)
@@ -975,7 +949,7 @@ void DraftViewer::dirCentroidMeasure()
     QString lmfolder = QFileDialog::getExistingDirectory(this);
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save file"), ".",
-        tr("Measure file (*.txt)"));
+                                                    tr("Measure file (*.txt)"));
 
     vector<string> fileNames = readDirectory(lmfolder.toStdString().c_str());
     string saveFile;
@@ -1001,7 +975,7 @@ void DraftViewer::dirCentroidMeasure()
             if (fileName != NULL || fileName != "")
             {
                 inFile << fileNames.at(i) << "\t" << ebary.getX() << "\t"
-                    << ebary.getY() << "\t" << mCentroid << "\n";
+                       << ebary.getY() << "\t" << mCentroid << "\n";
 
             }
         }
@@ -1010,7 +984,7 @@ void DraftViewer::dirCentroidMeasure()
             if (fileName != NULL || fileName != "")
             {
                 inFile << fileNames.at(i) << "\t" << 0 << "\t" << 0 << "\t" << 0
-                    << "\n";
+                       << "\n";
 
             }
         }
@@ -1116,10 +1090,10 @@ void DraftViewer::sobelAndSIFT()
         }
     }
     cout << "\nManual landmarks: "
-        << modelImage->getListOfManualLandmarks().size() << endl;
+         << modelImage->getListOfManualLandmarks().size() << endl;
     vector<Point> estLandmarks = verifyDescriptors3(modelImage->getGrayMatrix(),
-        matImage->getGrayMatrix(), contours, modelImage->getListOfManualLandmarks(),
-        9);
+                                                    matImage->getGrayMatrix(), contours, modelImage->getListOfManualLandmarks(),
+                                                    9);
     cout << "\nNumber of estimated landmarks: " << estLandmarks.size() << endl;
 
     RGB color;
@@ -1135,7 +1109,7 @@ void DraftViewer::sobelAndSIFT()
 
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-        "Sobel and SIFT");
+                     "Sobel and SIFT");
     other->move(x() - 40, y() - 40);
     other->show();
 }
@@ -1162,8 +1136,8 @@ void DraftViewer::cannyAndSIFT()
     matImage->cannyAlgorithm(cPoints);
     cout << "\nNumber of points on contours: " << cPoints.size() << endl;
     vector<Point> estLandmarks = verifyDescriptors4(modelImage->getGrayMatrix(),
-        matImage->getGrayMatrix(), cPoints, modelImage->getListOfManualLandmarks(),
-        63);
+                                                    matImage->getGrayMatrix(), cPoints, modelImage->getListOfManualLandmarks(),
+                                                    63);
     cout << "\nNumber of estimated landmarks: " << estLandmarks.size() << endl;
     RGB color;
     color.R = 255;
@@ -1178,7 +1152,7 @@ void DraftViewer::cannyAndSIFT()
 
     DraftViewer *other = new DraftViewer;
     other->loadImage(matImage, ptrRGBToQImage(matImage->getRGBMatrix()),
-        "Canny and SIFT");
+                     "Canny and SIFT");
     other->move(x() - 40, y() - 40);
     other->show();
 }
@@ -1202,7 +1176,7 @@ void DraftViewer::pcaiMethodViewer()
     QString reflmPath = QFileDialog::getOpenFileName(this);
     modelImage->readManualLandmarks(reflmPath.toStdString());
     vector<Point> estLandmarks = PCAI(*modelImage, *matImage,
-        modelImage->getListOfManualLandmarks());
+                                      modelImage->getListOfManualLandmarks());
     cout << "\nNumber of the landmarks: " << estLandmarks.size() << endl;
 
     RGB color;
@@ -1217,7 +1191,7 @@ void DraftViewer::pcaiMethodViewer()
     {
         lm = estLandmarks.at(i);
         cout << "Landmarks " << i + 1 << ":\t" << lm.getX() << "\t" << lm.getY()
-            << endl;
+             << endl;
         fillCircle(*(matImage->getRGBMatrix()), lm, 5, color);
         qpainter.drawEllipse(lm.getX(), lm.getY(), 4, 4);
         qpainter.drawText(lm.getX() + 6, lm.getY(), QString::number((int) i));
@@ -1226,9 +1200,9 @@ void DraftViewer::pcaiMethodViewer()
     Point ebary;
     double mCentroid = measureCentroidPoint(estLandmarks, ebary);
     msgbox.setText(
-        "<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
-            + QString::number(ebary.getY()) + ")</p>"
-                "<p>Centroid value: " + QString::number(mCentroid) + "</p");
+                "<p>Coordinate of bary point: (" + QString::number(ebary.getX()) + ", "
+                + QString::number(ebary.getY()) + ")</p>"
+                                                  "<p>Centroid value: " + QString::number(mCentroid) + "</p");
     msgbox.exec();
 
     // working on folder
@@ -1246,92 +1220,202 @@ void DraftViewer::pcaiMethodViewer()
     msgbox.exec();
 }
 
+/**
+ * Thanh
+ * Extract chosen object with the coordinates from mouse event double click.
+ * The algorithm is region growing + using binary matrix as mask for growing criteria.
+ * @param the coordinates.
+*/
 void DraftViewer::extractObject(int x, int y)
 {
     cout << "Extract object from the point: "<<x<<"  "<<y << endl;
 
+    float tValue = matImage->getThresholdValue();
+    Segmentation tr;
+    tr.setRefImage(*matImage);
+    cout << endl << "tValue: " << tValue << endl;
+
+    int rows = matImage->getRGBMatrix()->getRows();
+    int cols = matImage->getRGBMatrix()->getCols();
+
+    // copy grayMatrix of image to process
+    ptr_IntMatrix grayMatrix = new Matrix<int>(rows, cols);
+    grayMatrix->setData(matImage->getGrayMatrix()->getData());
+
+    // to determine the rectangle of object
+    int minX=x, maxX=x, minY=y, maxY=y;
+
+    // list of points to be checked.
+    vector<Point> seedPoints;
+    RGB color;
+    Point startPoint(x,y,color);
+    seedPoints.push_back(startPoint);
+    // label start Point is checked by value 256
+    grayMatrix->setAtPosition(y,x,256);
+    while(!seedPoints.empty())
+    {
+        // Pop a point from seedPoints (remove it from the list)
+        Point checkingPoint = seedPoints.back();
+        seedPoints.pop_back();
+
+        vector<Point> tempList = tr.growRegion(grayMatrix,tValue,checkingPoint,minX,maxX,minY,maxY);
+        seedPoints.insert(seedPoints.end(),tempList.begin(),tempList.end());
+    }
+
+    // fix the rectangel of object
+    rows = maxY-minY+4;
+    cols = maxX-minX+4;
+    ptr_RGBMatrix srcMatrix = matImage->getRGBMatrix();
+    // set the background is black => it can be use alpha channel
+    ptr_RGBMatrix objectRGBMatrix = new Matrix<RGB>(rows, cols);
+    ptr_IntMatrix objectBinMatrix = new Matrix<int>(rows, cols, 255);
+    for (int r = 2; r < rows; r++)
+    {
+        for (int c = 2; c < cols; c++)
+        {
+            int grayValue = grayMatrix->getAtPosition(r-2+minY,c-2+minX);
+            // check position of object only
+            if(grayValue == 256)
+            {
+                objectRGBMatrix->setAtPosition(r,c,srcMatrix->getAtPosition(r-2+minY,c-2+minX));
+                objectBinMatrix->setAtPosition(r,c,0);
+            }
+        }
+    }
+
+    // implement canny to detect boundary and suzuky to get list edges to draw it
+    vector<Point> cPoints;
+    ptr_IntMatrix cannyMatrix = cannyProcess(objectBinMatrix, (int) tValue,
+                                             3 * (int) tValue, cPoints);
+
+    vector<Edge> listOfEdges;
+    listOfEdges = suzuki(cannyMatrix);
+
+    for (size_t i = 0; i < listOfEdges.size(); i++)
+    {
+        Edge edgei = listOfEdges.at(i);
+        for (size_t k = 0; k < edgei.getPoints().size(); k++)
+        {
+            Point pi = edgei.getPoints().at(k);
+            if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+                    && pi.getY() < rows)
+            {
+                RGB red;
+                red.R = 255;
+                red.G = red.B = 0;
+                objectRGBMatrix->setAtPosition(pi.getY(), pi.getX(), red);
+            }
+        }
+        //cout << "Number of points in edge: " << edgei.getPoints().size() << endl;
+    }
+
+    DraftViewer *other1 = new DraftViewer;
+    other1->loadImage(matImage, ptrRGBToQImage(objectRGBMatrix), "Object color result");
+    other1->show();
+}
+
+///**
+// * Thanh
+// * Detect objects based on binary mask
+// * which is a binary matrix created by thresholding
+// */
+//void DraftViewer::detectObjects()
+//{
+//    cout << "Detect Objects" << endl;
+//    float tValue = matImage->getThresholdValue();
+
+//    Segmentation tr; // = new Segmentation();
+//    tr.setRefImage(*matImage);
+//    cout << "\ntValue: " << tValue << endl;
+//    ptr_IntMatrix rsMatrix = tr.threshold(tValue, 255);
+//    ptr_RGBMatrix exMatrix = extractByBinaryThreshold(matImage->getRGBMatrix(),rsMatrix);
+
+//    DraftViewer *other = new DraftViewer;
+//    other->loadImage(matImage, ptrRGBToQImage(exMatrix), "Detect objects result");
+//    other->show();
+//}
+
+void DraftViewer::process4Quater()
+{
+    cout << "Local threshold" << endl;
         float tValue = matImage->getThresholdValue();
         Segmentation tr;
         tr.setRefImage(*matImage);
         cout << endl << "tValue: " << tValue << endl;
 
-        int rows = matImage->getRGBMatrix()->getRows();
-        int cols = matImage->getRGBMatrix()->getCols();
+        int fullrows = matImage->getRGBMatrix()->getRows();
+        int fullcols = matImage->getRGBMatrix()->getCols();
+        // top right quater
+        int rows = fullrows/2;
+        int cols = fullcols/2;
 
-        // copy grayMatrix of image to process
-        ptr_IntMatrix grayMatrix = new Matrix<int>(rows, cols);
-        grayMatrix->setData(matImage->getGrayMatrix()->getData());
+    //    ptr_RGBMatrix firstQuaterRGBMatrix = copyRGBMatrix(matImage->getRGBMatrix(),0,rows,0,cols);
+        ptr_IntMatrix firstQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),0,rows,0,cols);
+    //    ptr_RGBMatrix secondQuaterRGBMatrix = copyRGBMatrix(matImage->getRGBMatrix(),0,rows,cols,fullcols);
+        ptr_IntMatrix secondQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),0,rows,cols,fullcols);
+    //    ptr_RGBMatrix thirdQuaterRGBMatrix = copyRGBMatrix(matImage->getRGBMatrix(),rows,fullrows,0,cols);
+        ptr_IntMatrix thirdQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),rows,fullrows,0,cols);
+    //    ptr_RGBMatrix fourthQuaterRGBMatrix = copyRGBMatrix(matImage->getRGBMatrix(),rows,fullrows,cols,fullcols);
+        ptr_IntMatrix fourthQuaterGrayMatrix = copyGrayMatrix(matImage->getGrayMatrix(),rows,fullrows,cols,fullcols);
 
-        // to determine the rectangle of object
-        int minX=x, maxX=x, minY=y, maxY=y;
+        // compute histogram
+        ptr_IntMatrix grayHistogram= new Matrix<int>(1, 256, 0);
+    //    RGB color;
+    //    color.R = color.G = color.B = 0;
+    //    ptr_RGBMatrix rgbHistogram = new Matrix<RGB>(1,256,color);
 
-        // list of points to be checked.
-        vector<Point> seedPoints;
-        RGB color;
-        Point startPoint(x,y,color);
-        seedPoints.push_back(startPoint);
-        // label start Point is checked by value 256
-        grayMatrix->setAtPosition(y,x,256);
-        while(!seedPoints.empty())
-        {
-            // Pop a point from seedPoints (remove it from the list)
-            Point checkingPoint = seedPoints.back();
-            seedPoints.pop_back();
+        float medianHistogram;
+        float meanHistogram;
+        float thresholdValue;
 
-            vector<Point> tempList = tr.growRegion(grayMatrix,tValue,checkingPoint,minX,maxX,minY,maxY);
-            seedPoints.insert(seedPoints.end(),tempList.begin(),tempList.end());
-        }
+        //1st quater
+        calculateHistogram(firstQuaterGrayMatrix, grayHistogram, medianHistogram, meanHistogram, thresholdValue);
+        // compute threshold value
+        calculateThreshold(medianHistogram,meanHistogram,thresholdValue,grayHistogram);
+        cout << "1st Quater threshold value: " << thresholdValue << endl;
 
-        // fix the rectangel of object
-        rows = maxY-minY+4;
-        cols = maxX-minX+4;
-        ptr_RGBMatrix srcMatrix = matImage->getRGBMatrix();
-        // set the background is black => it can be use alpha channel
-        ptr_RGBMatrix objectRGBMatrix = new Matrix<RGB>(rows, cols);
-        ptr_IntMatrix objectBinMatrix = new Matrix<int>(rows, cols, 255);
-        for (int r = 2; r < rows; r++)
-        {
-            for (int c = 2; c < cols; c++)
-            {
-                int grayValue = grayMatrix->getAtPosition(r-2+minY,c-2+minX);
-                // check position of object only
-                if(grayValue == 256)
-                {
-                    objectRGBMatrix->setAtPosition(r,c,srcMatrix->getAtPosition(r-2+minY,c-2+minX));
-                    objectBinMatrix->setAtPosition(r,c,0);
-                }
-            }
-        }
+        ptr_IntMatrix firstQuaterBinaryMatrix = binaryThreshold(firstQuaterGrayMatrix,thresholdValue,255);
 
-        // implement canny to detect boundary and suzuky to get list edges to draw it
-        vector<Point> cPoints;
-        ptr_IntMatrix cannyMatrix = cannyProcess(objectBinMatrix, (int) tValue,
-            3 * (int) tValue, cPoints);
+        // 2nd quater
+        calculateHistogram(secondQuaterGrayMatrix, grayHistogram, medianHistogram, meanHistogram, thresholdValue);
+        // compute threshold value
+        calculateThreshold(medianHistogram,meanHistogram,thresholdValue,grayHistogram);
+        cout << "2nd Quater threshold value: " << thresholdValue << endl;
 
-        vector<Edge> listOfEdges;
-        listOfEdges = suzuki(cannyMatrix);
+        ptr_IntMatrix secondQuaterBinaryMatrix = binaryThreshold(secondQuaterGrayMatrix,thresholdValue,255);
 
-        for (size_t i = 0; i < listOfEdges.size(); i++)
-        {
-            Edge edgei = listOfEdges.at(i);
-            for (size_t k = 0; k < edgei.getPoints().size(); k++)
-            {
-                Point pi = edgei.getPoints().at(k);
-                if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-                    && pi.getY() < rows)
-                {
-                    RGB red;
-                    red.R = 255;
-                    red.G = red.B = 0;
-                    objectRGBMatrix->setAtPosition(pi.getY(), pi.getX(), red);
-                }
-            }
-            cout << "Number of points in edge: " << edgei.getPoints().size() << endl;
-        }
+        // 3rd quater
+        calculateHistogram(thirdQuaterGrayMatrix, grayHistogram, medianHistogram, meanHistogram, thresholdValue);
+        // compute threshold value
+        calculateThreshold(medianHistogram,meanHistogram,thresholdValue,grayHistogram);
+        cout << "3rd Quater threshold value: " << thresholdValue << endl;
 
-        DraftViewer *other1 = new DraftViewer;
-        other1->loadImage(matImage, ptrRGBToQImage(objectRGBMatrix), "Object color result");
-        other1->show();
+        ptr_IntMatrix thirdQuaterBinaryMatrix = binaryThreshold(thirdQuaterGrayMatrix,thresholdValue,255);
+
+        // 4th quater
+        calculateHistogram(fourthQuaterGrayMatrix, grayHistogram, medianHistogram, meanHistogram, thresholdValue);
+        // compute threshold value
+        calculateThreshold(medianHistogram,meanHistogram,thresholdValue,grayHistogram);
+        cout << "4th Quater threshold value: " << thresholdValue << endl;
+
+        ptr_IntMatrix fourthQuaterBinaryMatrix = binaryThreshold(fourthQuaterGrayMatrix,thresholdValue,255);
+
+        // copy 1st quater to imageGray
+        ptr_IntMatrix binaryImageMatrix = new Matrix<int>(fullrows,fullcols);
+        copySmallToBigIntMatrix(firstQuaterBinaryMatrix,binaryImageMatrix,0,0);
+        copySmallToBigIntMatrix(secondQuaterBinaryMatrix,binaryImageMatrix,0,cols);
+        copySmallToBigIntMatrix(thirdQuaterBinaryMatrix,binaryImageMatrix,rows,0);
+        copySmallToBigIntMatrix(fourthQuaterBinaryMatrix,binaryImageMatrix,rows,cols);
+
+        DraftViewer *other = new DraftViewer;
+        other->loadImage(matImage, ptrIntToQImage(binaryImageMatrix), "4 Quater");
+        other->show();
+}
+
+void DraftViewer::openFragmentScreen()
+{
+    TestWindow *tw = new TestWindow;
+    tw->show();
 }
 //================================================================================
 
@@ -1343,6 +1427,8 @@ void DraftViewer::createActions()
     createSegmentationMenu();
     createLandmarksMenu();
     createFilterMenu();
+    //Thanh
+    createPluginMenu();
 }
 
 void DraftViewer::createMenus()
@@ -1404,6 +1490,14 @@ void DraftViewer::createMenus()
     menuDirectory->addAction(dirCentroidMeasureAct);
     menuDirectory->addAction(dirGenerateDataAct);
 
+    //Thanh
+    pluginMenu = new QMenu(tr("&Plugin"), this);
+    QMenu* extractObjectMenu = pluginMenu->addMenu(tr("Extract Object"));
+//    extractObjectMenu->addAction(detectObjectAct);
+    extractObjectMenu->addAction(process4QuaterAct);
+    pluginMenu->addAction(openFragmentScreenAct);
+    //===============
+
     //registrationMenu = new QMenu(tr("&Registration"), this);
     //registrationMenu->addAction(icpAct);
 
@@ -1415,6 +1509,8 @@ void DraftViewer::createMenus()
     menuBar()->addMenu(dominantPointMenu);
     //menuBar()->addMenu(registrationMenu);
     menuBar()->addMenu(helpMenu);
+    //Thanh
+    menuBar()->addMenu(pluginMenu);
 }
 
 void DraftViewer::createToolBars()
@@ -1436,7 +1532,7 @@ void DraftViewer::createStatusBar()
 void DraftViewer::createFileMenu()
 {
     openAct = new QAction(QIcon("./resources/ico/open.png"), tr("&Open..."),
-        this);
+                          this);
     openAct->setShortcuts(QKeySequence::Open);
     openAct->setStatusTip(tr("Open an existing file"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
@@ -1467,13 +1563,13 @@ void DraftViewer::createFileMenu()
 void DraftViewer::createViewMenu()
 {
     zoomInAct = new QAction(QIcon("./resources/ico/1uparrow.png"),
-        tr("Zoom &In (25%)"), this);
+                            tr("Zoom &In (25%)"), this);
     zoomInAct->setShortcut(tr("Ctrl++"));
     zoomInAct->setEnabled(false);
     connect(zoomInAct, SIGNAL(triggered()), this, SLOT(zoomIn()));
 
     zoomOutAct = new QAction(QIcon("./resources/ico/1downarrow.png"),
-        tr("Zoom &Out (25%)"), this);
+                             tr("Zoom &Out (25%)"), this);
     zoomOutAct->setShortcut(tr("Ctrl+-"));
     zoomOutAct->setEnabled(false);
     connect(zoomOutAct, SIGNAL(triggered()), this, SLOT(zoomOut()));
@@ -1502,7 +1598,7 @@ void DraftViewer::createViewMenu()
     displayMLandmarksAct->setCheckable(true);
     displayMLandmarksAct->setChecked(false);
     connect(displayMLandmarksAct, SIGNAL(triggered()), this,
-        SLOT(displayManualLandmarks()));
+            SLOT(displayManualLandmarks()));
 
     displayALandmarksAct = new QAction(tr("&Display estimated landmarks"), this);
     displayALandmarksAct->setEnabled(false);
@@ -1552,7 +1648,7 @@ void DraftViewer::createLandmarksMenu()
     autoLandmarksAct->setEnabled(false);
     autoLandmarksAct->setShortcut(tr("Ctrl+L"));
     connect(autoLandmarksAct, SIGNAL(triggered()), this,
-        SLOT(extractLandmarks()));
+            SLOT(extractLandmarks()));
 
     pcaiAct = new QAction(tr("PCAI method"), this);
     pcaiAct->setEnabled(false);
@@ -1578,21 +1674,21 @@ void DraftViewer::createLandmarksMenu()
     connect(measureEBaryAct, SIGNAL(triggered()), this, SLOT(measureEBary()));
 
     dirAutoLandmarksAct = new QAction(tr("Compute automatic landmarks on folder"),
-        this);
+                                      this);
     dirAutoLandmarksAct->setEnabled(false);
     connect(dirAutoLandmarksAct, SIGNAL(triggered()), this,
-        SLOT(dirAutoLandmarks()));
+            SLOT(dirAutoLandmarks()));
 
     dirCentroidMeasureAct = new QAction(tr("Measure centroid on folder"), this);
     dirCentroidMeasureAct->setEnabled(false);
     connect(dirCentroidMeasureAct, SIGNAL(triggered()), this,
-        SLOT(dirCentroidMeasure()));
+            SLOT(dirCentroidMeasure()));
 
     dirGenerateDataAct = new QAction(tr("Random generated the data"), this);
     dirGenerateDataAct->setEnabled(false);
     dirGenerateDataAct->setShortcut(tr("Ctrl+D"));
     connect(dirGenerateDataAct, SIGNAL(triggered()), this,
-        SLOT(dirGenerateData()));
+            SLOT(dirGenerateData()));
 }
 
 void DraftViewer::createFilterMenu()
@@ -1626,6 +1722,22 @@ void DraftViewer::createFilterMenu()
     connect(closeBinaryAct, SIGNAL(triggered()), this, SLOT(closeOperation()));
 }
 
+void DraftViewer::createPluginMenu()
+{
+//    detectObjectAct = new QAction(tr("&Based on Binary threshold"), this);
+//    detectObjectAct->setEnabled(false);
+//    connect(detectObjectAct, SIGNAL(triggered()), this, SLOT(detectObjects()));
+
+    process4QuaterAct = new QAction(tr("&Process 4 Quater"), this);
+    process4QuaterAct->setEnabled(false);
+    connect(process4QuaterAct, SIGNAL(triggered()), this, SLOT(process4Quater()));
+
+    openFragmentScreenAct = new QAction(tr("&Open Fragment Screen"), this);
+    openFragmentScreenAct->setEnabled(true);
+    connect(openFragmentScreenAct, SIGNAL(triggered()), this, SLOT(openFragmentScreen()));
+
+}
+
 void DraftViewer::activeFunction()
 {
     openAct->setEnabled(true);
@@ -1646,6 +1758,10 @@ void DraftViewer::activeFunction()
     cannyAct->setEnabled(true);
     suzukiAct->setEnabled(true);
     lineSegmentationAct->setEnabled(true);
+    //Thanh
+//    detectObjectAct->setEnabled(true);
+    process4QuaterAct->setEnabled(true);
+    //==========
 
     gauAct->setEnabled(true);
     robertAct->setEnabled(true);
@@ -1700,8 +1816,8 @@ void DraftViewer::scaleImage(double factor)
 void DraftViewer::adjustScrollBar(QScrollBar *scrollBar, double factor)
 {
     scrollBar->setValue(
-        int(
-            factor * scrollBar->value()
+                int(
+                    factor * scrollBar->value()
                     + ((factor - 1) * scrollBar->pageStep() / 2)));
 }
 

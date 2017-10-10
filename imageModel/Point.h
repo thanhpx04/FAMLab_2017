@@ -76,6 +76,82 @@ struct RGB
 	}
 };
 
+//========= Thanh == structure for PNG image ==================
+struct RGBA
+{
+    unsigned long int R;
+    unsigned long int G;
+    unsigned long int B;
+    unsigned long int A;
+    RGBA operator+(const RGBA& color) const
+    {
+        RGBA result;
+        result.R = color.R + R;
+        result.G = color.G + G;
+        result.B = color.B + B;
+        result.A = color.A + A;
+        return result;
+    }
+    RGBA operator*(const RGBA& color) const
+    {
+        RGBA result;
+        result.R = color.R * R;
+        result.G = color.G * G;
+        result.B = color.B * B;
+        result.A = color.A * A;
+        return result;
+    }
+    RGBA operator/(const double c) const
+    {
+        RGBA result;
+        result.R = R / c;
+        result.G = G / c;
+        result.B = B / c;
+        result.A = A / c;
+        return result;
+    }
+    RGBA operator+=(const RGBA& color) const
+    {
+        RGBA result;
+        result.R = color.R + R;
+        result.G = color.G + G;
+        result.B = color.B + B;
+        result.A = color.A + A;
+        return result;
+    }
+    bool operator==(const unsigned long int i) const
+    {
+        if (R == i && G == i && B == i && A == i)
+            return true;
+        return false;
+    }
+    bool operator!=(const unsigned long int i) const
+    {
+        if (R != i && G != i && B != i && A != i)
+            return true;
+        return false;
+    }
+    bool operator>(const unsigned long int i) const
+    {
+        if (R > i && G > i && B > i && A > i)
+            return true;
+        return false;
+    }
+    bool operator>=(const unsigned long int i) const
+    {
+        if (R >= i && G >= i && B >= i && A >= i)
+            return true;
+        return false;
+    }
+    RGBA operator=(const unsigned long int value) const
+    {
+        RGBA color;
+        color.R = color.G = color.B = color.A = value;
+        return color;
+    }
+};
+//=================================================
+
 class Point
 {
 private:

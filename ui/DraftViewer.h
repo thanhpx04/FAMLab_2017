@@ -70,6 +70,8 @@ private slots:
 
     //Thanh
     void extractObject(int x, int y);
+    void process4Quater();
+    void openFragmentScreen();
 
 private:
 
@@ -84,6 +86,9 @@ private:
     QMenu *processMenu;
     QMenu *dominantPointMenu;
     QMenu *helpMenu;
+    //Thanh
+    QMenu *pluginMenu;
+    //============
 
     // toolbar
     QToolBar *fileToolBar;
@@ -113,6 +118,12 @@ private:
     QAction *cannyAct;
     QAction *suzukiAct;
     QAction *lineSegmentationAct;
+
+    //Thanh
+//    QAction *detectObjectAct;
+    QAction *process4QuaterAct;
+    QAction *openFragmentScreenAct;
+    //==============
 
     QAction *gauAct;
     QAction *robertAct;
@@ -148,11 +159,13 @@ private:
     void createLandmarksMenu();
     void createRegistrationMenu();
     void createFilterMenu();
+    //Thanh
+    void createPluginMenu();
+    //=============
     void activeFunction();
     void viewMenuUpdateActions();
     void scaleImage(double factor);
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
-
     void displayLandmarks(Image *image, std::vector<Point> lms, RGB color);
 };
 
