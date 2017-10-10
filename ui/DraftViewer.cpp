@@ -133,7 +133,7 @@ DraftViewer::~DraftViewer()
     delete lineSegmentationAct;
     //Thanh
     //    delete detectObjectAct;
-    delete process4QuaterAct;
+    delete process4QuartersAct;
     delete openFragmentScreenAct;
     //==========
 
@@ -1221,10 +1221,10 @@ void DraftViewer::pcaiMethodViewer()
 }
 
 /**
- * Thanh
- * Extract chosen object with the coordinates from mouse event double click.
- * The algorithm is region growing on gray matrix using threshold value for growing criteria.
- * @param the coordinates of mouse click.
+  Extract chosen object with the coordinates from mouse event double click.
+  The algorithm is region growing on gray matrix using threshold value for growing criteria.
+
+  @param the coordinates of mouse click.
 */
 void DraftViewer::extractObject(int x, int y)
 {
@@ -1250,7 +1250,7 @@ void DraftViewer::extractObject(int x, int y)
     RGB color;
     Point startPoint(x,y,color);
     seedPoints.push_back(startPoint);
-    // label start Point is checked by value 256
+    // label the starting Point is checked by value 256
     grayMatrix->setAtPosition(y,x,256);
     while(!seedPoints.empty())
     {
@@ -1263,18 +1263,20 @@ void DraftViewer::extractObject(int x, int y)
     }
 
     // fix the rectangel of object
-    rows = maxY-minY+4;
+    rows = maxY-minY+4; // add 2 pixels more in each side to obtain the full border of object
     cols = maxX-minX+4;
     ptr_RGBMatrix srcMatrix = matImage->getRGBMatrix();
     // set the background is black => it can be use alpha channel
     ptr_RGBMatrix objectRGBMatrix = new Matrix<RGB>(rows, cols);
     ptr_IntMatrix objectBinMatrix = new Matrix<int>(rows, cols, 255);
+
+    // obtain the color value of labeled pixels
     for (int r = 2; r < rows; r++)
     {
         for (int c = 2; c < cols; c++)
         {
             int grayValue = grayMatrix->getAtPosition(r-2+minY,c-2+minX);
-            // check position of object only
+            // check labeled pixels of object
             if(grayValue == 256)
             {
                 objectRGBMatrix->setAtPosition(r,c,srcMatrix->getAtPosition(r-2+minY,c-2+minX));
@@ -1291,6 +1293,7 @@ void DraftViewer::extractObject(int x, int y)
     vector<Edge> listOfEdges;
     listOfEdges = suzuki(cannyMatrix);
 
+    // Draw red color at the border of object
     for (size_t i = 0; i < listOfEdges.size(); i++)
     {
         Edge edgei = listOfEdges.at(i);
@@ -1306,7 +1309,6 @@ void DraftViewer::extractObject(int x, int y)
                 objectRGBMatrix->setAtPosition(pi.getY(), pi.getX(), red);
             }
         }
-        //cout << "Number of points in edge: " << edgei.getPoints().size() << endl;
     }
 
     DraftViewer *other1 = new DraftViewer;
@@ -1314,7 +1316,11 @@ void DraftViewer::extractObject(int x, int y)
     other1->show();
 }
 
-void DraftViewer::process4Quater()
+/**
+  Obtain segmented image after split image into 4 quarters.
+  Segment each quarter then combine them.
+*/
+void DraftViewer::process4Quarters()
 {
     Segmentation tr;
     tr.setRefImage(*matImage);
@@ -1453,7 +1459,7 @@ void DraftViewer::createMenus()
     pluginMenu = new QMenu(tr("&Plugin"), this);
     QMenu* extractObjectMenu = pluginMenu->addMenu(tr("Extract Object"));
     //    extractObjectMenu->addAction(detectObjectAct);
-    extractObjectMenu->addAction(process4QuaterAct);
+    extractObjectMenu->addAction(process4QuartersAct);
     pluginMenu->addAction(openFragmentScreenAct);
     //===============
 
@@ -1683,18 +1689,13 @@ void DraftViewer::createFilterMenu()
 
 void DraftViewer::createPluginMenu()
 {
-    //    detectObjectAct = new QAction(tr("&Based on Binary threshold"), this);
-    //    detectObjectAct->setEnabled(false);
-    //    connect(detectObjectAct, SIGNAL(triggered()), this, SLOT(detectObjects()));
-
-    process4QuaterAct = new QAction(tr("&Process 4 Quater"), this);
-    process4QuaterAct->setEnabled(false);
-    connect(process4QuaterAct, SIGNAL(triggered()), this, SLOT(process4Quater()));
+    process4QuartersAct = new QAction(tr("&Process 4 Quater"), this);
+    process4QuartersAct->setEnabled(false);
+    connect(process4QuartersAct, SIGNAL(triggered()), this, SLOT(process4Quarters()));
 
     openFragmentScreenAct = new QAction(tr("&Open Fragment Screen"), this);
     openFragmentScreenAct->setEnabled(true);
     connect(openFragmentScreenAct, SIGNAL(triggered()), this, SLOT(openFragmentScreen()));
-
 }
 
 void DraftViewer::activeFunction()
@@ -1719,7 +1720,7 @@ void DraftViewer::activeFunction()
     lineSegmentationAct->setEnabled(true);
     //Thanh
     //    detectObjectAct->setEnabled(true);
-    process4QuaterAct->setEnabled(true);
+    process4QuartersAct->setEnabled(true);
     //==========
 
     gauAct->setEnabled(true);

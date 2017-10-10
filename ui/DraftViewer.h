@@ -70,7 +70,7 @@ private slots:
 
     //Thanh
     void extractObject(int x, int y);
-    void process4Quater();
+    void process4Quarters();
     void openFragmentScreen();
 
 private:
@@ -121,7 +121,7 @@ private:
 
     //Thanh
 //    QAction *detectObjectAct;
-    QAction *process4QuaterAct;
+    QAction *process4QuartersAct;
     QAction *openFragmentScreenAct;
     //==============
 
