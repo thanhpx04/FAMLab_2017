@@ -10,4 +10,7 @@
 
 QImage ptrIntToQImage(ptr_IntMatrix inputMatrix);
 QImage ptrRGBToQImage(ptr_RGBMatrix inputMatrix);
+//Thanh
+QImage ptrRGBAToQImage(ptrRGBAMatrix inputMatrix);
+//==========
 #endif /* IMAGECONVERT_H_ */

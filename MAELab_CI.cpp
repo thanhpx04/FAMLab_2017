@@ -36,6 +36,7 @@ using namespace std;
 #include <QtGui/QApplication>
 #include "ui/ImageViewer.h"
 #include "ui/DraftViewer.h"
+#include "ui/TestWindow.h"
 #include "io/Reader.h"
 
 #include "MAELab.h"
@@ -51,12 +52,19 @@ int main(int argc, char* argv[])
 //	imageViewer.show();
 //#endif
 
-        DraftViewer draftViewer;
-    #if defined(Q_OS_SYMBIAN)
-        draftViewer.showMaximized();
-    #else
-        draftViewer.show();
-    #endif
+//        DraftViewer draftViewer;
+//    #if defined(Q_OS_SYMBIAN)
+//        draftViewer.showMaximized();
+//    #else
+//        draftViewer.show();
+//    #endif
+
+    TestWindow tw;
+#if defined(Q_OS_SYMBIAN)
+    tw.showMaximized();
+#else
+    tw.show();
+#endif
 	return app.exec();
 	return 0;
 

@@ -1,11 +1,17 @@
 #ifndef TESTWINDOW_H
 #define TESTWINDOW_H
 
+
+
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
 #include <QMouseEvent>
+
+#include "DraftViewer.h"
+
+
 
 
 class Image;
@@ -29,15 +35,18 @@ public:
 
 private slots:
     void on_actionOpen_triggered();
-
     void on_btnRotateLeft_clicked();
-
     void on_btnRotateRight_clicked();
+
+public slots:
+    void loadObject(ptrRGBAMatrix objectRGBAMatrix);
 
 private:
     Ui::TestWindow *ui;
     QGraphicsScene *scene;
     QGraphicsPixmapItem *pixmapItem;
+
+    DraftViewer *draftViewer;
 
 };
 

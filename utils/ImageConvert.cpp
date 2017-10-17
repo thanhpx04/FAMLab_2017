@@ -54,3 +54,20 @@ QImage ptrRGBToQImage(ptr_RGBMatrix inputMatrix)
 	}
 	return image;
 }
+
+QImage ptrRGBAToQImage(ptrRGBAMatrix inputMatrix)
+{
+    int width = inputMatrix->getCols();
+    int height = inputMatrix->getRows();
+
+    QImage image(width, height, QImage::Format_ARGB32);
+    for (int r = 0; r < height; r++)
+    {
+        for (int c = 0; c < width; c++)
+        {
+            RGBA value = inputMatrix->getAtPosition(r, c);
+            image.setPixel(c, r, qRgba(value.R,value.G,value.B,value.A));
+        }
+    }
+    return image;
+}

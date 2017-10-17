@@ -471,7 +471,7 @@ ptr_RGBMatrix colorThreshold(ptr_RGBMatrix rgbImage,
 
   @param Matrix pointer type Int.
 */
-void showMatrix(ptr_IntMatrix intMatrix)
+void showIntMatrix(ptr_IntMatrix intMatrix)
 {
     int rows = intMatrix->getRows();
     int cols = intMatrix->getCols();
@@ -481,6 +481,21 @@ void showMatrix(ptr_IntMatrix intMatrix)
         for (int c = 0; c < cols; c++)
         {
             cout << intMatrix->getAtPosition(r,c) << " \t";
+        }
+        cout << endl;
+    }
+}
+
+void showRGBAMatrix(ptrRGBAMatrix rgbaMatrix)
+{
+    int rows = rgbaMatrix->getRows();
+    int cols = rgbaMatrix->getCols();
+    cout << endl;
+    for (int r = 0; r < rows; r++)
+    {
+        for (int c = 0; c < cols; c++)
+        {
+            cout<<c<<", "<<r<<"=RGBA("<<rgbaMatrix->getAtPosition(r,c).R<<","<<rgbaMatrix->getAtPosition(r,c).G<<","<<rgbaMatrix->getAtPosition(r,c).B<<","<<rgbaMatrix->getAtPosition(r,c).A<<")"<<endl;
         }
         cout << endl;
     }
@@ -690,3 +705,5 @@ void copySmallToBigIntMatrix(ptr_IntMatrix intSmallMatrix, ptr_IntMatrix intBigM
         }
     }
 }
+
+

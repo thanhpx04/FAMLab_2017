@@ -85,6 +85,13 @@ ptrRGBAMatrix decompressPNG(const char *filename, int &rows, int &cols)
             png_bytep px = &(row[x * 4]);
             // print each value
             printf("%4d, %4d = RGBA(%3d, %3d, %3d, %3d)\n", x, y, px[0], px[1], px[2], px[3]);
+
+            RGBA rgba;
+            rgba.R = (unsigned long int) px[0];
+            rgba.G = (unsigned long int) px[1];
+            rgba.B = (unsigned long int) px[2];
+            rgba.A = (unsigned long int) px[3];
+            rgbaMatrix->setAtPosition(y, x, rgba);
         }
     }
 

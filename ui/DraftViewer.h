@@ -1,7 +1,22 @@
 #ifndef DRAFTVIEWER_H
 #define DRAFTVIEWER_H
 
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <math.h>
+#include <cmath>
+#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <float.h>
+using namespace std;
+
 #include "../imageModel/Point.h"
+#include "../imageModel/Line.h"
+#include "../imageModel/Edge.h"
+#include "../imageModel/Matrix.h"
 #include <QtGui/qlabel.h>
 #include <QtGui/qscrollarea.h>
 #include <QtGui/QMainWindow>
@@ -26,6 +41,10 @@ public:
 
     void loadImage(QString fn);
     void loadImage(Image *_matImage, QImage _qImage, QString tt);
+
+signals:
+    void sendObjectRGBA(ptrRGBAMatrix objectRGBAMatrix);
+
 private slots:
     void about();
     void testMethod();

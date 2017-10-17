@@ -160,11 +160,12 @@ DraftViewer::~DraftViewer()
 void DraftViewer::loadImage(QString fn)
 {
     //test call PNG decompress
-    //    string filePath = fn.toStdString();
-    //    int rows = 0, cols = 0;
-    //    cout << filePath << endl;
-    //    cout << filePath.c_str() << endl;
-    //    ptrRGBAMatrix test = readPNGToRGBA(filePath.c_str(), rows, cols);
+//    string filePath = fn.toStdString();
+//    int rows = 0, cols = 0;
+//    cout << filePath << endl;
+//    cout << filePath.c_str() << endl;
+//    ptrRGBAMatrix test = readPNGToRGBA(filePath.c_str(), rows, cols);
+//    showRGBAMatrix(test);
 
     matImage = new Image(fn.toStdString());
     qImage.load(fn);
@@ -1267,8 +1268,30 @@ void DraftViewer::extractObject(int x, int y)
     cols = maxX-minX+4;
     ptr_RGBMatrix srcMatrix = matImage->getRGBMatrix();
     // set the background is black => it can be use alpha channel
-    ptr_RGBMatrix objectRGBMatrix = new Matrix<RGB>(rows, cols);
+//    ptr_RGBMatrix objectRGBMatrix = new Matrix<RGB>(rows, cols);
+    RGBA defaultValue;
+    defaultValue.A = 0;
+    defaultValue.R = 0;
+    defaultValue.G = 0;
+    defaultValue.B = 0;
+    ptrRGBAMatrix objectRGBAMatrix = new Matrix<RGBA>(rows, cols, defaultValue);
     ptr_IntMatrix objectBinMatrix = new Matrix<int>(rows, cols, 255);
+
+    // obtain the color value of labeled pixels
+//    for (int r = 2; r < rows; r++)
+//    {
+//        for (int c = 2; c < cols; c++)
+//        {
+//            int grayValue = grayMatrix->getAtPosition(r-2+minY,c-2+minX);
+//            // check labeled pixels of object
+//            if(grayValue == 256)
+//            {
+//                RGB color = srcMatrix->getAtPosition(r-2+minY,c-2+minX);
+//                objectRGBMatrix->setAtPosition(r,c,color);
+//                objectBinMatrix->setAtPosition(r,c,0);
+//            }
+//        }
+//    }
 
     // obtain the color value of labeled pixels
     for (int r = 2; r < rows; r++)
@@ -1279,41 +1302,51 @@ void DraftViewer::extractObject(int x, int y)
             // check labeled pixels of object
             if(grayValue == 256)
             {
-                objectRGBMatrix->setAtPosition(r,c,srcMatrix->getAtPosition(r-2+minY,c-2+minX));
+                RGB currentColor = srcMatrix->getAtPosition(r-2+minY,c-2+minX);
+                RGBA currentColorWithAlpha;
+                currentColorWithAlpha.A = 255;// set transparency
+                currentColorWithAlpha.R = currentColor.R;
+                currentColorWithAlpha.G = currentColor.G;
+                currentColorWithAlpha.B = currentColor.B;
+                objectRGBAMatrix->setAtPosition(r,c,currentColorWithAlpha);
                 objectBinMatrix->setAtPosition(r,c,0);
             }
         }
     }
 
     // implement canny to detect boundary and suzuky to get list edges to draw it
-    vector<Point> cPoints;
-    ptr_IntMatrix cannyMatrix = cannyProcess(objectBinMatrix, (int) tValue,
-                                             3 * (int) tValue, cPoints);
+//    vector<Point> cPoints;
+//    ptr_IntMatrix cannyMatrix = cannyProcess(objectBinMatrix, (int) tValue,
+//                                             3 * (int) tValue, cPoints);
 
-    vector<Edge> listOfEdges;
-    listOfEdges = suzuki(cannyMatrix);
+//    vector<Edge> listOfEdges;
+//    listOfEdges = suzuki(cannyMatrix);
 
-    // Draw red color at the border of object
-    for (size_t i = 0; i < listOfEdges.size(); i++)
-    {
-        Edge edgei = listOfEdges.at(i);
-        for (size_t k = 0; k < edgei.getPoints().size(); k++)
-        {
-            Point pi = edgei.getPoints().at(k);
-            if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-                    && pi.getY() < rows)
-            {
-                RGB red;
-                red.R = 255;
-                red.G = red.B = 0;
-                objectRGBMatrix->setAtPosition(pi.getY(), pi.getX(), red);
-            }
-        }
-    }
+//    // Draw red color at the border of object
+//    for (size_t i = 0; i < listOfEdges.size(); i++)
+//    {
+//        Edge edgei = listOfEdges.at(i);
+//        for (size_t k = 0; k < edgei.getPoints().size(); k++)
+//        {
+//            Point pi = edgei.getPoints().at(k);
+//            if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+//                    && pi.getY() < rows)
+//            {
+//                RGB red;
+//                red.R = 255;
+//                red.G = red.B = 0;
+//                objectRGBMatrix->setAtPosition(pi.getY(), pi.getX(), red);
+//            }
+//        }
+//    }
 
-    DraftViewer *other1 = new DraftViewer;
-    other1->loadImage(matImage, ptrRGBToQImage(objectRGBMatrix), "Object color result");
-    other1->show();
+//    DraftViewer *other1 = new DraftViewer;
+//    other1->loadImage(matImage, ptrRGBAToQImage(objectRGBAMatrix), "Object color result");
+//    other1->show();
+
+    // emmit to signal in order to send to main window
+    emit this->sendObjectRGBA(objectRGBAMatrix);
+    cout << "send object"<< endl;
 }
 
 /**

@@ -12,7 +12,8 @@ ptr_IntMatrix binaryThreshold(ptr_IntMatrix inputMatrix, int tValue, int maxValu
 ptr_IntMatrix postProcess(ptr_IntMatrix binaryMatrix, int maxValue);
 ptr_RGBMatrix colorThreshold(ptr_RGBMatrix rgbImage, ptr_RGBMatrix colorHistogram);
 //Thanh
-void showMatrix(ptr_IntMatrix intMatrix);
+void showIntMatrix(ptr_IntMatrix intMatrix);
+void showRGBAMatrix(ptrRGBAMatrix rgbaMatrix);
 ptr_IntMatrix copyGrayMatrix(ptr_IntMatrix grayMatrix, int fromRow, int toRow, int fromCol, int toCol);
 ptr_RGBMatrix copyRGBMatrix(ptr_RGBMatrix RGBMatrix, int fromRow, int toRow, int fromCol, int toCol);
 ptr_IntMatrix calculateHistogram(ptr_IntMatrix grayMatrix, float &medianHistogram, float &meanHistogram, float &thresholdValue);
