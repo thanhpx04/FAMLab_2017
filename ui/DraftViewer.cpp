@@ -1315,37 +1315,37 @@ void DraftViewer::extractObject(int x, int y)
     }
 
     // implement canny to detect boundary and suzuky to get list edges to draw it
-//    vector<Point> cPoints;
-//    ptr_IntMatrix cannyMatrix = cannyProcess(objectBinMatrix, (int) tValue,
-//                                             3 * (int) tValue, cPoints);
+    vector<Point> cPoints;
+    ptr_IntMatrix cannyMatrix = cannyProcess(objectBinMatrix, (int) tValue,
+                                             3 * (int) tValue, cPoints);
 
-//    vector<Edge> listOfEdges;
-//    listOfEdges = suzuki(cannyMatrix);
+    vector<Edge> listOfEdges;
+    listOfEdges = suzuki(cannyMatrix);
 
-//    // Draw red color at the border of object
-//    for (size_t i = 0; i < listOfEdges.size(); i++)
-//    {
-//        Edge edgei = listOfEdges.at(i);
-//        for (size_t k = 0; k < edgei.getPoints().size(); k++)
-//        {
-//            Point pi = edgei.getPoints().at(k);
-//            if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-//                    && pi.getY() < rows)
-//            {
-//                RGB red;
-//                red.R = 255;
-//                red.G = red.B = 0;
-//                objectRGBMatrix->setAtPosition(pi.getY(), pi.getX(), red);
-//            }
-//        }
-//    }
+    // Draw red color at the border of object
+    for (size_t i = 0; i < listOfEdges.size(); i++)
+    {
+        Edge edgei = listOfEdges.at(i);
+        for (size_t k = 0; k < edgei.getPoints().size(); k++)
+        {
+            Point pi = edgei.getPoints().at(k);
+            if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+                    && pi.getY() < rows)
+            {
+                RGBA red;
+                red.R = red.A = 255;
+                red.G = red.B = 0;
+                objectRGBAMatrix->setAtPosition(pi.getY(), pi.getX(), red);
+            }
+        }
+    }
 
 //    DraftViewer *other1 = new DraftViewer;
 //    other1->loadImage(matImage, ptrRGBAToQImage(objectRGBAMatrix), "Object color result");
 //    other1->show();
 
     // emmit to signal in order to send to main window
-    emit this->sendObjectRGBA(objectRGBAMatrix);
+    emit sendObjectRGBA(objectRGBAMatrix);
     cout << "send object"<< endl;
 }
 
