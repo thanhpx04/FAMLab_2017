@@ -45,7 +45,6 @@ MatchingFragmentWindow::MatchingFragmentWindow(QWidget *parent) :
 
     connect(this->fragmentViewer,SIGNAL(sendObjectRGBA(ptrRGBAMatrix,vector<Edge>)),this,SLOT(loadObject(ptrRGBAMatrix,vector<Edge>)));
     createActions();
-//    createMenus();
 }
 
 MatchingFragmentWindow::~MatchingFragmentWindow()
@@ -144,11 +143,6 @@ void MatchingFragmentWindow::loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<E
     FragmentItem *pixmapItem = new FragmentItem(listOfEdges, QPixmap::fromImage(qImage));
 
     scene->addItem(pixmapItem);
-}
-
-void MatchingFragmentWindow::on_pushButton_clicked()
-{
-    cout<<"aaaa"<<endl;
 }
 
 void MatchingFragmentWindow::chooseFragment2()

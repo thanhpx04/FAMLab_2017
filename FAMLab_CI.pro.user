@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.3.1, 2017-11-13T11:27:32. -->
+<!-- Written by QtCreator 4.3.1, 2017-11-14T10:54:26. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -243,8 +243,8 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">FAMLab_CI</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/xuanthanh/workplace/MEALab/MAELab_2016/FAMLab_CI.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">FAMLab_CI2</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/xuanthanh/workplace/FAMLab/FAMLab_2017/FAMLab_CI.pro</value>
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">FAMLab_CI.pro</value>

@@ -26,7 +26,6 @@ public:
 
     QImage qImage;
 
-//    void loadImage(QString fn);
 //    void mousePressEvent(QMouseEvent *mouseEvent);
 //    void mouseDoubleClickEvent(QMouseEvent *mouseEvent);
     // rotate around center point with angle
@@ -41,8 +40,6 @@ private slots:
     void on_actionOpen_triggered();
     void on_btnRotateLeft_clicked();
     void on_btnRotateRight_clicked();
-
-    void on_pushButton_clicked();
 
     void chooseFragment1();
     void chooseFragment2();
@@ -60,7 +57,6 @@ private:
     FragmentItem *selectedFragmentItem() const;
 
     void createActions();
-//    void createMenus();
 
     QAction *chooseFragment1Act;
     QAction *chooseFragment2Act;
