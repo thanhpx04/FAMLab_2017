@@ -17,9 +17,7 @@ public:
 	ptr_IntMatrix threshold(int tValue, int maxValue);
 	vector<Edge> canny();
 	int removePronotum();
-	void gridRemoveFolder();
-    //Thanh
-    vector<Point> growRegion(ptr_IntMatrix mask, float thresholdValue, Point checkingPoint, int &minX, int &maxX, int &minY, int &maxY);
+    void gridRemoveFolder();
 };
 
 #endif /* SEGMENTATION_H_ */
