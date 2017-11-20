@@ -1,10 +1,11 @@
 
 #include "FragmentItem.h"
 
-FragmentItem::FragmentItem(vector<Edge> listOfEdges, const QPixmap &pixmap, QGraphicsItem *parent, QGraphicsScene *scene)
+FragmentItem::FragmentItem(vector<Edge> listOfEdges, const QPixmap &pixmap, QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsPixmapItem(pixmap, parent, scene)
 {
     this->listOfEdges = listOfEdges;
+    this->myContextMenu = contextMenu;
     setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
 }
 
@@ -56,6 +57,13 @@ void FragmentItem::updatePosition(QPointF newPosition)
 
         connectedLines.at(i)->setLine(QLineF(p1, p2));
     }
+}
+
+void FragmentItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    scene()->clearSelection();
+    setSelected(true);
+    myContextMenu->exec(event->screenPos());
 }
 
 QVariant FragmentItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)

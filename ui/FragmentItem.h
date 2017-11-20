@@ -18,14 +18,17 @@ using namespace std;
 #include "../imageModel/Matrix.h"
 #include "../imageModel/Image.h"
 #include <QtCore>
+#include <QGraphicsScene>
+#include <QMenu>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsSceneContextMenuEvent>
 
 class FragmentItem : public QObject, public QGraphicsPixmapItem
 {
     Q_OBJECT
 
 public:
-    FragmentItem(vector<Edge> listOfEdges, const QPixmap &pixmap, QGraphicsItem *parent = 0,
+    FragmentItem(vector<Edge> listOfEdges, const QPixmap &pixmap, QMenu *contextMenu, QGraphicsItem *parent = 0,
                  QGraphicsScene *scene = 0);
     void setListOfEdges(vector<Edge> listOfEdges);
     vector<Edge> getListOfEdges();
@@ -38,10 +41,12 @@ public:
     void updatePosition(QPointF newPosition);
 
 protected:
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
     vector<Edge> listOfEdges;
+    QMenu *myContextMenu;
     // attributes for drawing connected lines between Fragments
     QVector<QPointF> listConnectedPoints;
     QVector<QGraphicsLineItem*> connectedLines;

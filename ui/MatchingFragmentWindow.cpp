@@ -36,7 +36,10 @@ MatchingFragmentWindow::MatchingFragmentWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    scene = new QGraphicsScene(this);
+    createActions();
+    createMenus();
+
+    scene = new MatchingFragmentScene(itemMenu);
     ui->graphicsView->setScene(scene);
 
     fragmentViewer = new FragmentViewer;
@@ -51,11 +54,14 @@ MatchingFragmentWindow::~MatchingFragmentWindow()
 {
     delete ui;
     delete scene;
-    delete fragment1;
-    delete fragment2;
+    delete itemMenu;
+
+    delete deleteAction;
+    delete toFrontAction;
+    delete sendBackAction;
+
     delete fragmentViewer;
-    delete chooseFragment1Act;
-    delete chooseFragment2Act;
+
 }
 
 void MatchingFragmentWindow::rotateCenter(QGraphicsItem* selectedItem, int angle)
@@ -71,16 +77,6 @@ void MatchingFragmentWindow::rotateCenter(QGraphicsItem* selectedItem, int angle
     selectedItem->setRotation(selectedItem->rotation() + angle);
 }
 
-#ifndef QT_NO_CONTEXTMENU
-void MatchingFragmentWindow::contextMenuEvent(QContextMenuEvent *event)
-{
-    QMenu menu(this);
-    menu.addAction(chooseFragment1Act);
-    menu.addAction(chooseFragment2Act);
-    menu.exec(event->globalPos());
-}
-#endif // QT_NO_CONTEXTMENU
-
 FragmentItem *MatchingFragmentWindow::selectedFragmentItem() const
 {
     QList<QGraphicsItem *> items = scene->selectedItems();
@@ -92,15 +88,26 @@ FragmentItem *MatchingFragmentWindow::selectedFragmentItem() const
 
 void MatchingFragmentWindow::createActions()
 {
-    chooseFragment1Act = new QAction(tr("&Set 1st Fragment"), this);
-//    chooseFragment1Act->setShortcuts(QKeySequence::);
-    chooseFragment1Act->setStatusTip(tr("Choose the first Fragment"));
-    connect(chooseFragment1Act, SIGNAL(triggered()), this, SLOT(chooseFragment1()));
+    deleteAction = new QAction(QIcon("./resources/ico/delete.png"),
+                               tr("&Delete"), this);
+    deleteAction->setShortcut(tr("Delete"));
+    deleteAction->setStatusTip(tr("Delete item from screen"));
+    connect(deleteAction, SIGNAL(triggered()),
+            this, SLOT(deleteItem()));
 
-    chooseFragment2Act = new QAction(tr("&Set 2nd Fragment"), this);
-//    chooseFragment2Act->setShortcuts(QKeySequence::);
-    chooseFragment2Act->setStatusTip(tr("Choose second Fragment"));
-    connect(chooseFragment2Act, SIGNAL(triggered()), this, SLOT(chooseFragment2()));
+    toFrontAction = new QAction(QIcon("./resources/ico/bringtofront.png"),
+                                tr("Bring to &Front"), this);
+    toFrontAction->setShortcut(tr("Ctrl+F"));
+    toFrontAction->setStatusTip(tr("Bring item to front"));
+    connect(toFrontAction, SIGNAL(triggered()),
+            this, SLOT(bringToFront()));
+
+    sendBackAction = new QAction(QIcon("./resources/ico/sendtoback.png"),
+                                 tr("Send to &Back"), this);
+    sendBackAction->setShortcut(tr("Ctrl+B"));
+    sendBackAction->setStatusTip(tr("Send item to back"));
+    connect(sendBackAction, SIGNAL(triggered()),
+            this, SLOT(sendToBack()));
 }
 
 void MatchingFragmentWindow::on_actionOpen_triggered()
@@ -123,16 +130,56 @@ void MatchingFragmentWindow::on_actionOpen_triggered()
 
 void MatchingFragmentWindow::on_btnRotateLeft_clicked()
 {
-    fragment1 = selectedFragmentItem();
-    if(fragment1)
-        rotateCenter(fragment1,-1);
+//    fragment1 = selectedFragmentItem();
+//    if(fragment1)
+//        rotateCenter(fragment1,-1);
 }
 
 void MatchingFragmentWindow::on_btnRotateRight_clicked()
 {
-    fragment1 = selectedFragmentItem();
-    if(fragment1)
-        rotateCenter(fragment1,+1);
+//    fragment1 = selectedFragmentItem();
+//    if(fragment1)
+    //        rotateCenter(fragment1,+1);
+}
+
+void MatchingFragmentWindow::deleteItem()
+{
+    FragmentItem *selected = selectedFragmentItem();
+    if(selected){
+        scene->removeItem(selected);
+    }
+}
+
+void MatchingFragmentWindow::bringToFront()
+{
+    if (scene->selectedItems().isEmpty())
+        return;
+
+    QGraphicsItem *selectedItem = scene->selectedItems().first();
+    QList<QGraphicsItem *> overlapItems = selectedItem->collidingItems();
+
+    qreal zValue = 0;
+    foreach (QGraphicsItem *item, overlapItems) {
+        if (item->zValue() >= zValue)
+            zValue = item->zValue() + 0.1;
+    }
+    selectedItem->setZValue(zValue);
+}
+
+void MatchingFragmentWindow::sendToBack()
+{
+    if (scene->selectedItems().isEmpty())
+        return;
+
+    QGraphicsItem *selectedItem = scene->selectedItems().first();
+    QList<QGraphicsItem *> overlapItems = selectedItem->collidingItems();
+
+    qreal zValue = 0;
+    foreach (QGraphicsItem *item, overlapItems) {
+        if (item->zValue() <= zValue)
+            zValue = item->zValue() - 0.1;
+    }
+    selectedItem->setZValue(zValue);
 }
 
 void MatchingFragmentWindow::loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<Edge> listOfEdges)
@@ -140,21 +187,16 @@ void MatchingFragmentWindow::loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<E
     cout << "received" << endl;
     qImage = ptrRGBAToQImage(objectRGBAMatrix);
 
-    FragmentItem *pixmapItem = new FragmentItem(listOfEdges, QPixmap::fromImage(qImage));
+    FragmentItem *pixmapItem = new FragmentItem(listOfEdges, QPixmap::fromImage(qImage), itemMenu);
 
     scene->addItem(pixmapItem);
 }
 
-void MatchingFragmentWindow::chooseFragment2()
+void MatchingFragmentWindow::createMenus()
 {
-    fragment2 = selectedFragmentItem();
-    if(fragment2)
-        cout<<"2"<<endl;
-}
-
-void MatchingFragmentWindow::chooseFragment1()
-{
-    fragment1 = selectedFragmentItem();
-    if(fragment1)
-        cout<<"1"<<endl;
+    itemMenu = menuBar()->addMenu(tr("&Fragment"));
+    itemMenu->addAction(deleteAction);
+    itemMenu->addSeparator();
+    itemMenu->addAction(toFrontAction);
+    itemMenu->addAction(sendBackAction);
 }

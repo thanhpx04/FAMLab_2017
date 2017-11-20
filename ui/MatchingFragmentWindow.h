@@ -4,11 +4,14 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QMenu>
+#include <QAction>
 #include <QGraphicsPixmapItem>
 #include <QMouseEvent>
 
 #include "FragmentViewer.h"
 #include "FragmentItem.h"
+#include "MatchingFragmentScene.h"
 
 class Image;
 
@@ -31,35 +34,37 @@ public:
     // rotate around center point with angle
     void rotateCenter(QGraphicsItem* selectedItem, int angle);
 
-protected:
-#ifndef QT_NO_CONTEXTMENU
-    void contextMenuEvent(QContextMenuEvent *event) override;
-#endif // QT_NO_CONTEXTMENU
 
 private slots:
     void on_actionOpen_triggered();
     void on_btnRotateLeft_clicked();
     void on_btnRotateRight_clicked();
+    void deleteItem();
+    void bringToFront();
+    void sendToBack();
 
-    void chooseFragment1();
-    void chooseFragment2();
 
 public slots:
     void loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<Edge> listOfEdges);
 
 private:
+    void createActions();
+    void createMenus();
+
     Ui::MatchingFragmentWindow *ui;
-    QGraphicsScene *scene;
-    FragmentItem *fragment1;
-    FragmentItem *fragment2;
+    MatchingFragmentScene *scene;
+
+    QMenu *itemMenu;
+
+    QAction *deleteAction;
+    QAction *toFrontAction;
+    QAction *sendBackAction;
+
+
     FragmentViewer *fragmentViewer;
 
     FragmentItem *selectedFragmentItem() const;
 
-    void createActions();
-
-    QAction *chooseFragment1Act;
-    QAction *chooseFragment2Act;
 
 };
 
