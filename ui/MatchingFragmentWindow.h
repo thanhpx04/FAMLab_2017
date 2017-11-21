@@ -5,9 +5,12 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QMenu>
+#include <QToolBox>
+#include <QPushButton>
 #include <QAction>
 #include <QGraphicsPixmapItem>
 #include <QMouseEvent>
+#include <QHBoxLayout>
 
 #include "FragmentViewer.h"
 #include "FragmentItem.h"
@@ -15,52 +18,66 @@
 
 class Image;
 
-namespace Ui {
-class MatchingFragmentWindow;
-}
 
 class MatchingFragmentWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MatchingFragmentWindow(QWidget *parent = 0);
+    MatchingFragmentWindow();
     ~MatchingFragmentWindow();
 
     QImage qImage;
 
-//    void mousePressEvent(QMouseEvent *mouseEvent);
-//    void mouseDoubleClickEvent(QMouseEvent *mouseEvent);
     // rotate around center point with angle
-    void rotateCenter(QGraphicsItem* selectedItem, int angle);
-
+    void rotateCenter(FragmentItem *selectedItem, int angle);
 
 private slots:
-    void on_actionOpen_triggered();
-    void on_btnRotateLeft_clicked();
-    void on_btnRotateRight_clicked();
+    void open();
+    void about();
+
     void deleteItem();
     void bringToFront();
     void sendToBack();
-
+    void rotateleft();
+    void rotateright();
 
 public slots:
     void loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<Edge> listOfEdges);
 
 private:
     void createActions();
+    void createFileMenuActions();
+    void createFragmentMenuActions();
+    void createHelpMenuActions();
+
     void createMenus();
+    void createToolBars();
 
-    Ui::MatchingFragmentWindow *ui;
     MatchingFragmentScene *scene;
+    QGraphicsView *view;
 
-    QMenu *itemMenu;
+    // menu
+    QMenu *fileMenu;
+    QMenu *fragmentMenu;
+    QMenu *helpMenu;
+
+    // toolbar
+    QToolBar *fileToolBar;
+    QToolBar *fragmentToolBar;
 
     QAction *deleteAction;
     QAction *toFrontAction;
     QAction *sendBackAction;
+    QAction *rotateLeftAction;
+    QAction *rotateRightAction;
 
+    // actions
+    QAction *openAction;
+    QAction *exitAction;
+    QAction *aboutAction;
 
+    // image viewer
     FragmentViewer *fragmentViewer;
 
     FragmentItem *selectedFragmentItem() const;

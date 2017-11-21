@@ -30,41 +30,58 @@ using namespace std;
 #include "MatchingFragmentWindow.h"
 #include "ui_MatchingFragmentWindow.h"
 
-MatchingFragmentWindow::MatchingFragmentWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MatchingFragmentWindow)
+MatchingFragmentWindow::MatchingFragmentWindow()
 {
-    ui->setupUi(this);
-
     createActions();
     createMenus();
+    createToolBars();
 
-    scene = new MatchingFragmentScene(itemMenu);
-    ui->graphicsView->setScene(scene);
+    scene = new MatchingFragmentScene(fragmentMenu);
 
     fragmentViewer = new FragmentViewer;
 
     setWindowIcon(QIcon("./resources/ico/FAMLab.png"));
 
     connect(this->fragmentViewer,SIGNAL(sendObjectRGBA(ptrRGBAMatrix,vector<Edge>)),this,SLOT(loadObject(ptrRGBAMatrix,vector<Edge>)));
-    createActions();
+
+    QHBoxLayout *mainLayout = new QHBoxLayout;
+    view = new QGraphicsView(scene);
+    mainLayout->addWidget(view);
+
+    QWidget *widget = new QWidget;
+    widget->setLayout(mainLayout);
+
+    setCentralWidget(widget);
+    setWindowTitle(tr(".: Papyrus FAMLab :."));
+    setUnifiedTitleAndToolBarOnMac(true);
 }
 
 MatchingFragmentWindow::~MatchingFragmentWindow()
 {
-    delete ui;
     delete scene;
-    delete itemMenu;
+    delete view;
+
+    delete fileMenu;
+    delete fragmentMenu;
+    delete helpMenu;
+
+    delete fileToolBar;
+    delete fragmentToolBar;
 
     delete deleteAction;
     delete toFrontAction;
     delete sendBackAction;
+    delete rotateLeftAction;
+    delete rotateRightAction;
+
+    delete openAction;
+    delete exitAction;
+    delete aboutAction;
 
     delete fragmentViewer;
-
 }
 
-void MatchingFragmentWindow::rotateCenter(QGraphicsItem* selectedItem, int angle)
+void MatchingFragmentWindow::rotateCenter(FragmentItem* selectedItem, int angle)
 {
     QRectF rect;
     rect = selectedItem->mapToScene(selectedItem->boundingRect()).boundingRect();
@@ -77,40 +94,7 @@ void MatchingFragmentWindow::rotateCenter(QGraphicsItem* selectedItem, int angle
     selectedItem->setRotation(selectedItem->rotation() + angle);
 }
 
-FragmentItem *MatchingFragmentWindow::selectedFragmentItem() const
-{
-    QList<QGraphicsItem *> items = scene->selectedItems();
-    if(items.count()==1)
-        return dynamic_cast<FragmentItem *> (items.first());
-    else
-        return 0;
-}
-
-void MatchingFragmentWindow::createActions()
-{
-    deleteAction = new QAction(QIcon("./resources/ico/delete.png"),
-                               tr("&Delete"), this);
-    deleteAction->setShortcut(tr("Delete"));
-    deleteAction->setStatusTip(tr("Delete item from screen"));
-    connect(deleteAction, SIGNAL(triggered()),
-            this, SLOT(deleteItem()));
-
-    toFrontAction = new QAction(QIcon("./resources/ico/bringtofront.png"),
-                                tr("Bring to &Front"), this);
-    toFrontAction->setShortcut(tr("Ctrl+F"));
-    toFrontAction->setStatusTip(tr("Bring item to front"));
-    connect(toFrontAction, SIGNAL(triggered()),
-            this, SLOT(bringToFront()));
-
-    sendBackAction = new QAction(QIcon("./resources/ico/sendtoback.png"),
-                                 tr("Send to &Back"), this);
-    sendBackAction->setShortcut(tr("Ctrl+B"));
-    sendBackAction->setStatusTip(tr("Send item to back"));
-    connect(sendBackAction, SIGNAL(triggered()),
-            this, SLOT(sendToBack()));
-}
-
-void MatchingFragmentWindow::on_actionOpen_triggered()
+void MatchingFragmentWindow::open()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::currentPath());
     cout << fileName.toStdString() << endl;
@@ -128,18 +112,55 @@ void MatchingFragmentWindow::on_actionOpen_triggered()
     }
 }
 
-void MatchingFragmentWindow::on_btnRotateLeft_clicked()
+void MatchingFragmentWindow::about()
 {
-//    fragment1 = selectedFragmentItem();
-//    if(fragment1)
-//        rotateCenter(fragment1,-1);
+    QMessageBox::about(this, tr("About FAMLab"),
+                       tr(
+                           "<p><b>FAMLab</b> is a software in Computer Vision. It provides the functions to "
+                           "extraction and matching fragments.</p>"));
 }
 
-void MatchingFragmentWindow::on_btnRotateRight_clicked()
+FragmentItem *MatchingFragmentWindow::selectedFragmentItem() const
 {
-//    fragment1 = selectedFragmentItem();
-//    if(fragment1)
-    //        rotateCenter(fragment1,+1);
+    QList<QGraphicsItem *> items = scene->selectedItems();
+    if(items.count()==1)
+        return dynamic_cast<FragmentItem *> (items.first());
+    else
+        return 0;
+}
+
+void MatchingFragmentWindow::createFragmentMenuActions()
+{
+    deleteAction = new QAction(QIcon("./resources/ico/delete.png"), tr("&Delete"), this);
+    deleteAction->setShortcut(tr("Delete"));
+    deleteAction->setStatusTip(tr("Delete item from screen"));
+    connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
+
+    toFrontAction = new QAction(QIcon("./resources/ico/bringtofront.png"), tr("Bring to &Front"), this);
+    toFrontAction->setShortcut(tr("Ctrl+F"));
+    toFrontAction->setStatusTip(tr("Bring item to front"));
+    connect(toFrontAction, SIGNAL(triggered()), this, SLOT(bringToFront()));
+
+    sendBackAction = new QAction(QIcon("./resources/ico/sendtoback.png"), tr("Send to &Back"), this);
+    sendBackAction->setShortcut(tr("Ctrl+B"));
+    sendBackAction->setStatusTip(tr("Send item to back"));
+    connect(sendBackAction, SIGNAL(triggered()), this, SLOT(sendToBack()));
+
+    rotateLeftAction = new QAction(QIcon("./resources/ico/rotateleft.png"), tr("Rotate &Left"), this);
+    rotateLeftAction->setShortcut(tr("Ctrl+L"));
+    rotateLeftAction->setStatusTip(tr("Rotate left"));
+    connect(rotateLeftAction, SIGNAL(triggered()), this, SLOT(rotateleft()));
+
+    rotateRightAction = new QAction(QIcon("./resources/ico/rotateright.png"), tr("Rotate &Right"), this);
+    rotateRightAction->setShortcut(tr("Ctrl+R"));
+    rotateRightAction->setStatusTip(tr("Rotate Right"));
+    connect(rotateRightAction, SIGNAL(triggered()), this, SLOT(rotateright()));
+}
+
+void MatchingFragmentWindow::createHelpMenuActions()
+{
+    aboutAction = new QAction(tr("&About MAELab"), this);
+    connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
 }
 
 void MatchingFragmentWindow::deleteItem()
@@ -182,21 +203,85 @@ void MatchingFragmentWindow::sendToBack()
     selectedItem->setZValue(zValue);
 }
 
+void MatchingFragmentWindow::rotateleft()
+{
+    FragmentItem *selected = selectedFragmentItem();
+    if(selected){
+        rotateCenter(selected,-1);
+    }
+}
+
+void MatchingFragmentWindow::rotateright()
+{
+    FragmentItem *selected = selectedFragmentItem();
+    if(selected){
+        rotateCenter(selected,+1);
+    }
+}
+
 void MatchingFragmentWindow::loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<Edge> listOfEdges)
 {
-    cout << "received" << endl;
     qImage = ptrRGBAToQImage(objectRGBAMatrix);
 
-    FragmentItem *pixmapItem = new FragmentItem(listOfEdges, QPixmap::fromImage(qImage), itemMenu);
+    FragmentItem *pixmapItem = new FragmentItem(listOfEdges, QPixmap::fromImage(qImage), fragmentMenu);
 
     scene->addItem(pixmapItem);
 }
 
+void MatchingFragmentWindow::createActions()
+{
+    createFileMenuActions();
+    createFragmentMenuActions();
+    createHelpMenuActions();
+}
+
+void MatchingFragmentWindow::createFileMenuActions()
+{
+    openAction = new QAction(QIcon("./resources/ico/open.png"), tr("&Open..."), this);
+    openAction->setShortcuts(QKeySequence::Open);
+    openAction->setStatusTip(tr("Open an existing file"));
+    connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+
+    exitAction = new QAction(tr("E&xit"), this);
+    exitAction->setShortcuts(QKeySequence::Quit);
+    exitAction->setStatusTip(tr("Exit the application"));
+    connect(exitAction, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
+}
+
 void MatchingFragmentWindow::createMenus()
 {
-    itemMenu = menuBar()->addMenu(tr("&Fragment"));
-    itemMenu->addAction(deleteAction);
-    itemMenu->addSeparator();
-    itemMenu->addAction(toFrontAction);
-    itemMenu->addAction(sendBackAction);
+    fileMenu = new QMenu(tr("&File"), this);
+    fileMenu->addAction(openAction);
+    fileMenu->addSeparator();
+    fileMenu->addAction(exitAction);
+
+    fragmentMenu = menuBar()->addMenu(tr("&Fragment"));
+    fragmentMenu->addAction(deleteAction);
+    fragmentMenu->addSeparator();
+    fragmentMenu->addAction(toFrontAction);
+    fragmentMenu->addAction(sendBackAction);
+    fragmentMenu->addSeparator();
+    fragmentMenu->addAction(rotateLeftAction);
+    fragmentMenu->addAction(rotateRightAction);
+
+    helpMenu = menuBar()->addMenu(tr("&Help"));
+    helpMenu->addAction(aboutAction);
+
+    // add menus to GUI
+    menuBar()->addMenu(fileMenu);
+    menuBar()->addMenu(fragmentMenu);
+    menuBar()->addMenu(helpMenu);
+}
+
+void MatchingFragmentWindow::createToolBars()
+{
+    fileToolBar = addToolBar(tr("File"));
+    fileToolBar->addAction(openAction);
+
+    fragmentToolBar = addToolBar(tr("Fragment"));
+    fragmentToolBar->addAction(deleteAction);
+    fragmentToolBar->addAction(toFrontAction);
+    fragmentToolBar->addAction(sendBackAction);
+    fragmentToolBar->addAction(rotateLeftAction);
+    fragmentToolBar->addAction(rotateRightAction);
 }

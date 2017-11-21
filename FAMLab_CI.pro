@@ -21,5 +21,3 @@ SOURCES += io/*.cpp io/LibJpeg/*.c imageModel/*.cpp \
                  utils/*.cpp ui/*.cpp MAELab.cpp FAMLab_CI.cpp
 
 
-FORMS += \
-    ui/MatchingFragmentWindow.ui
