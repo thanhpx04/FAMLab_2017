@@ -5,8 +5,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QMenu>
-#include <QToolBox>
-#include <QPushButton>
+#include <QMenuBar>
+#include <QToolBar>
 #include <QAction>
 #include <QGraphicsPixmapItem>
 #include <QMouseEvent>

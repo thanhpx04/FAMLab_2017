@@ -28,7 +28,6 @@ using namespace std;
 #include "../utils/ImageConvert.h"
 
 #include "MatchingFragmentWindow.h"
-#include "ui_MatchingFragmentWindow.h"
 
 MatchingFragmentWindow::MatchingFragmentWindow()
 {
