@@ -462,7 +462,7 @@ ImageViewer::ImageViewer()
 	setWindowTitle(tr(".: MAELab :."));
 	resize(900, 700);
 
-	setWindowIcon(QIcon("./resources/ico/ip.ico"));
+    setWindowIcon(QIcon(":/Icons/resources/ico/ip.ico"));
 	//parameterPanel = NULL;
 
 }

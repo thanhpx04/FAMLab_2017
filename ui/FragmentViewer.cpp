@@ -82,7 +82,7 @@ FragmentViewer::FragmentViewer()
     setWindowTitle(tr(".: MAELab :."));
     resize(900, 700);
 
-    setWindowIcon(QIcon("./resources/ico/ip.ico"));
+    setWindowIcon(QIcon(":/Icons/resources/ico/ip.ico"));
 
     connect(this->imageLabel,SIGNAL(sendMouseLocation(int,int)),this,SLOT(extractObject(int,int)));
 }
