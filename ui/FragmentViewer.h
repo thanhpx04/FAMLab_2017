@@ -36,8 +36,8 @@ public:
     QImage qImage;
     Image *matImage;
 
-    QAction *parameterAction;
-    QDialog *parameterDialog;
+//    QAction *parameterAction;
+//    QDialog *parameterDialog;
 
     void loadImage(QString fn);
     void loadImage(Image *_matImage, QImage _qImage, QString tt);
@@ -114,7 +114,7 @@ private:
 
     //menu action
     QAction *openAct;
-    QAction *printAct;
+//    QAction *printAct;
     QAction *saveAct;
     QAction *saveAsAct;
     QAction *closeAct;

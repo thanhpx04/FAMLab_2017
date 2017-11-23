@@ -470,8 +470,8 @@ ImageViewer::ImageViewer()
 ImageViewer::~ImageViewer()
 {
 	delete matImage;
-	delete parameterAction;
-	delete parameterDialog;
+//	delete parameterAction;
+//	delete parameterDialog;
 
 	delete imageLabel;
 	delete scrollArea;
@@ -489,7 +489,7 @@ ImageViewer::~ImageViewer()
 
 	//menu action
 	delete openAct;
-	delete printAct;
+//	delete printAct;
 	delete saveAct;
 	delete saveAsAct;
 	delete closeAct;

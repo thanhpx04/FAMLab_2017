@@ -33,24 +33,24 @@ public:
     void setListOfEdges(vector<Edge> listOfEdges);
     vector<Edge> getListOfEdges();
 
-    void setListConnectedPoints(QVector<QPointF> listConnectedPoints);
-    QVector<QPointF> getListConnectedPoints();
-    void setconnectedLines(QVector<QGraphicsLineItem*> connectedLines, bool isFragment1);
-    QVector<QGraphicsLineItem*> getConnectedLines();
+//    void setListConnectedPoints(QVector<QPointF> listConnectedPoints);
+//    QVector<QPointF> getListConnectedPoints();
+//    void setconnectedLines(QVector<QGraphicsLineItem*> connectedLines, bool isFragment1);
+//    QVector<QGraphicsLineItem*> getConnectedLines();
 
     void updatePosition(QPointF newPosition);
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+//    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
     vector<Edge> listOfEdges;
     QMenu *myContextMenu;
     // attributes for drawing connected lines between Fragments
-    QVector<QPointF> listConnectedPoints;
-    QVector<QGraphicsLineItem*> connectedLines;
-    bool isFragment1;
+//    QVector<QPointF> listConnectedPoints;
+//    QVector<QGraphicsLineItem*> connectedLines;
+//    bool isFragment1;
     //----------------------------------------
 
 };
