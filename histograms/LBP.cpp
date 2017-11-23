@@ -60,7 +60,8 @@ int lbpCalculate(ptr_IntMatrix grayImage, int rowIndex, int colIndex,
 					countl0++;
 					suml0 += value;
 				}
-				lbpSum += (bValue * pow(2, i));
+//				lbpSum += (bValue * pow(2, i));
+                lbpSum += (bValue * pow(static_cast<double>(2), i));
 				i++;
 			}
 		}

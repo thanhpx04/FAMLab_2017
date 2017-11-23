@@ -64,7 +64,7 @@ vector<Point> readTPSFile(const char* filename)
 }
 
 
-ptrRGBAMatrix readPNGToRGBA(const char *filename, int &rows, int &cols)
-{
-    return decompressPNG(filename,rows,cols);
-}
+//ptrRGBAMatrix readPNGToRGBA(const char *filename, int &rows, int &cols)
+//{
+//    return decompressPNG(filename,rows,cols);
+//}

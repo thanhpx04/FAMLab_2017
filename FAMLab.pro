@@ -2,7 +2,7 @@ TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
 INCLUDEPATH += "/usr/local/include"
-LIBS += -lpng -L"/usr/lib"
+LIBS += -L"/usr/lib"
 	
 
 QT           += opengl

@@ -211,7 +211,8 @@ ptr_IntMatrix sobelOperationCanny(ptr_IntMatrix gaussianImage)
 			double dx = dxMatrix->getAtPosition(r, c);
 			double dy = dyMatrix->getAtPosition(r, c);
 
-			double value = abs(dx) + abs(dy);
+//			double value = abs(dx) + abs(dy);
+            double value = fabs(dx) + fabs(dy);
 
 			filteredImg->setAtPosition(r, c, value);
 
