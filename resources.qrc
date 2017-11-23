@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/Icons">
+        <file>resources/ico/1downarrow.png</file>
+        <file>resources/ico/1uparrow.png</file>
+        <file>resources/ico/bringtofront.png</file>
+        <file>resources/ico/copy.png</file>
+        <file>resources/ico/cut.png</file>
+        <file>resources/ico/delete.png</file>
+        <file>resources/ico/FAMLab.png</file>
+        <file>resources/ico/ip.ico</file>
+        <file>resources/ico/new.png</file>
+        <file>resources/ico/open.png</file>
+        <file>resources/ico/paste.png</file>
+        <file>resources/ico/rotateleft.png</file>
+        <file>resources/ico/rotateright.png</file>
+        <file>resources/ico/save.png</file>
+        <file>resources/ico/sendtoback.png</file>
+    </qresource>
+</RCC>

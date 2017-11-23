@@ -39,7 +39,7 @@ MatchingFragmentWindow::MatchingFragmentWindow()
 
     fragmentViewer = new FragmentViewer;
 
-    setWindowIcon(QIcon("./resources/ico/FAMLab.png"));
+    setWindowIcon(QIcon(":/Icons/resources/ico/FAMLab.png"));
 
     connect(this->fragmentViewer,SIGNAL(sendObjectRGBA(ptrRGBAMatrix,vector<Edge>)),this,SLOT(loadObject(ptrRGBAMatrix,vector<Edge>)));
 
@@ -130,27 +130,27 @@ FragmentItem *MatchingFragmentWindow::selectedFragmentItem() const
 
 void MatchingFragmentWindow::createFragmentMenuActions()
 {
-    deleteAction = new QAction(QIcon("./resources/ico/delete.png"), tr("&Delete"), this);
+    deleteAction = new QAction(QIcon(":/Icons/resources/ico/delete.png"), tr("&Delete"), this);
     deleteAction->setShortcut(tr("Delete"));
     deleteAction->setStatusTip(tr("Delete item from screen"));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItem()));
 
-    toFrontAction = new QAction(QIcon("./resources/ico/bringtofront.png"), tr("Bring to &Front"), this);
+    toFrontAction = new QAction(QIcon(":/Icons/resources/ico/bringtofront.png"), tr("Bring to &Front"), this);
     toFrontAction->setShortcut(tr("Ctrl+F"));
     toFrontAction->setStatusTip(tr("Bring item to front"));
     connect(toFrontAction, SIGNAL(triggered()), this, SLOT(bringToFront()));
 
-    sendBackAction = new QAction(QIcon("./resources/ico/sendtoback.png"), tr("Send to &Back"), this);
+    sendBackAction = new QAction(QIcon(":/Icons/resources/ico/sendtoback.png"), tr("Send to &Back"), this);
     sendBackAction->setShortcut(tr("Ctrl+B"));
     sendBackAction->setStatusTip(tr("Send item to back"));
     connect(sendBackAction, SIGNAL(triggered()), this, SLOT(sendToBack()));
 
-    rotateLeftAction = new QAction(QIcon("./resources/ico/rotateleft.png"), tr("Rotate &Left"), this);
+    rotateLeftAction = new QAction(QIcon(":/Icons/resources/ico/rotateleft.png"), tr("Rotate &Left"), this);
     rotateLeftAction->setShortcut(tr("Ctrl+L"));
     rotateLeftAction->setStatusTip(tr("Rotate left"));
     connect(rotateLeftAction, SIGNAL(triggered()), this, SLOT(rotateleft()));
 
-    rotateRightAction = new QAction(QIcon("./resources/ico/rotateright.png"), tr("Rotate &Right"), this);
+    rotateRightAction = new QAction(QIcon(":/Icons/resources/ico/rotateright.png"), tr("Rotate &Right"), this);
     rotateRightAction->setShortcut(tr("Ctrl+R"));
     rotateRightAction->setStatusTip(tr("Rotate Right"));
     connect(rotateRightAction, SIGNAL(triggered()), this, SLOT(rotateright()));
@@ -236,7 +236,7 @@ void MatchingFragmentWindow::createActions()
 
 void MatchingFragmentWindow::createFileMenuActions()
 {
-    openAction = new QAction(QIcon("./resources/ico/open.png"), tr("&Open..."), this);
+    openAction = new QAction(QIcon(":/Icons/resources/ico/open.png"), tr("&Open..."), this);
     openAction->setShortcuts(QKeySequence::Open);
     openAction->setStatusTip(tr("Open an existing file"));
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));

@@ -1459,13 +1459,13 @@ void FragmentViewer::createStatusBar()
 
 void FragmentViewer::createFileMenu()
 {
-    openAct = new QAction(QIcon("./resources/ico/open.png"), tr("&Open..."),
+    openAct = new QAction(QIcon(":/Icons/resources/ico/open.png"), tr("&Open..."),
                           this);
     openAct->setShortcuts(QKeySequence::Open);
     openAct->setStatusTip(tr("Open an existing file"));
     connect(openAct, SIGNAL(triggered()), this, SLOT(open()));
 
-    saveAct = new QAction(QIcon("./resources/ico/save.png"), tr("&Save"), this);
+    saveAct = new QAction(QIcon(":/Icons/resources/ico/save.png"), tr("&Save"), this);
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save the document to disk"));
     saveAct->setEnabled(false);
@@ -1490,13 +1490,13 @@ void FragmentViewer::createFileMenu()
 
 void FragmentViewer::createViewMenu()
 {
-    zoomInAct = new QAction(QIcon("./resources/ico/1uparrow.png"),
+    zoomInAct = new QAction(QIcon(":/Icons/resources/ico/1uparrow.png"),
                             tr("Zoom &In (25%)"), this);
     zoomInAct->setShortcut(tr("Ctrl++"));
     zoomInAct->setEnabled(false);
     connect(zoomInAct, SIGNAL(triggered()), this, SLOT(zoomIn()));
 
-    zoomOutAct = new QAction(QIcon("./resources/ico/1downarrow.png"),
+    zoomOutAct = new QAction(QIcon(":/Icons/resources/ico/1downarrow.png"),
                              tr("Zoom &Out (25%)"), this);
     zoomOutAct->setShortcut(tr("Ctrl+-"));
     zoomOutAct->setEnabled(false);

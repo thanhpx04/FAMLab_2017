@@ -20,5 +20,8 @@ SOURCES += io/*.cpp io/LibJpeg/*.c imageModel/*.cpp \
                  histograms/*.cpp pht/*.cpp pointInterest/*.cpp algorithm/*.cpp correlation/*.cpp \
                  utils/*.cpp ui/*.cpp MAELab.cpp FAMLab.cpp \
 
+RESOURCES += \
+    resources.qrc
+
 
 
