@@ -1295,8 +1295,8 @@ void FragmentViewer::extractObject(int x, int y)
     red.G = red.B = 0;
     rows = objectRGBAMatrix->getRows();
     cols = objectRGBAMatrix->getCols();
-    vector<Point> drawPoints = cPoints;
-//    vector<Point> drawPoints = longestEdge.getPoints();
+//    vector<Point> drawPoints = cPoints;
+    vector<Point> drawPoints = longestEdge.getPoints();
     for (size_t k = 0; k < drawPoints.size(); k++)
     {
         Point pi = drawPoints.at(k);
@@ -1313,7 +1313,7 @@ void FragmentViewer::extractObject(int x, int y)
 
 
     // emmit to signal in order to send to matching fragment window
-    emit sendObjectRGBA(objectRGBAMatrix, drawPoints);
+    emit sendObjectRGBA(objectRGBAMatrix, longestEdge);
     cout << "send object" << endl;
 }
 

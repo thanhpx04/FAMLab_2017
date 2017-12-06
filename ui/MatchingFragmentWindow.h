@@ -43,18 +43,23 @@ private slots:
     void rotateright();
     void setLeftFragment();
     void setRightFragment();
+    void suggestDTW();
 
 public slots:
-    void loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<Point> border);
+    void loadObject(ptrRGBAMatrix objectRGBAMatrix, Edge border);
 
 private:
     void createActions();
     void createFileMenuActions();
     void createFragmentMenuActions();
+    void createMatchingMenuActions();
     void createHelpMenuActions();
 
     void createMenus();
     void createToolBars();
+
+    vector<Point> findMinXmappingY(Edge edge);
+    vector<Point> findMaxXmappingY(Edge edge);
 
     MatchingFragmentScene *scene;
     QGraphicsView *view;
@@ -62,11 +67,13 @@ private:
     // menu
     QMenu *fileMenu;
     QMenu *fragmentMenu;
+    QMenu *matchingMenu;
     QMenu *helpMenu;
 
     // toolbar
     QToolBar *fileToolBar;
     QToolBar *fragmentToolBar;
+    QToolBar *matchingToolBar;
 
     QAction *deleteAction;
     QAction *toFrontAction;
@@ -75,6 +82,7 @@ private:
     QAction *rotateRightAction;
     QAction *setLeftFragmentAction;
     QAction *setRightFragmentAction;
+    QAction *suggestDTWAction;
 
     // actions
     QAction *openAction;

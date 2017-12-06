@@ -21,6 +21,7 @@ using namespace std;
 #include "../segmentation/Suzuki.h"
 #include "../segmentation/Projection.h"
 #include "../segmentation/Filters.h"
+#include "algorithm/MatchingAlgorithm.h"
 
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
@@ -41,7 +42,7 @@ MatchingFragmentWindow::MatchingFragmentWindow()
 
     setWindowIcon(QIcon(":/Icons/resources/ico/FAMLab.png"));
 
-    connect(this->fragmentViewer,SIGNAL(sendObjectRGBA(ptrRGBAMatrix,vector<Point>)),this,SLOT(loadObject(ptrRGBAMatrix,vector<Point>)));
+    connect(this->fragmentViewer,SIGNAL(sendObjectRGBA(ptrRGBAMatrix,Edge)),this,SLOT(loadObject(ptrRGBAMatrix,Edge)));
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
     view = new QGraphicsView(scene);
@@ -62,10 +63,12 @@ MatchingFragmentWindow::~MatchingFragmentWindow()
 
     delete fileMenu;
     delete fragmentMenu;
+    delete matchingMenu;
     delete helpMenu;
 
     delete fileToolBar;
     delete fragmentToolBar;
+    delete matchingToolBar;
 
     delete deleteAction;
     delete toFrontAction;
@@ -74,6 +77,7 @@ MatchingFragmentWindow::~MatchingFragmentWindow()
     delete rotateRightAction;
     delete setLeftFragmentAction;
     delete setRightFragmentAction;
+    delete suggestDTWAction;
 
     delete openAction;
     delete exitAction;
@@ -169,6 +173,14 @@ void MatchingFragmentWindow::createFragmentMenuActions()
     connect(setRightFragmentAction, SIGNAL(triggered()), this, SLOT(setRightFragment()));
 }
 
+void MatchingFragmentWindow::createMatchingMenuActions()
+{
+    suggestDTWAction = new QAction(QIcon(":/Icons/resources/ico/rotateright.png"), tr("suggest matching by DTW"), this);
+    //    suggestDTWAction->setShortcut(tr("Delete"));
+    suggestDTWAction->setStatusTip(tr("suggest matching by DTW"));
+    connect(suggestDTWAction, SIGNAL(triggered()), this, SLOT(suggestDTW()));
+}
+
 void MatchingFragmentWindow::createHelpMenuActions()
 {
     aboutAction = new QAction(tr("&About MAELab"), this);
@@ -233,27 +245,51 @@ void MatchingFragmentWindow::rotateright()
 
 void MatchingFragmentWindow::setLeftFragment()
 {
-
     leftFragment = selectedFragmentItem();
     if(leftFragment){
-        cout << "left\t" << leftFragment->getBorder().size() << endl;
+        cout << "set left" << endl;
     }
 }
 
 void MatchingFragmentWindow::setRightFragment()
 {
-
     rightFragment = selectedFragmentItem();
     if(rightFragment){
-        cout << "right\t" << rightFragment->getBorder().size() << endl;
+        cout << "set right" << endl;
     }
 }
 
-void MatchingFragmentWindow::loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<Point> border)
+void MatchingFragmentWindow::suggestDTW()
+{
+    if(leftFragment && rightFragment){
+        cout << "DTW" << endl;
+
+        // get list points from Left
+        cout << leftFragment->getObjectRGBAMatrix()->getRows() << endl;
+        cout << rightFragment->getObjectRGBAMatrix()->getRows() << endl;
+        vector<Point> listPointsOfLeft = findMinXmappingY(leftFragment->getBorder());
+        vector<Point> listPointsOfRight = findMaxXmappingY(rightFragment->getBorder());
+
+        // get list points from Rght
+
+        // run the algorithm
+        vector<int> vectorX;
+        vector<int> vectorY;
+        vector< vector<int> > myDTW = cumulativeDistanceMatrix(vectorX,vectorY);
+        vector< pair<int,int> > myPath = optimalWarpingPath(myDTW);
+        int n = myPath.size();
+        for(int i=0; i<n; i++)
+        {
+            cout << myPath[i].first << "\t" << myPath[i].second << endl;
+        }
+    }
+}
+
+void MatchingFragmentWindow::loadObject(ptrRGBAMatrix objectRGBAMatrix, Edge border)
 {
     qImage = ptrRGBAToQImage(objectRGBAMatrix);
 
-    FragmentItem *pixmapItem = new FragmentItem(border, QPixmap::fromImage(qImage), fragmentMenu);
+    FragmentItem *pixmapItem = new FragmentItem(border, objectRGBAMatrix, QPixmap::fromImage(qImage), fragmentMenu);
 
     scene->addItem(pixmapItem);
 }
@@ -262,6 +298,7 @@ void MatchingFragmentWindow::createActions()
 {
     createFileMenuActions();
     createFragmentMenuActions();
+    createMatchingMenuActions();
     createHelpMenuActions();
 }
 
@@ -297,12 +334,16 @@ void MatchingFragmentWindow::createMenus()
     fragmentMenu->addAction(setLeftFragmentAction);
     fragmentMenu->addAction(setRightFragmentAction);
 
+    matchingMenu = menuBar()->addMenu(tr("&Matching"));
+    matchingMenu->addAction(suggestDTWAction);
+
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAction);
 
     // add menus to GUI
     menuBar()->addMenu(fileMenu);
     menuBar()->addMenu(fragmentMenu);
+    menuBar()->addMenu(matchingMenu);
     menuBar()->addMenu(helpMenu);
 }
 
@@ -319,4 +360,68 @@ void MatchingFragmentWindow::createToolBars()
     fragmentToolBar->addAction(rotateRightAction);
     fragmentToolBar->addAction(setLeftFragmentAction);
     fragmentToolBar->addAction(setRightFragmentAction);
+
+    matchingToolBar = addToolBar(tr("Matching"));
+    matchingToolBar->addAction(suggestDTWAction);
+
+}
+
+vector<Point> MatchingFragmentWindow::findMinXmappingY(Edge edge)
+{
+    vector<Point> result;
+    edge.sortByY();
+    vector<Point> theListPoints = edge.getPoints();
+    int size = theListPoints.size();
+    Point minPoint = theListPoints.at(0);
+    for(int i = 1;i<size;i++)
+    {
+        Point currentPoint = theListPoints.at(i);
+        // compare the same y
+        if(minPoint.getY() == currentPoint.getY())
+        {
+            // find the min X
+            if(minPoint.getX()>currentPoint.getX())
+            {
+                minPoint = currentPoint;
+            }
+        }
+        else
+        {
+            result.push_back(minPoint);
+            minPoint = currentPoint;
+        }
+    }
+    // add point of final range
+    result.push_back(minPoint);
+    return result;
+}
+
+vector<Point> MatchingFragmentWindow::findMaxXmappingY(Edge edge)
+{
+    vector<Point> result;
+    edge.sortByY();
+    vector<Point> theListPoints = edge.getPoints();
+    int size = theListPoints.size();
+    Point maxPoint = theListPoints.at(0);
+    for(int i = 1;i<size;i++)
+    {
+        Point currentPoint = theListPoints.at(i);
+        // compare the same y
+        if(maxPoint.getY() == currentPoint.getY())
+        {
+            // find the max X
+            if(maxPoint.getX()<currentPoint.getX())
+            {
+                maxPoint = currentPoint;
+            }
+        }
+        else
+        {
+            result.push_back(maxPoint);
+            maxPoint = currentPoint;
+        }
+    }
+    // add point of final range
+    result.push_back(maxPoint);
+    return result;
 }

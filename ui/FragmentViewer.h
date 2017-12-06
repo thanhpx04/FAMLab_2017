@@ -43,7 +43,7 @@ public:
     void loadImage(Image *_matImage, QImage _qImage, QString tt);
 
 signals:
-    void sendObjectRGBA(ptrRGBAMatrix objectRGBAMatrix, vector<Point> border);
+    void sendObjectRGBA(ptrRGBAMatrix objectRGBAMatrix, Edge border);
 
 private slots:
     void about();
