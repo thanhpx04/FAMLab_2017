@@ -120,7 +120,7 @@ void MatchingFragmentWindow::about()
 {
     QMessageBox::about(this, tr("About FAMLab"),
                        tr(
-                           "<p><b>FAMLab</b> is a software in Computer Vision. It provides the functions to "
+                           "<p><b>FAMLab</b> is a software in computer vision. It provides the functions to "
                            "extraction and matching fragments.</p>"));
 }
 
