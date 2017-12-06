@@ -472,3 +472,20 @@ ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
 
 	return thresholdImage;
 }
+
+Point findMinPointOfBorder(Edge border)
+{
+    border.sortByX();
+    Point pointMinX = border.getPoints().at(0);
+    int i=1;
+    Point pointCurrent = border.getPoints().at(i);
+    while(pointMinX.getX()==pointCurrent.getX())
+    {
+        if(pointCurrent.getY()<pointMinX.getY())
+            pointMinX = pointCurrent;
+
+        i++;
+        pointCurrent = border.getPoints().at(i);
+    }
+    return pointMinX;
+}

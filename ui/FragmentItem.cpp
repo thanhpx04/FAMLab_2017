@@ -1,22 +1,22 @@
 
 #include "FragmentItem.h"
 
-FragmentItem::FragmentItem(vector<Edge> listOfEdges, const QPixmap &pixmap, QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
+FragmentItem::FragmentItem(vector<Point> border, const QPixmap &pixmap, QMenu *contextMenu, QGraphicsItem *parent, QGraphicsScene *scene)
     : QGraphicsPixmapItem(pixmap, parent, scene)
 {
-    this->listOfEdges = listOfEdges;
+    this->border = border;
     this->myContextMenu = contextMenu;
     setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
 }
 
-void FragmentItem::setListOfEdges(vector<Edge> listOfEdges)
+void FragmentItem::setBorder(vector<Point> border)
 {
-    this->listOfEdges = listOfEdges;
+    this->border = border;
 }
 
-vector<Edge> FragmentItem::getListOfEdges()
+vector<Point> FragmentItem::getBorder()
 {
-    return this->listOfEdges;
+    return this->border;
 }
 
 //void FragmentItem::setListConnectedPoints(QVector<QPointF> listConnectedPoints)

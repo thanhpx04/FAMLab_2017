@@ -90,8 +90,8 @@ FragmentViewer::FragmentViewer()
 FragmentViewer::~FragmentViewer()
 {
     delete matImage;
-//    delete parameterAction;
-//    delete parameterDialog;
+    //    delete parameterAction;
+    //    delete parameterDialog;
 
     delete imageLabel;
     delete scrollArea;
@@ -112,7 +112,7 @@ FragmentViewer::~FragmentViewer()
 
     //menu action
     delete openAct;
-//    delete printAct;
+    //    delete printAct;
     delete saveAct;
     delete saveAsAct;
     delete closeAct;
@@ -320,7 +320,7 @@ void FragmentViewer::gScaleHistogram()
         if (histogram->getAtPosition(0, c) > max)
             max = histogram->getAtPosition(0, c);
     }
-//    int cols = histogram->getCols();
+    //    int cols = histogram->getCols();
     RGB color;
     color.R = color.G = color.B = 0;
     ptr_RGBMatrix hDisplay = new Matrix<RGB>(240, 300, color);
@@ -1280,8 +1280,40 @@ void FragmentViewer::extractObject(int x, int y)
                                              3 * (int) tValue, cPoints);
     vector<Edge> listOfEdges = suzuki(cannyMatrix);
 
+    //find the longest Edge
+    Edge longestEdge = listOfEdges.at(0);
+    for(size_t i =1; i<listOfEdges.size();i++)
+    {
+        Edge current = listOfEdges.at(i);
+        if(longestEdge.getPoints().size()< current.getPoints().size())
+            longestEdge = current;
+    }
+
+    // paint red line
+    RGBA red;
+    red.R = red.A = 255;
+    red.G = red.B = 0;
+    rows = objectRGBAMatrix->getRows();
+    cols = objectRGBAMatrix->getCols();
+    vector<Point> drawPoints = cPoints;
+//    vector<Point> drawPoints = longestEdge.getPoints();
+    for (size_t k = 0; k < drawPoints.size(); k++)
+    {
+        Point pi = drawPoints.at(k);
+        if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+                && pi.getY() < rows)
+        {
+            objectRGBAMatrix->setAtPosition(pi.getY(), pi.getX(), red);
+        }
+    }
+
+//    Edge border;
+//    border.setPoints(cPoints);
+//    Point pointMinX = findMinPointOfBorder(border);
+
+
     // emmit to signal in order to send to matching fragment window
-    emit sendObjectRGBA(objectRGBAMatrix, listOfEdges);
+    emit sendObjectRGBA(objectRGBAMatrix, drawPoints);
     cout << "send object" << endl;
 }
 
@@ -1423,7 +1455,7 @@ void FragmentViewer::createMenus()
     QMenu* extractObjectMenu = pluginMenu->addMenu(tr("Extract Object"));
     //    extractObjectMenu->addAction(detectObjectAct);
     extractObjectMenu->addAction(process4QuartersAct);
-//    pluginMenu->addAction(openFragmentScreenAct);
+    //    pluginMenu->addAction(openFragmentScreenAct);
     //===============
 
     //registrationMenu = new QMenu(tr("&Registration"), this);
@@ -1656,9 +1688,9 @@ void FragmentViewer::createPluginMenu()
     process4QuartersAct->setEnabled(false);
     connect(process4QuartersAct, SIGNAL(triggered()), this, SLOT(process4Quarters()));
 
-//    openFragmentScreenAct = new QAction(tr("&Open Fragment Screen"), this);
-//    openFragmentScreenAct->setEnabled(true);
-//    connect(openFragmentScreenAct, SIGNAL(triggered()), this, SLOT(openFragmentScreen()));
+    //    openFragmentScreenAct = new QAction(tr("&Open Fragment Screen"), this);
+    //    openFragmentScreenAct->setEnabled(true);
+    //    connect(openFragmentScreenAct, SIGNAL(triggered()), this, SLOT(openFragmentScreen()));
 }
 
 void FragmentViewer::activeFunction()

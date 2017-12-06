@@ -28,10 +28,10 @@ class FragmentItem : public QObject, public QGraphicsPixmapItem
     Q_OBJECT
 
 public:
-    FragmentItem(vector<Edge> listOfEdges, const QPixmap &pixmap, QMenu *contextMenu, QGraphicsItem *parent = 0,
+    FragmentItem(vector<Point> border, const QPixmap &pixmap, QMenu *contextMenu, QGraphicsItem *parent = 0,
                  QGraphicsScene *scene = 0);
-    void setListOfEdges(vector<Edge> listOfEdges);
-    vector<Edge> getListOfEdges();
+    void setBorder(vector<Point> border);
+    vector<Point> getBorder();
 
 //    void setListConnectedPoints(QVector<QPointF> listConnectedPoints);
 //    QVector<QPointF> getListConnectedPoints();
@@ -45,7 +45,7 @@ protected:
 //    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
-    vector<Edge> listOfEdges;
+    vector<Point> border;
     QMenu *myContextMenu;
     // attributes for drawing connected lines between Fragments
 //    QVector<QPointF> listConnectedPoints;

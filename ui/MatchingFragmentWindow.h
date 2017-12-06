@@ -41,9 +41,11 @@ private slots:
     void sendToBack();
     void rotateleft();
     void rotateright();
+    void setLeftFragment();
+    void setRightFragment();
 
 public slots:
-    void loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<Edge> listOfEdges);
+    void loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<Point> border);
 
 private:
     void createActions();
@@ -71,11 +73,17 @@ private:
     QAction *sendBackAction;
     QAction *rotateLeftAction;
     QAction *rotateRightAction;
+    QAction *setLeftFragmentAction;
+    QAction *setRightFragmentAction;
 
     // actions
     QAction *openAction;
     QAction *exitAction;
     QAction *aboutAction;
+
+    // fragment items left and right
+    FragmentItem *leftFragment;
+    FragmentItem *rightFragment;
 
     // image viewer
     FragmentViewer *fragmentViewer;

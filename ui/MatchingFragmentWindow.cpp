@@ -41,7 +41,7 @@ MatchingFragmentWindow::MatchingFragmentWindow()
 
     setWindowIcon(QIcon(":/Icons/resources/ico/FAMLab.png"));
 
-    connect(this->fragmentViewer,SIGNAL(sendObjectRGBA(ptrRGBAMatrix,vector<Edge>)),this,SLOT(loadObject(ptrRGBAMatrix,vector<Edge>)));
+    connect(this->fragmentViewer,SIGNAL(sendObjectRGBA(ptrRGBAMatrix,vector<Point>)),this,SLOT(loadObject(ptrRGBAMatrix,vector<Point>)));
 
     QHBoxLayout *mainLayout = new QHBoxLayout;
     view = new QGraphicsView(scene);
@@ -72,10 +72,15 @@ MatchingFragmentWindow::~MatchingFragmentWindow()
     delete sendBackAction;
     delete rotateLeftAction;
     delete rotateRightAction;
+    delete setLeftFragmentAction;
+    delete setRightFragmentAction;
 
     delete openAction;
     delete exitAction;
     delete aboutAction;
+
+    delete leftFragment;
+    delete rightFragment;
 
     delete fragmentViewer;
 }
@@ -154,6 +159,14 @@ void MatchingFragmentWindow::createFragmentMenuActions()
     rotateRightAction->setShortcut(tr("Ctrl+R"));
     rotateRightAction->setStatusTip(tr("Rotate Right"));
     connect(rotateRightAction, SIGNAL(triggered()), this, SLOT(rotateright()));
+
+    setLeftFragmentAction = new QAction(QIcon(":/Icons/resources/ico/rotateright.png"), tr("Set the left fragment"), this);
+    setLeftFragmentAction->setStatusTip(tr("Set the left fragment"));
+    connect(setLeftFragmentAction, SIGNAL(triggered()), this, SLOT(setLeftFragment()));
+
+    setRightFragmentAction = new QAction(QIcon(":/Icons/resources/ico/rotateright.png"), tr("Set the right fragment"), this);
+    setRightFragmentAction->setStatusTip(tr("Set the right fragment"));
+    connect(setRightFragmentAction, SIGNAL(triggered()), this, SLOT(setRightFragment()));
 }
 
 void MatchingFragmentWindow::createHelpMenuActions()
@@ -218,11 +231,29 @@ void MatchingFragmentWindow::rotateright()
     }
 }
 
-void MatchingFragmentWindow::loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<Edge> listOfEdges)
+void MatchingFragmentWindow::setLeftFragment()
+{
+
+    leftFragment = selectedFragmentItem();
+    if(leftFragment){
+        cout << "left\t" << leftFragment->getBorder().size() << endl;
+    }
+}
+
+void MatchingFragmentWindow::setRightFragment()
+{
+
+    rightFragment = selectedFragmentItem();
+    if(rightFragment){
+        cout << "right\t" << rightFragment->getBorder().size() << endl;
+    }
+}
+
+void MatchingFragmentWindow::loadObject(ptrRGBAMatrix objectRGBAMatrix, vector<Point> border)
 {
     qImage = ptrRGBAToQImage(objectRGBAMatrix);
 
-    FragmentItem *pixmapItem = new FragmentItem(listOfEdges, QPixmap::fromImage(qImage), fragmentMenu);
+    FragmentItem *pixmapItem = new FragmentItem(border, QPixmap::fromImage(qImage), fragmentMenu);
 
     scene->addItem(pixmapItem);
 }
@@ -262,6 +293,9 @@ void MatchingFragmentWindow::createMenus()
     fragmentMenu->addSeparator();
     fragmentMenu->addAction(rotateLeftAction);
     fragmentMenu->addAction(rotateRightAction);
+    fragmentMenu->addSeparator();
+    fragmentMenu->addAction(setLeftFragmentAction);
+    fragmentMenu->addAction(setRightFragmentAction);
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAction);
@@ -283,4 +317,6 @@ void MatchingFragmentWindow::createToolBars()
     fragmentToolBar->addAction(sendBackAction);
     fragmentToolBar->addAction(rotateLeftAction);
     fragmentToolBar->addAction(rotateRightAction);
+    fragmentToolBar->addAction(setLeftFragmentAction);
+    fragmentToolBar->addAction(setRightFragmentAction);
 }
