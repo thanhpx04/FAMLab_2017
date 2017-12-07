@@ -60,6 +60,8 @@ private:
 
     vector<Point> findMinXmappingY(Edge edge);
     vector<Point> findMaxXmappingY(Edge edge);
+    vector<Point> getSubPointsByDistance(vector<Point> listPoints, int distance);
+    vector<int> getXvalueOfListPoints(vector<Point> listPoints);
 
     MatchingFragmentScene *scene;
     QGraphicsView *view;

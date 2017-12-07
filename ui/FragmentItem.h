@@ -35,25 +35,26 @@ public:
     void setObjectRGBAMatrix(ptrRGBAMatrix objectRGBAMatrix);
     ptrRGBAMatrix getObjectRGBAMatrix();
 
-//    void setListConnectedPoints(QVector<QPointF> listConnectedPoints);
-//    QVector<QPointF> getListConnectedPoints();
-//    void setconnectedLines(QVector<QGraphicsLineItem*> connectedLines, bool isFragment1);
-//    QVector<QGraphicsLineItem*> getConnectedLines();
+    void setListConnectedPoints(vector<Point> listConnectedPoints);
+    vector<Point> getListConnectedPoints();
+    void setconnectedLines(QVector<QGraphicsLineItem*> connectedLines, bool isFragment1);
+    QVector<QGraphicsLineItem*> getConnectedLines();
 
     void updatePosition(QPointF newPosition);
 
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
-//    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 private:
     Edge border;
     ptrRGBAMatrix objectRGBAMatrix;
     QMenu *myContextMenu;
+
     // attributes for drawing connected lines between Fragments
-//    QVector<QPointF> listConnectedPoints;
-//    QVector<QGraphicsLineItem*> connectedLines;
-//    bool isFragment1;
+    vector<Point> listConnectedPoints;
+    QVector<QGraphicsLineItem*> connectedLines;
+    bool isFragment1;
     //----------------------------------------
 
 };

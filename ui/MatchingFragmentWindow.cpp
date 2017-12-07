@@ -263,25 +263,52 @@ void MatchingFragmentWindow::suggestDTW()
 {
     if(leftFragment && rightFragment){
         cout << "DTW" << endl;
+        // this 2 list is used to draw connected lines
+        vector<Point> listPointsBeginToDraw;
+        vector<Point> listPointsEndToDraw;
+        QVector<QGraphicsLineItem*> suggestLines;
+        // --------------------------------------------
 
         // get list points from Left
-        cout << leftFragment->getObjectRGBAMatrix()->getRows() << endl;
-        cout << rightFragment->getObjectRGBAMatrix()->getRows() << endl;
-        vector<Point> listPointsOfLeft = findMinXmappingY(leftFragment->getBorder());
-        vector<Point> listPointsOfRight = findMaxXmappingY(rightFragment->getBorder());
+        vector<Point> listPointsOfLeft = findMaxXmappingY(leftFragment->getBorder());
+        // get every 20 pixel
+        vector<Point> listPointsOfLeft20Pixel = getSubPointsByDistance(listPointsOfLeft,10);
+
 
         // get list points from Rght
+        vector<Point> listPointsOfRight = findMinXmappingY(rightFragment->getBorder());
+        // get every 20 pixel
+        vector<Point> listPointsOfRight20Pixel = getSubPointsByDistance(listPointsOfRight,10);
 
         // run the algorithm
-        vector<int> vectorX;
-        vector<int> vectorY;
-        vector< vector<int> > myDTW = cumulativeDistanceMatrix(vectorX,vectorY);
+        vector<int> vectorA = getXvalueOfListPoints(listPointsOfLeft20Pixel);
+        vector<int> vectorB = getXvalueOfListPoints(listPointsOfRight20Pixel);
+        vector< vector<int> > myDTW = cumulativeDistanceMatrix(vectorA,vectorB);
         vector< pair<int,int> > myPath = optimalWarpingPath(myDTW);
         int n = myPath.size();
         for(int i=0; i<n; i++)
         {
-            cout << myPath[i].first << "\t" << myPath[i].second << endl;
+            int indexA = myPath[i].first;
+            Point pointA = listPointsOfLeft20Pixel.at(indexA);
+            int indexB = myPath[i].second;
+            Point pointB = listPointsOfRight20Pixel.at(indexB);
+
+            QRectF rectA = leftFragment->mapToScene(leftFragment->boundingRect()).boundingRect();\
+            QRectF rectB = rightFragment->mapToScene(rightFragment->boundingRect()).boundingRect();
+
+            QPen pen(Qt::DotLine);
+            QGraphicsLineItem *line = scene->addLine(rectA.x()+pointA.getX(),rectA.y()+pointA.getY(),
+                                                     rectB.x()+pointB.getX(),rectB.y()+pointB.getY(),pen);
+            suggestLines.append(line);
+            // add mapping point to draw
+            listPointsBeginToDraw.push_back(pointA);
+            listPointsEndToDraw.push_back(pointB);
         }
+        leftFragment->setconnectedLines(suggestLines, true);
+        leftFragment->setListConnectedPoints(listPointsBeginToDraw);
+
+        rightFragment->setconnectedLines(suggestLines, false);
+        rightFragment->setListConnectedPoints(listPointsEndToDraw);
     }
 }
 
@@ -423,5 +450,30 @@ vector<Point> MatchingFragmentWindow::findMaxXmappingY(Edge edge)
     }
     // add point of final range
     result.push_back(maxPoint);
+    return result;
+}
+
+vector<Point> MatchingFragmentWindow::getSubPointsByDistance(vector<Point> listPoints, int distance)
+{
+    vector<Point> result;
+    int size = listPoints.size();
+    int i=0;
+    while(i<size)
+    {
+        result.push_back(listPoints.at(i));
+        i=i+distance;
+    }
+    return result;
+}
+
+vector<int> MatchingFragmentWindow::getXvalueOfListPoints(vector<Point> listPoints)
+{
+    vector<int> result;
+    int size = listPoints.size();
+    for(int i=0;i<size;i++)
+    {
+        Point currentPoint = listPoints.at(i);
+        result.push_back(currentPoint.getX());
+    }
     return result;
 }
