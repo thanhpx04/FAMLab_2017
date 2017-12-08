@@ -175,8 +175,7 @@ void MatchingFragmentWindow::createFragmentMenuActions()
 
 void MatchingFragmentWindow::createMatchingMenuActions()
 {
-    suggestDTWAction = new QAction(QIcon(":/Icons/resources/ico/rotateright.png"), tr("suggest matching by DTW"), this);
-    //    suggestDTWAction->setShortcut(tr("Delete"));
+    suggestDTWAction = new QAction(QIcon(":/resources/ico/matching.png"), tr("suggest matching by DTW"), this);
     suggestDTWAction->setStatusTip(tr("suggest matching by DTW"));
     connect(suggestDTWAction, SIGNAL(triggered()), this, SLOT(suggestDTW()));
 }
@@ -272,13 +271,13 @@ void MatchingFragmentWindow::suggestDTW()
         // get list points from Left
         vector<Point> listPointsOfLeft = findMaxXmappingY(leftFragment->getBorder());
         // get every 20 pixel
-        vector<Point> listPointsOfLeft20Pixel = getSubPointsByDistance(listPointsOfLeft,10);
+        vector<Point> listPointsOfLeft20Pixel = getSubPointsByDistance(listPointsOfLeft,20);
 
 
         // get list points from Rght
         vector<Point> listPointsOfRight = findMinXmappingY(rightFragment->getBorder());
         // get every 20 pixel
-        vector<Point> listPointsOfRight20Pixel = getSubPointsByDistance(listPointsOfRight,10);
+        vector<Point> listPointsOfRight20Pixel = getSubPointsByDistance(listPointsOfRight,20);
 
         // run the algorithm
         vector<int> vectorA = getXvalueOfListPoints(listPointsOfLeft20Pixel);
@@ -385,8 +384,6 @@ void MatchingFragmentWindow::createToolBars()
     fragmentToolBar->addAction(sendBackAction);
     fragmentToolBar->addAction(rotateLeftAction);
     fragmentToolBar->addAction(rotateRightAction);
-    fragmentToolBar->addAction(setLeftFragmentAction);
-    fragmentToolBar->addAction(setRightFragmentAction);
 
     matchingToolBar = addToolBar(tr("Matching"));
     matchingToolBar->addAction(suggestDTWAction);

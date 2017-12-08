@@ -16,4 +16,7 @@
         <file>resources/ico/save.png</file>
         <file>resources/ico/sendtoback.png</file>
     </qresource>
+    <qresource prefix="/">
+        <file>resources/ico/matching.png</file>
+    </qresource>
 </RCC>
