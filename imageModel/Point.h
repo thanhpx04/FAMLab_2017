@@ -7,6 +7,10 @@
 
 #ifndef POINT_H_
 #define POINT_H_
+
+#include <iostream>
+using namespace std;
+
 struct RGB
 {
 	unsigned long int R;

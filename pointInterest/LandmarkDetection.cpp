@@ -26,11 +26,6 @@ using namespace std;
 #include "../segmentation/Thresholds.h"
 
 #include "../histograms/ShapeHistogram.h"
-#include "../pht/PHTEntry.h"
-#include "../pht/PHoughTransform.h"
-#include "../pht/GHTInPoint.h"
-#include "../correlation/CrossCorrelation.h"
-#include "../correlation/DescriptorDistance.h"
 #include "../utils/Drawing.h"
 #include "../io/Reader.h"
 

@@ -11,13 +11,13 @@ CONFIG       += console
 QMAKE_CXXFLAGS += -fPIC -lpthread
 QMAKE_CFLAGS += -fPIC -lpthread
 HEADERS += io/*.h io/LibJpeg/*.h imageModel/*.h \
-			segmentation/*.h histograms/*.h pht/*.h \
-                  pointInterest/*.h algorithm/*.h correlation/*.h utils/*.h ui/*.h MAELab.h
+                        segmentation/*.h histograms/*.h \
+                  pointInterest/*.h algorithm/*.h utils/*.h ui/*.h MAELab.h
 
 	
 SOURCES += io/*.cpp io/LibJpeg/*.c imageModel/*.cpp \
 		 segmentation/*.cpp \
-                 histograms/*.cpp pht/*.cpp pointInterest/*.cpp algorithm/*.cpp correlation/*.cpp \
+                 histograms/*.cpp pointInterest/*.cpp algorithm/*.cpp \
                  utils/*.cpp ui/*.cpp MAELab.cpp FAMLab.cpp \
 
 RESOURCES += \
