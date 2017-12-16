@@ -107,7 +107,7 @@ Image::Image(std::string filePath)
 
 	fileName = filePath;
 	int rows = 0, cols = 0;
-    imgMatrix = readJPGToRGB(filePath.c_str(), rows, cols);
+	imgMatrix = readJPGToRGB(filePath.c_str(), rows, cols);
 
 	grayMatrix = new Matrix<int>(rows, cols);
 	grayMatrix = convertRGBToGray(imgMatrix);

@@ -796,7 +796,7 @@ vector<Edge> suzuki(ptr_IntMatrix inputImage)
 	int rows = inputImage->getRows();
 	int cols = inputImage->getCols();
 	int nBD = 1;
-	int lNBD = 1;
+    int lNBD = 1;
 	int i1 = -1, j1 = -1, i2 = -1, j2 = -1, i3 = -1, j3 = -1, i4 = -1, j4 = -1;
 	bool flag = false;
 

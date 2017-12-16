@@ -13,6 +13,4 @@ void saveRGB(const char* filename, ptr_RGBMatrix rgbMatrix);
 void saveGrayScale(const char* filename, ptr_IntMatrix grayMatrix);
 vector<Point> readTPSFile(const char* filename);
 vector<string> readDirectory(const char* dirPath);
-//Thanh
-//ptrRGBAMatrix readPNGToRGBA(const char* filename,int &rows, int &cols);
 #endif /* READER_H_ */

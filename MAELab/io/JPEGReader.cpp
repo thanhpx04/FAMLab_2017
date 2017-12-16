@@ -58,7 +58,7 @@ ptr_RGBMatrix decompressJPEG(const char* filename, int &rows, int &cols) {
 				+ cinfo.output_scanline * cinfo.image_width
 						* cinfo.num_components;
 		jpeg_read_scanlines(&cinfo, &p, 1);
-		for (int i = 0; i < cinfo.output_width; i++) {
+        for (size_t i = 0; i < cinfo.output_width; i++) {
 			unsigned int k = (i + cinfo.output_width * row) * 3;
 			RGB rgb;
 			rgb.R = (unsigned short int) buffer[k];

@@ -22,18 +22,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+HEADERS += \
+        MAELab/imageModel/*.h \
+        MAELab/io/*.h \
+        MAELab/io/LibJpeg/*.h \
+        MAELab/segmentation/*.h \
+        MAELab/utils/*.h \
+        ui/*.h
 
 SOURCES += \
         MAELab/imageModel/*.cpp \
         MAELab/io/*.cpp \
-        MAELab/imageModel/*.cpp \
+        MAELab/io/LibJpeg/*.c \
+        MAELab/segmentation/*.cpp \
+        MAELab/utils/*.cpp \
         ui/*.cpp \
-        main.cpp \
-        mainwindow.cpp
-
-HEADERS += \
-        MAELab/imageModel/*.h \
-        MAELab/io/*.h \
-        MAELab/imageModel/*.h \
-        ui/*.h \
-        mainwindow.h
+        main.cpp

@@ -207,30 +207,30 @@ Matrix<T> Matrix<T>::transposition(T defaultValue)
 	}
 	return result;
 }
-template<typename T>
-Matrix<T> Matrix<T>::multiply(Matrix<T> object, T defaultValue)
-{
-	int objRows = object.rows;
-	int objCols = object.cols;
-	Matrix<T> result(rows, objCols);
-	result.InitWithValue(defaultValue);
-	if (cols != objRows)
-		return result;
-	for (int row = 0; row < rows; row++)
-	{
-		for (int col = 0; col < objCols; col++)
-		{
-			T sum = defaultValue;
-			for (int k = 0; k < cols; k++)
-			{
-				T value1 = data[row][k];
-				T value2 = object.data[k][col];
-				sum += value1 * value2;
-			}
-			result.data[row][col] = sum;
-		}
-	}
-}
+//template<typename T>
+//Matrix<T> Matrix<T>::multiply(Matrix<T> object, T defaultValue)
+//{
+//	int objRows = object.rows;
+//	int objCols = object.cols;
+//	Matrix<T> result(rows, objCols);
+//	result.InitWithValue(defaultValue);
+//	if (cols != objRows)
+//		return result;
+//	for (int row = 0; row < rows; row++)
+//	{
+//		for (int col = 0; col < objCols; col++)
+//		{
+//			T sum = defaultValue;
+//			for (int k = 0; k < cols; k++)
+//			{
+//				T value1 = data[row][k];
+//				T value2 = object.data[k][col];
+//				sum += value1 * value2;
+//			}
+//			result.data[row][col] = sum;
+//		}
+//	}
+//}
 
 template<typename T>
 Matrix<T> Matrix<T>::extractPatch(int width, int height, int rowIndex,
@@ -269,5 +269,4 @@ template class Matrix<int> ;
 template class Matrix<double> ;
 template class Matrix<float> ;
 template class Matrix<RGB> ;
-template class Matrix<RGBA> ;
 

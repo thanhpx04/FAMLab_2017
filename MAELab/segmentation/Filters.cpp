@@ -90,7 +90,7 @@ Matrix<int> RobertOperation(ptr_IntMatrix grayMatrix)
 	int rows = grayMatrix->getRows();
 	int cols = grayMatrix->getCols();
 	Matrix<int> dMatrix(rows, cols, 0);
-	int v = 0, v1 = 0, v2 = 0;
+    int v1 = 0, v2 = 0;
 	int v3 = 0, v4 = 0;
 	int gx = 0, gy = 0, gxy = 0;
 	for (int r = 0; r < rows; r++)

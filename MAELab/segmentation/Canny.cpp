@@ -405,10 +405,7 @@ ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 	int highThreshold, vector<Point> &contourPoints)
 {
 //	ptr_IntMatrix binary2 = postProcess(binaryImage, 255);
-//  ptr_IntMatrix sobelFilter = sobelOperationCanny(binary2);
-    //Thanh - ignore postProcess
     ptr_IntMatrix sobelFilter = sobelOperationCanny(binaryImage);
-    //--------
 	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
 	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
 		highThreshold);
@@ -430,62 +427,45 @@ ptr_IntMatrix cannyProcess(ptr_IntMatrix binaryImage, int lowThreshold,
 
 	return thresholdImage;
 }
-ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
-	int highThreshold, ptr_IntMatrix &gradDirection, vector<Point> &edgePoints)
-{
-	ptr_IntMatrix binary2 = postProcess(binaryImage, 255);
-	ptr_IntMatrix sobelFilter = sobelOperationCanny(binary2);
-	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
-	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
-		highThreshold);
+//ptr_IntMatrix cannyProcess2(ptr_IntMatrix binaryImage, int lowThreshold,
+//	int highThreshold, ptr_IntMatrix &gradDirection, vector<Point> &edgePoints)
+//{
+//	ptr_IntMatrix binary2 = postProcess(binaryImage, 255);
+//	ptr_IntMatrix sobelFilter = sobelOperationCanny(binary2);
+//	ptr_IntMatrix nonMaxSuppress = nonMaxSuppression(sobelFilter);
+//	ptr_IntMatrix thresholdImage = doubleThreshold(nonMaxSuppress, lowThreshold,
+//		highThreshold);
 
-	// viet them cho GPH tren pixel
-	int rows = binaryImage->getRows();
-	int cols = binaryImage->getCols();
-	//gradDirection = new Matrix<int>(rows, cols, -1);
-	double angle = 0;
-	int count = 0;
-	edgePoints.clear();
-	for (int r = 0; r < rows; r++)
-	{
-		for (int c = 0; c < cols; c++)
-		{
-			if (thresholdImage->getAtPosition(r, c) == 255)
-			{
-				edgePoints.push_back(Point(c, r));
-				angle = angles->getAtPosition(r, c);
+//	// viet them cho GPH tren pixel
+//	int rows = binaryImage->getRows();
+//	int cols = binaryImage->getCols();
+//	//gradDirection = new Matrix<int>(rows, cols, -1);
+//	double angle = 0;
+//	int count = 0;
+//	edgePoints.clear();
+//	for (int r = 0; r < rows; r++)
+//	{
+//		for (int c = 0; c < cols; c++)
+//		{
+//			if (thresholdImage->getAtPosition(r, c) == 255)
+//			{
+//				edgePoints.push_back(Point(c, r));
+//				angle = angles->getAtPosition(r, c);
 
-				if (angle < 0)
-				{
-					angle = 360 + angle;
-				}
-				gradDirection->setAtPosition(r, c, roundToDegree(angle));
-				count++;
-			}
+//				if (angle < 0)
+//				{
+//					angle = 360 + angle;
+//				}
+//				gradDirection->setAtPosition(r, c, roundToDegree(angle));
+//				count++;
+//			}
 
-		}
-	}
-	cout << "\nTotal canny points: " << count << endl;
-	delete binary2;
-	delete sobelFilter;
-	delete nonMaxSuppress;
+//		}
+//	}
+//	cout << "\nTotal canny points: " << count << endl;
+//	delete binary2;
+//	delete sobelFilter;
+//	delete nonMaxSuppress;
 
-	return thresholdImage;
-}
-
-Point findMinPointOfBorder(Edge border)
-{
-    border.sortByX();
-    Point pointMinX = border.getPoints().at(0);
-    int i=1;
-    Point pointCurrent = border.getPoints().at(i);
-    while(pointMinX.getX()==pointCurrent.getX())
-    {
-        if(pointCurrent.getY()<pointMinX.getY())
-            pointMinX = pointCurrent;
-
-        i++;
-        pointCurrent = border.getPoints().at(i);
-    }
-    return pointMinX;
-}
+//	return thresholdImage;
+//}

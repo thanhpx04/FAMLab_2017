@@ -14,7 +14,6 @@ using namespace std;
 
 #include "TPSReader.h"
 #include "JPEGReader.h"
-#include "PNGReader.h"
 
 #include "Reader.h"
 
@@ -45,7 +44,7 @@ vector<string> readDirectory(const char* dirPath)
 		result.clear();
 		return result;
 	}
-	while (entry = readdir(pDir))
+    while ((entry = readdir(pDir)))
 	{
 		if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
 		{
@@ -63,8 +62,3 @@ vector<Point> readTPSFile(const char* filename)
 	return readTPS(filename);
 }
 
-
-//ptrRGBAMatrix readPNGToRGBA(const char *filename, int &rows, int &cols)
-//{
-//    return decompressPNG(filename,rows,cols);
-//}

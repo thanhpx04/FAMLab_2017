@@ -55,29 +55,127 @@ SOURCES       = MAELab/imageModel/Edge.cpp \
 		MAELab/imageModel/Line.cpp \
 		MAELab/imageModel/Matrix.cpp \
 		MAELab/imageModel/Point.cpp \
-		MAELab/io/*.cpp \
-		MAELab/imageModel/Edge.cpp \
-		MAELab/imageModel/Image.cpp \
-		MAELab/imageModel/Line.cpp \
-		MAELab/imageModel/Matrix.cpp \
-		MAELab/imageModel/Point.cpp \
+		MAELab/io/JPEGReader.cpp \
+		MAELab/io/PNGReader.cpp \
+		MAELab/io/Reader.cpp \
+		MAELab/io/TPSReader.cpp \
+		MAELab/io/LibJpeg/jaricom.c \
+		MAELab/io/LibJpeg/jcapimin.c \
+		MAELab/io/LibJpeg/jcapistd.c \
+		MAELab/io/LibJpeg/jcarith.c \
+		MAELab/io/LibJpeg/jccoefct.c \
+		MAELab/io/LibJpeg/jccolor.c \
+		MAELab/io/LibJpeg/jcdctmgr.c \
+		MAELab/io/LibJpeg/jchuff.c \
+		MAELab/io/LibJpeg/jcinit.c \
+		MAELab/io/LibJpeg/jcmainct.c \
+		MAELab/io/LibJpeg/jcmarker.c \
+		MAELab/io/LibJpeg/jcmaster.c \
+		MAELab/io/LibJpeg/jcomapi.c \
+		MAELab/io/LibJpeg/jcparam.c \
+		MAELab/io/LibJpeg/jcprepct.c \
+		MAELab/io/LibJpeg/jcsample.c \
+		MAELab/io/LibJpeg/jctrans.c \
+		MAELab/io/LibJpeg/jdapimin.c \
+		MAELab/io/LibJpeg/jdapistd.c \
+		MAELab/io/LibJpeg/jdarith.c \
+		MAELab/io/LibJpeg/jdatadst.c \
+		MAELab/io/LibJpeg/jdatasrc.c \
+		MAELab/io/LibJpeg/jdcoefct.c \
+		MAELab/io/LibJpeg/jdcolor.c \
+		MAELab/io/LibJpeg/jddctmgr.c \
+		MAELab/io/LibJpeg/jdhuff.c \
+		MAELab/io/LibJpeg/jdinput.c \
+		MAELab/io/LibJpeg/jdmainct.c \
+		MAELab/io/LibJpeg/jdmarker.c \
+		MAELab/io/LibJpeg/jdmaster.c \
+		MAELab/io/LibJpeg/jdmerge.c \
+		MAELab/io/LibJpeg/jdpostct.c \
+		MAELab/io/LibJpeg/jdsample.c \
+		MAELab/io/LibJpeg/jdtrans.c \
+		MAELab/io/LibJpeg/jerror.c \
+		MAELab/io/LibJpeg/jfdctflt.c \
+		MAELab/io/LibJpeg/jfdctfst.c \
+		MAELab/io/LibJpeg/jfdctint.c \
+		MAELab/io/LibJpeg/jidctflt.c \
+		MAELab/io/LibJpeg/jidctfst.c \
+		MAELab/io/LibJpeg/jidctint.c \
+		MAELab/io/LibJpeg/jmemmgr.c \
+		MAELab/io/LibJpeg/jmemnobs.c \
+		MAELab/io/LibJpeg/jquant1.c \
+		MAELab/io/LibJpeg/jquant2.c \
+		MAELab/io/LibJpeg/jutils.c \
+		MAELab/segmentation/Canny.cpp \
+		MAELab/segmentation/Filters.cpp \
+		MAELab/segmentation/Suzuki.cpp \
+		MAELab/segmentation/Thresholds.cpp \
+		MAELab/utils/Converter.cpp \
 		ui/FragmentItem.cpp \
-		main.cpp \
-		mainwindow.cpp moc_mainwindow.cpp
+		ui/mainwindow.cpp \
+		main.cpp moc_mainwindow.cpp
 OBJECTS       = Edge.o \
 		Image.o \
 		Line.o \
 		Matrix.o \
 		Point.o \
-		*.o \
-		Edge.o \
-		Image.o \
-		Line.o \
-		Matrix.o \
-		Point.o \
+		JPEGReader.o \
+		PNGReader.o \
+		Reader.o \
+		TPSReader.o \
+		jaricom.o \
+		jcapimin.o \
+		jcapistd.o \
+		jcarith.o \
+		jccoefct.o \
+		jccolor.o \
+		jcdctmgr.o \
+		jchuff.o \
+		jcinit.o \
+		jcmainct.o \
+		jcmarker.o \
+		jcmaster.o \
+		jcomapi.o \
+		jcparam.o \
+		jcprepct.o \
+		jcsample.o \
+		jctrans.o \
+		jdapimin.o \
+		jdapistd.o \
+		jdarith.o \
+		jdatadst.o \
+		jdatasrc.o \
+		jdcoefct.o \
+		jdcolor.o \
+		jddctmgr.o \
+		jdhuff.o \
+		jdinput.o \
+		jdmainct.o \
+		jdmarker.o \
+		jdmaster.o \
+		jdmerge.o \
+		jdpostct.o \
+		jdsample.o \
+		jdtrans.o \
+		jerror.o \
+		jfdctflt.o \
+		jfdctfst.o \
+		jfdctint.o \
+		jidctflt.o \
+		jidctfst.o \
+		jidctint.o \
+		jmemmgr.o \
+		jmemnobs.o \
+		jquant1.o \
+		jquant2.o \
+		jutils.o \
+		Canny.o \
+		Filters.o \
+		Suzuki.o \
+		Thresholds.o \
+		Converter.o \
 		FragmentItem.o \
-		main.o \
 		mainwindow.o \
+		main.o \
 		moc_mainwindow.o
 DIST          = /opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/common/unix.conf \
@@ -263,27 +361,88 @@ DIST          = /opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/features/spec_pre.prf \
 		MAELab/imageModel/Line.h \
 		MAELab/imageModel/Matrix.h \
 		MAELab/imageModel/Point.h \
-		MAELab/io/*.h \
-		MAELab/imageModel/Edge.h \
-		MAELab/imageModel/Image.h \
-		MAELab/imageModel/Line.h \
-		MAELab/imageModel/Matrix.h \
-		MAELab/imageModel/Point.h \
+		MAELab/io/JPEGReader.h \
+		MAELab/io/PNGReader.h \
+		MAELab/io/Reader.h \
+		MAELab/io/TPSReader.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jdct.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jmemsys.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jversion.h \
+		MAELab/segmentation/Canny.h \
+		MAELab/segmentation/Filters.h \
+		MAELab/segmentation/Suzuki.h \
+		MAELab/segmentation/Thresholds.h \
+		MAELab/utils/Converter.h \
 		ui/FragmentItem.h \
-		mainwindow.h MAELab/imageModel/Edge.cpp \
+		ui/mainwindow.h MAELab/imageModel/Edge.cpp \
 		MAELab/imageModel/Image.cpp \
 		MAELab/imageModel/Line.cpp \
 		MAELab/imageModel/Matrix.cpp \
 		MAELab/imageModel/Point.cpp \
-		MAELab/io/*.cpp \
-		MAELab/imageModel/Edge.cpp \
-		MAELab/imageModel/Image.cpp \
-		MAELab/imageModel/Line.cpp \
-		MAELab/imageModel/Matrix.cpp \
-		MAELab/imageModel/Point.cpp \
+		MAELab/io/JPEGReader.cpp \
+		MAELab/io/PNGReader.cpp \
+		MAELab/io/Reader.cpp \
+		MAELab/io/TPSReader.cpp \
+		MAELab/io/LibJpeg/jaricom.c \
+		MAELab/io/LibJpeg/jcapimin.c \
+		MAELab/io/LibJpeg/jcapistd.c \
+		MAELab/io/LibJpeg/jcarith.c \
+		MAELab/io/LibJpeg/jccoefct.c \
+		MAELab/io/LibJpeg/jccolor.c \
+		MAELab/io/LibJpeg/jcdctmgr.c \
+		MAELab/io/LibJpeg/jchuff.c \
+		MAELab/io/LibJpeg/jcinit.c \
+		MAELab/io/LibJpeg/jcmainct.c \
+		MAELab/io/LibJpeg/jcmarker.c \
+		MAELab/io/LibJpeg/jcmaster.c \
+		MAELab/io/LibJpeg/jcomapi.c \
+		MAELab/io/LibJpeg/jcparam.c \
+		MAELab/io/LibJpeg/jcprepct.c \
+		MAELab/io/LibJpeg/jcsample.c \
+		MAELab/io/LibJpeg/jctrans.c \
+		MAELab/io/LibJpeg/jdapimin.c \
+		MAELab/io/LibJpeg/jdapistd.c \
+		MAELab/io/LibJpeg/jdarith.c \
+		MAELab/io/LibJpeg/jdatadst.c \
+		MAELab/io/LibJpeg/jdatasrc.c \
+		MAELab/io/LibJpeg/jdcoefct.c \
+		MAELab/io/LibJpeg/jdcolor.c \
+		MAELab/io/LibJpeg/jddctmgr.c \
+		MAELab/io/LibJpeg/jdhuff.c \
+		MAELab/io/LibJpeg/jdinput.c \
+		MAELab/io/LibJpeg/jdmainct.c \
+		MAELab/io/LibJpeg/jdmarker.c \
+		MAELab/io/LibJpeg/jdmaster.c \
+		MAELab/io/LibJpeg/jdmerge.c \
+		MAELab/io/LibJpeg/jdpostct.c \
+		MAELab/io/LibJpeg/jdsample.c \
+		MAELab/io/LibJpeg/jdtrans.c \
+		MAELab/io/LibJpeg/jerror.c \
+		MAELab/io/LibJpeg/jfdctflt.c \
+		MAELab/io/LibJpeg/jfdctfst.c \
+		MAELab/io/LibJpeg/jfdctint.c \
+		MAELab/io/LibJpeg/jidctflt.c \
+		MAELab/io/LibJpeg/jidctfst.c \
+		MAELab/io/LibJpeg/jidctint.c \
+		MAELab/io/LibJpeg/jmemmgr.c \
+		MAELab/io/LibJpeg/jmemnobs.c \
+		MAELab/io/LibJpeg/jquant1.c \
+		MAELab/io/LibJpeg/jquant2.c \
+		MAELab/io/LibJpeg/jutils.c \
+		MAELab/segmentation/Canny.cpp \
+		MAELab/segmentation/Filters.cpp \
+		MAELab/segmentation/Suzuki.cpp \
+		MAELab/segmentation/Thresholds.cpp \
+		MAELab/utils/Converter.cpp \
 		ui/FragmentItem.cpp \
-		main.cpp \
-		mainwindow.cpp
+		ui/mainwindow.cpp \
+		main.cpp
 QMAKE_TARGET  = FAMLab_2017
 DESTDIR       = 
 TARGET        = FAMLab_2017
@@ -677,8 +836,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents MAELab/imageModel/Edge.h MAELab/imageModel/Image.h MAELab/imageModel/Line.h MAELab/imageModel/Matrix.h MAELab/imageModel/Point.h MAELab/io/*.h MAELab/imageModel/Edge.h MAELab/imageModel/Image.h MAELab/imageModel/Line.h MAELab/imageModel/Matrix.h MAELab/imageModel/Point.h ui/FragmentItem.h mainwindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents MAELab/imageModel/Edge.cpp MAELab/imageModel/Image.cpp MAELab/imageModel/Line.cpp MAELab/imageModel/Matrix.cpp MAELab/imageModel/Point.cpp MAELab/io/*.cpp MAELab/imageModel/Edge.cpp MAELab/imageModel/Image.cpp MAELab/imageModel/Line.cpp MAELab/imageModel/Matrix.cpp MAELab/imageModel/Point.cpp ui/FragmentItem.cpp main.cpp mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents MAELab/imageModel/Edge.h MAELab/imageModel/Image.h MAELab/imageModel/Line.h MAELab/imageModel/Matrix.h MAELab/imageModel/Point.h MAELab/io/JPEGReader.h MAELab/io/PNGReader.h MAELab/io/Reader.h MAELab/io/TPSReader.h MAELab/io/LibJpeg/jconfig.h MAELab/io/LibJpeg/jdct.h MAELab/io/LibJpeg/jerror.h MAELab/io/LibJpeg/jinclude.h MAELab/io/LibJpeg/jmemsys.h MAELab/io/LibJpeg/jmorecfg.h MAELab/io/LibJpeg/jpegint.h MAELab/io/LibJpeg/jpeglib.h MAELab/io/LibJpeg/jversion.h MAELab/segmentation/Canny.h MAELab/segmentation/Filters.h MAELab/segmentation/Suzuki.h MAELab/segmentation/Thresholds.h MAELab/utils/Converter.h ui/FragmentItem.h ui/mainwindow.h $(DISTDIR)/
+	$(COPY_FILE) --parents MAELab/imageModel/Edge.cpp MAELab/imageModel/Image.cpp MAELab/imageModel/Line.cpp MAELab/imageModel/Matrix.cpp MAELab/imageModel/Point.cpp MAELab/io/JPEGReader.cpp MAELab/io/PNGReader.cpp MAELab/io/Reader.cpp MAELab/io/TPSReader.cpp MAELab/io/LibJpeg/jaricom.c MAELab/io/LibJpeg/jcapimin.c MAELab/io/LibJpeg/jcapistd.c MAELab/io/LibJpeg/jcarith.c MAELab/io/LibJpeg/jccoefct.c MAELab/io/LibJpeg/jccolor.c MAELab/io/LibJpeg/jcdctmgr.c MAELab/io/LibJpeg/jchuff.c MAELab/io/LibJpeg/jcinit.c MAELab/io/LibJpeg/jcmainct.c MAELab/io/LibJpeg/jcmarker.c MAELab/io/LibJpeg/jcmaster.c MAELab/io/LibJpeg/jcomapi.c MAELab/io/LibJpeg/jcparam.c MAELab/io/LibJpeg/jcprepct.c MAELab/io/LibJpeg/jcsample.c MAELab/io/LibJpeg/jctrans.c MAELab/io/LibJpeg/jdapimin.c MAELab/io/LibJpeg/jdapistd.c MAELab/io/LibJpeg/jdarith.c MAELab/io/LibJpeg/jdatadst.c MAELab/io/LibJpeg/jdatasrc.c MAELab/io/LibJpeg/jdcoefct.c MAELab/io/LibJpeg/jdcolor.c MAELab/io/LibJpeg/jddctmgr.c MAELab/io/LibJpeg/jdhuff.c MAELab/io/LibJpeg/jdinput.c MAELab/io/LibJpeg/jdmainct.c MAELab/io/LibJpeg/jdmarker.c MAELab/io/LibJpeg/jdmaster.c MAELab/io/LibJpeg/jdmerge.c MAELab/io/LibJpeg/jdpostct.c MAELab/io/LibJpeg/jdsample.c MAELab/io/LibJpeg/jdtrans.c MAELab/io/LibJpeg/jerror.c MAELab/io/LibJpeg/jfdctflt.c MAELab/io/LibJpeg/jfdctfst.c MAELab/io/LibJpeg/jfdctint.c MAELab/io/LibJpeg/jidctflt.c MAELab/io/LibJpeg/jidctfst.c MAELab/io/LibJpeg/jidctint.c MAELab/io/LibJpeg/jmemmgr.c MAELab/io/LibJpeg/jmemnobs.c MAELab/io/LibJpeg/jquant1.c MAELab/io/LibJpeg/jquant2.c MAELab/io/LibJpeg/jutils.c MAELab/segmentation/Canny.cpp MAELab/segmentation/Filters.cpp MAELab/segmentation/Suzuki.cpp MAELab/segmentation/Thresholds.cpp MAELab/utils/Converter.cpp ui/FragmentItem.cpp ui/mainwindow.cpp main.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -816,10 +975,10 @@ moc_mainwindow.cpp: /opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/QMainWindow \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qtouchdevice.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qtabwidget.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qicon.h \
-		mainwindow.h \
+		ui/mainwindow.h \
 		moc_predefs.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/bin/moc
-	/opt/Qt5.9.1/5.9.1/gcc_64/bin/moc $(DEFINES) --include ./moc_predefs.h -I/opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/linux-g++ -I/home/xuanthanh/workplace/FAM/FAMLab_2017 -I/opt/Qt5.9.1/5.9.1/gcc_64/include -I/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets -I/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui -I/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include mainwindow.h -o moc_mainwindow.cpp
+	/opt/Qt5.9.1/5.9.1/gcc_64/bin/moc $(DEFINES) --include ./moc_predefs.h -I/opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/linux-g++ -I/home/xuanthanh/workplace/FAM/FAMLab_2017 -I/opt/Qt5.9.1/5.9.1/gcc_64/include -I/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets -I/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui -I/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore -I/usr/include/c++/5 -I/usr/include/x86_64-linux-gnu/c++/5 -I/usr/include/c++/5/backward -I/usr/lib/gcc/x86_64-linux-gnu/5/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include ui/mainwindow.h -o moc_mainwindow.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -844,6 +1003,10 @@ Image.o: MAELab/imageModel/Image.cpp MAELab/imageModel/Point.h \
 		MAELab/imageModel/Line.h \
 		MAELab/imageModel/Edge.h \
 		MAELab/imageModel/Matrix.h \
+		MAELab/io/Reader.h \
+		MAELab/segmentation/Thresholds.h \
+		MAELab/segmentation/Canny.h \
+		MAELab/segmentation/Suzuki.h \
 		MAELab/imageModel/Image.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Image.o MAELab/imageModel/Image.cpp
 
@@ -858,36 +1021,558 @@ Matrix.o: MAELab/imageModel/Matrix.cpp MAELab/imageModel/Point.h \
 Point.o: MAELab/imageModel/Point.cpp MAELab/imageModel/Point.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Point.o MAELab/imageModel/Point.cpp
 
-*.o: MAELab/io/*.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o *.o MAELab/io/*.cpp
+JPEGReader.o: MAELab/io/JPEGReader.cpp MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/imageModel/Point.h \
+		MAELab/imageModel/Matrix.h \
+		MAELab/io/JPEGReader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o JPEGReader.o MAELab/io/JPEGReader.cpp
 
-Edge.o: MAELab/imageModel/Edge.cpp MAELab/imageModel/Point.h \
-		MAELab/imageModel/Line.h \
-		MAELab/imageModel/Edge.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Edge.o MAELab/imageModel/Edge.cpp
+PNGReader.o: MAELab/io/PNGReader.cpp MAELab/imageModel/Point.h \
+		MAELab/imageModel/Matrix.h \
+		MAELab/io/PNGReader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o PNGReader.o MAELab/io/PNGReader.cpp
 
-Image.o: MAELab/imageModel/Image.cpp MAELab/imageModel/Point.h \
+Reader.o: MAELab/io/Reader.cpp MAELab/imageModel/Point.h \
+		MAELab/imageModel/Matrix.h \
+		MAELab/io/TPSReader.h \
+		MAELab/io/JPEGReader.h \
+		MAELab/io/Reader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Reader.o MAELab/io/Reader.cpp
+
+TPSReader.o: MAELab/io/TPSReader.cpp MAELab/imageModel/Point.h \
+		MAELab/io/TPSReader.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o TPSReader.o MAELab/io/TPSReader.cpp
+
+jaricom.o: MAELab/io/LibJpeg/jaricom.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jaricom.o MAELab/io/LibJpeg/jaricom.c
+
+jcapimin.o: MAELab/io/LibJpeg/jcapimin.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcapimin.o MAELab/io/LibJpeg/jcapimin.c
+
+jcapistd.o: MAELab/io/LibJpeg/jcapistd.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcapistd.o MAELab/io/LibJpeg/jcapistd.c
+
+jcarith.o: MAELab/io/LibJpeg/jcarith.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcarith.o MAELab/io/LibJpeg/jcarith.c
+
+jccoefct.o: MAELab/io/LibJpeg/jccoefct.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jccoefct.o MAELab/io/LibJpeg/jccoefct.c
+
+jccolor.o: MAELab/io/LibJpeg/jccolor.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jccolor.o MAELab/io/LibJpeg/jccolor.c
+
+jcdctmgr.o: MAELab/io/LibJpeg/jcdctmgr.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jdct.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcdctmgr.o MAELab/io/LibJpeg/jcdctmgr.c
+
+jchuff.o: MAELab/io/LibJpeg/jchuff.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jchuff.o MAELab/io/LibJpeg/jchuff.c
+
+jcinit.o: MAELab/io/LibJpeg/jcinit.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcinit.o MAELab/io/LibJpeg/jcinit.c
+
+jcmainct.o: MAELab/io/LibJpeg/jcmainct.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcmainct.o MAELab/io/LibJpeg/jcmainct.c
+
+jcmarker.o: MAELab/io/LibJpeg/jcmarker.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcmarker.o MAELab/io/LibJpeg/jcmarker.c
+
+jcmaster.o: MAELab/io/LibJpeg/jcmaster.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcmaster.o MAELab/io/LibJpeg/jcmaster.c
+
+jcomapi.o: MAELab/io/LibJpeg/jcomapi.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcomapi.o MAELab/io/LibJpeg/jcomapi.c
+
+jcparam.o: MAELab/io/LibJpeg/jcparam.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcparam.o MAELab/io/LibJpeg/jcparam.c
+
+jcprepct.o: MAELab/io/LibJpeg/jcprepct.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcprepct.o MAELab/io/LibJpeg/jcprepct.c
+
+jcsample.o: MAELab/io/LibJpeg/jcsample.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jcsample.o MAELab/io/LibJpeg/jcsample.c
+
+jctrans.o: MAELab/io/LibJpeg/jctrans.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jctrans.o MAELab/io/LibJpeg/jctrans.c
+
+jdapimin.o: MAELab/io/LibJpeg/jdapimin.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdapimin.o MAELab/io/LibJpeg/jdapimin.c
+
+jdapistd.o: MAELab/io/LibJpeg/jdapistd.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdapistd.o MAELab/io/LibJpeg/jdapistd.c
+
+jdarith.o: MAELab/io/LibJpeg/jdarith.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdarith.o MAELab/io/LibJpeg/jdarith.c
+
+jdatadst.o: MAELab/io/LibJpeg/jdatadst.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdatadst.o MAELab/io/LibJpeg/jdatadst.c
+
+jdatasrc.o: MAELab/io/LibJpeg/jdatasrc.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdatasrc.o MAELab/io/LibJpeg/jdatasrc.c
+
+jdcoefct.o: MAELab/io/LibJpeg/jdcoefct.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdcoefct.o MAELab/io/LibJpeg/jdcoefct.c
+
+jdcolor.o: MAELab/io/LibJpeg/jdcolor.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdcolor.o MAELab/io/LibJpeg/jdcolor.c
+
+jddctmgr.o: MAELab/io/LibJpeg/jddctmgr.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jdct.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jddctmgr.o MAELab/io/LibJpeg/jddctmgr.c
+
+jdhuff.o: MAELab/io/LibJpeg/jdhuff.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdhuff.o MAELab/io/LibJpeg/jdhuff.c
+
+jdinput.o: MAELab/io/LibJpeg/jdinput.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdinput.o MAELab/io/LibJpeg/jdinput.c
+
+jdmainct.o: MAELab/io/LibJpeg/jdmainct.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdmainct.o MAELab/io/LibJpeg/jdmainct.c
+
+jdmarker.o: MAELab/io/LibJpeg/jdmarker.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdmarker.o MAELab/io/LibJpeg/jdmarker.c
+
+jdmaster.o: MAELab/io/LibJpeg/jdmaster.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdmaster.o MAELab/io/LibJpeg/jdmaster.c
+
+jdmerge.o: MAELab/io/LibJpeg/jdmerge.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdmerge.o MAELab/io/LibJpeg/jdmerge.c
+
+jdpostct.o: MAELab/io/LibJpeg/jdpostct.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdpostct.o MAELab/io/LibJpeg/jdpostct.c
+
+jdsample.o: MAELab/io/LibJpeg/jdsample.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdsample.o MAELab/io/LibJpeg/jdsample.c
+
+jdtrans.o: MAELab/io/LibJpeg/jdtrans.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jdtrans.o MAELab/io/LibJpeg/jdtrans.c
+
+jerror.o: MAELab/io/LibJpeg/jerror.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jversion.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jerror.o MAELab/io/LibJpeg/jerror.c
+
+jfdctflt.o: MAELab/io/LibJpeg/jfdctflt.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jdct.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jfdctflt.o MAELab/io/LibJpeg/jfdctflt.c
+
+jfdctfst.o: MAELab/io/LibJpeg/jfdctfst.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jdct.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jfdctfst.o MAELab/io/LibJpeg/jfdctfst.c
+
+jfdctint.o: MAELab/io/LibJpeg/jfdctint.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jdct.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jfdctint.o MAELab/io/LibJpeg/jfdctint.c
+
+jidctflt.o: MAELab/io/LibJpeg/jidctflt.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jdct.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jidctflt.o MAELab/io/LibJpeg/jidctflt.c
+
+jidctfst.o: MAELab/io/LibJpeg/jidctfst.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jdct.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jidctfst.o MAELab/io/LibJpeg/jidctfst.c
+
+jidctint.o: MAELab/io/LibJpeg/jidctint.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jdct.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jidctint.o MAELab/io/LibJpeg/jidctint.c
+
+jmemmgr.o: MAELab/io/LibJpeg/jmemmgr.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jmemsys.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jmemmgr.o MAELab/io/LibJpeg/jmemmgr.c
+
+jmemnobs.o: MAELab/io/LibJpeg/jmemnobs.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h \
+		MAELab/io/LibJpeg/jmemsys.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jmemnobs.o MAELab/io/LibJpeg/jmemnobs.c
+
+jquant1.o: MAELab/io/LibJpeg/jquant1.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jquant1.o MAELab/io/LibJpeg/jquant1.c
+
+jquant2.o: MAELab/io/LibJpeg/jquant2.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jquant2.o MAELab/io/LibJpeg/jquant2.c
+
+jutils.o: MAELab/io/LibJpeg/jutils.c MAELab/io/LibJpeg/jinclude.h \
+		MAELab/io/LibJpeg/jconfig.h \
+		MAELab/io/LibJpeg/jpeglib.h \
+		MAELab/io/LibJpeg/jmorecfg.h \
+		MAELab/io/LibJpeg/jpegint.h \
+		MAELab/io/LibJpeg/jerror.h
+	$(CC) -c $(CFLAGS) $(INCPATH) -o jutils.o MAELab/io/LibJpeg/jutils.c
+
+Canny.o: MAELab/segmentation/Canny.cpp MAELab/imageModel/Point.h \
 		MAELab/imageModel/Line.h \
 		MAELab/imageModel/Edge.h \
 		MAELab/imageModel/Matrix.h \
-		MAELab/imageModel/Image.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Image.o MAELab/imageModel/Image.cpp
+		MAELab/io/Reader.h \
+		MAELab/utils/Converter.h \
+		MAELab/segmentation/Filters.h \
+		MAELab/segmentation/Thresholds.h \
+		MAELab/segmentation/Canny.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Canny.o MAELab/segmentation/Canny.cpp
 
-Line.o: MAELab/imageModel/Line.cpp MAELab/imageModel/Point.h \
-		MAELab/imageModel/Line.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Line.o MAELab/imageModel/Line.cpp
+Filters.o: MAELab/segmentation/Filters.cpp MAELab/imageModel/Point.h \
+		MAELab/imageModel/Matrix.h \
+		MAELab/segmentation/Canny.h \
+		MAELab/segmentation/Filters.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Filters.o MAELab/segmentation/Filters.cpp
 
-Matrix.o: MAELab/imageModel/Matrix.cpp MAELab/imageModel/Point.h \
-		MAELab/imageModel/Matrix.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Matrix.o MAELab/imageModel/Matrix.cpp
+Suzuki.o: MAELab/segmentation/Suzuki.cpp MAELab/imageModel/Point.h \
+		MAELab/imageModel/Line.h \
+		MAELab/imageModel/Edge.h \
+		MAELab/imageModel/Matrix.h \
+		MAELab/io/Reader.h \
+		MAELab/segmentation/Thresholds.h \
+		MAELab/segmentation/Suzuki.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Suzuki.o MAELab/segmentation/Suzuki.cpp
 
-Point.o: MAELab/imageModel/Point.cpp MAELab/imageModel/Point.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Point.o MAELab/imageModel/Point.cpp
+Thresholds.o: MAELab/segmentation/Thresholds.cpp MAELab/imageModel/Point.h \
+		MAELab/imageModel/Line.h \
+		MAELab/imageModel/Edge.h \
+		MAELab/imageModel/Matrix.h \
+		MAELab/segmentation/Filters.h \
+		MAELab/segmentation/Thresholds.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Thresholds.o MAELab/segmentation/Thresholds.cpp
+
+Converter.o: MAELab/utils/Converter.cpp MAELab/utils/Converter.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o Converter.o MAELab/utils/Converter.cpp
 
 FragmentItem.o: ui/FragmentItem.cpp ui/FragmentItem.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o FragmentItem.o ui/FragmentItem.cpp
 
-main.o: main.cpp mainwindow.h \
+mainwindow.o: ui/mainwindow.cpp ui/mainwindow.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/QMainWindow \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qmainwindow.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qtguiglobal.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qglobal.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qconfig.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qtcore-config.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsystemdetection.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qprocessordetection.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcompilerdetection.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qtypeinfo.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsysinfo.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qlogging.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qflags.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qatomic.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qbasicatomic.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qgenericatomic.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qatomic_msvc.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qglobalstatic.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qmutex.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qnumeric.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qversiontagging.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qtgui-config.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qtwidgets-config.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qwidget.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qwindowdefs.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qobjectdefs.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qnamespace.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qwindowdefs_win.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qobject.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qstring.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qchar.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qbytearray.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qrefcount.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qarraydata.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qstringbuilder.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qlist.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qalgorithms.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qiterator.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qhashfunctions.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qpair.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qbytearraylist.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qstringlist.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qregexp.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qstringmatcher.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcoreevent.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qscopedpointer.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qmetatype.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qvarlengtharray.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcontainerfwd.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qobject_impl.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qmargins.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpaintdevice.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qrect.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsize.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qpoint.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpalette.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qcolor.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qrgb.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qrgba64.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qbrush.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qvector.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qmatrix.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpolygon.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qregion.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qdatastream.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qiodevice.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qline.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qtransform.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpainterpath.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qimage.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpixelformat.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpixmap.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsharedpointer.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qshareddata.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qhash.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qfont.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qfontmetrics.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qfontinfo.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qsizepolicy.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qcursor.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qkeysequence.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qevent.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qvariant.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qmap.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qdebug.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qtextstream.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qlocale.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qset.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcontiguouscache.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qurl.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qurlquery.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qfile.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qfiledevice.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qvector2d.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qtouchdevice.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qtabwidget.h \
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qicon.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ui/mainwindow.cpp
+
+main.o: main.cpp ui/mainwindow.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/QMainWindow \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qmainwindow.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -999,112 +1684,6 @@ main.o: main.cpp mainwindow.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qguiapplication.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qinputmethod.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o main.cpp
-
-mainwindow.o: mainwindow.cpp mainwindow.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/QMainWindow \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qmainwindow.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qtguiglobal.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qglobal.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qconfig-bootstrapped.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qconfig.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qtcore-config.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsystemdetection.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qprocessordetection.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcompilerdetection.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qtypeinfo.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsysinfo.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qlogging.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qflags.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qatomic.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qbasicatomic.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qatomic_bootstrap.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qgenericatomic.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qatomic_cxx11.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qatomic_msvc.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qglobalstatic.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qmutex.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qnumeric.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qversiontagging.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qtgui-config.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qtwidgets-config.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qwidget.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qwindowdefs.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qobjectdefs.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qnamespace.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qobjectdefs_impl.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qwindowdefs_win.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qobject.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qstring.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qchar.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qbytearray.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qrefcount.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qarraydata.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qstringbuilder.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qlist.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qalgorithms.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qiterator.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qhashfunctions.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qpair.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qbytearraylist.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qstringlist.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qregexp.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qstringmatcher.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcoreevent.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qscopedpointer.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qmetatype.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qvarlengtharray.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcontainerfwd.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qobject_impl.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qmargins.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpaintdevice.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qrect.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsize.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qpoint.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpalette.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qcolor.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qrgb.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qrgba64.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qbrush.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qvector.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qmatrix.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpolygon.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qregion.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qdatastream.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qiodevice.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qline.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qtransform.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpainterpath.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qimage.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpixelformat.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qpixmap.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsharedpointer.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qshareddata.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qhash.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsharedpointer_impl.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qfont.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qfontmetrics.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qfontinfo.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qsizepolicy.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qcursor.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qkeysequence.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qevent.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qvariant.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qmap.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qdebug.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qtextstream.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qlocale.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qset.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcontiguouscache.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qurl.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qurlquery.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qfile.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qfiledevice.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qvector2d.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qtouchdevice.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtWidgets/qtabwidget.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtGui/qicon.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
