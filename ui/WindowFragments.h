@@ -25,7 +25,7 @@ using namespace std;
 #include "../MAELab/segmentation/Suzuki.h"
 #include "../MAELab/segmentation/Filters.h"
 #include "../MAELab/utils/ImageConvert.h"
-#include "algorithm/MatchingAlgorithm.h"
+#include "matching/MatchingAlgorithm.h"
 #include "ImageViewer.h"
 #include "FragmentItem.h"
 #include "SceneFragments.h"

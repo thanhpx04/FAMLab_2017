@@ -18,7 +18,7 @@ HEADERS += \
         MAELab/io/LibJpeg/*.h \
         MAELab/segmentation/*.h \
         MAELab/utils/*.h \
-        algorithm/*.h \
+        matching/*.h \
         segmentation/*.h \
         ui/*.h
 
@@ -28,7 +28,7 @@ SOURCES += \
         MAELab/io/LibJpeg/*.c \
         MAELab/segmentation/*.cpp \
         MAELab/utils/*.cpp \
-        algorithm/*.cpp \
+        matching/*.cpp \
         segmentation/*.cpp \
         ui/*.cpp \
         main.cpp
