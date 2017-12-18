@@ -168,22 +168,20 @@ void WindowFragments::propertyItem()
         int xImage = selected->getImageX();
         int yImage = selected->getImageY();
 
-        int x = selected->boundingRect().topLeft().x();
-        int y = selected->boundingRect().topLeft().y();
+        QRectF rect;
+        rect = selected->mapToScene(selected->boundingRect()).boundingRect();
+        int x = rect.x();
+        int y = rect.y();
         int rotation = selected->rotation();
 
-        //        stringstream myString;
-        //        myString << "<p>The fragment is in location ("<<xImage<< ", "+yImage+
-        //                    ") of image: "+imageName+"</p>"
-        //                    "<p>location on screen is ("+x+", "+y+")</p>"
-        //                    "<p>its rotation: "+rotation+"</p>";
+        ostringstream result;
+        result << "<p>The fragment is in location (" <<
+                  xImage << ", " << yImage << ") of image: " <<
+                  imageName << "</p><p>On the screen at (" <<
+                  x << ", " << y << ")</p><p>Its rotation: "<<
+                  rotation << "</p>";
 
-        //        string result = "<p>The fragment is in location (" << xImage ", "+yImage+
-        //                ") of image: "+imageName+"</p>"
-        //                "<p>location on screen is ("+x+", "+y+")</p>"
-        //                "<p>its rotation: "+rotation+"</p>";
-
-        QMessageBox::information(this, "Information of fragment","tr(imageName)");
+        QMessageBox::information(this, "Information of fragment",QString::fromStdString(result.str()));
     }
 }
 

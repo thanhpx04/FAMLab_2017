@@ -5,6 +5,9 @@
 #include <vector>
 using namespace std;
 
+#include "MAELab/imageModel/Point.h"
+#include "MAELab/imageModel/Edge.h"
+
 vector<vector<int> > cumulativeDistanceMatrix(vector<int> vectorX, vector<int> vectorY);
 vector< pair<int,int> > optimalWarpingPath(vector< vector<int> > dtw);
 

@@ -32,6 +32,7 @@ public:
     FragmentItem(string name, int locationX, int locationY, Edge border,
                  ptrRGBAMatrix objectRGBAMatrix, const QPixmap &pixmap,
                  QMenu *contextMenu, QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    ~FragmentItem();
 
     void setName(string name);
     string getName();

@@ -18,6 +18,12 @@ FragmentItem::FragmentItem(string name, int locationX, int locationY, Edge borde
     setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 
+FragmentItem::~FragmentItem()
+{
+    delete myContextMenu;
+//    delete connectedLines;
+}
+
 void FragmentItem::setName(string name)
 {
     this->name = name;

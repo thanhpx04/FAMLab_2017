@@ -192,22 +192,22 @@ void ImageViewer::extractObject(int x, int y)
     }
 
     // paint red line
-    RGBA red;
-    red.R = red.A = 255;
-    red.G = red.B = 0;
-    rows = objectRGBAMatrix->getRows();
-    cols = objectRGBAMatrix->getCols();
-//    vector<Point> drawPoints = cPoints;
-    vector<Point> drawPoints = longestEdge.getPoints();
-    for (size_t k = 0; k < drawPoints.size(); k++)
-    {
-        Point pi = drawPoints.at(k);
-        if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
-                && pi.getY() < rows)
-        {
-            objectRGBAMatrix->setAtPosition(pi.getY(), pi.getX(), red);
-        }
-    }
+//    RGBA red;
+//    red.R = red.A = 255;
+//    red.G = red.B = 0;
+//    rows = objectRGBAMatrix->getRows();
+//    cols = objectRGBAMatrix->getCols();
+////    vector<Point> drawPoints = cPoints;
+//    vector<Point> drawPoints = longestEdge.getPoints();
+//    for (size_t k = 0; k < drawPoints.size(); k++)
+//    {
+//        Point pi = drawPoints.at(k);
+//        if (pi.getX() >= 0 && pi.getX() < cols && pi.getY() >= 0
+//                && pi.getY() < rows)
+//        {
+//            objectRGBAMatrix->setAtPosition(pi.getY(), pi.getX(), red);
+//        }
+//    }
 
 //    Edge border;
 //    border.setPoints(cPoints);

@@ -1,9 +1,4 @@
-
-#include "MAELab/imageModel/Point.h"
-#include "MAELab/imageModel/Edge.h"
-
 #include "MatchingAlgorithm.h"
-
 
 vector<vector<int> > cumulativeDistanceMatrix(vector<int> vectorX, vector<int> vectorY)
 {

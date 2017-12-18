@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <float.h>
 #include <string>
+#include <sstream>
 using namespace std;
 
 #include "../MAELab/imageModel/Point.h"
