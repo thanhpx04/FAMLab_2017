@@ -4,21 +4,6 @@
  *  Created on: Sep 15, 2016
  *      Author: linh
  */
-#include <iostream>
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <vector>
-#include <string.h>
-#include <fstream>
-#include <time.h>
-#include <istream>
-#include <algorithm>
-
-using namespace std;
-
-#include "Point.h"
-#include "Line.h"
 #include "Edge.h"
 
 //=================================================== Constructor ===========================================

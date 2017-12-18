@@ -7,12 +7,30 @@
 
 #ifndef EDGE_H_
 #define EDGE_H_
+
+#include <iostream>
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <vector>
+#include <string.h>
+#include <fstream>
+#include <time.h>
+#include <istream>
+#include <algorithm>
+
+using namespace std;
+
+#include "Point.h"
+#include "Line.h"
+
+
 bool checkPointInList(std::vector<Point>, Point);
 class Edge
 {
 
 private:
-	std::vector<Point> listOfPoints; // list of points in the edge
+    std::vector<Point> listOfPoints; // list of points in the edge
 	std::vector<Point> listOfBreakPoints; // list of break points in edge. Break point is connection point between two lines on edge.
 	void breakEdge(double);
 

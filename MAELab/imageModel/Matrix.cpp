@@ -5,18 +5,7 @@
  *      Author: linh
  */
 
-#include <iostream>
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <vector>
-#include <string.h>
-#include <fstream>
-#include <time.h>
 
-using namespace std;
-
-#include "Point.h"
 
 #include "Matrix.h"
 
@@ -269,4 +258,6 @@ template class Matrix<int> ;
 template class Matrix<double> ;
 template class Matrix<float> ;
 template class Matrix<RGB> ;
+// Thanh edit
+template class Matrix<RGBA> ;
 

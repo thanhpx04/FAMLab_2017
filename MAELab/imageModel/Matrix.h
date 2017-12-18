@@ -8,6 +8,20 @@
 
 #ifndef MATRIX_H_
 #define MATRIX_H_
+
+#include <iostream>
+#include <math.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <vector>
+#include <string.h>
+#include <fstream>
+#include <time.h>
+
+using namespace std;
+
+#include "Point.h"
+
 void rotateAPoint(int x, int y, Point center, double angle, double scale,
 		int &xnew, int &ynew);
 template<typename T>
@@ -74,5 +88,7 @@ public:
 typedef Matrix<int>* ptr_IntMatrix;
 typedef Matrix<double>* ptr_DoubleMatrix;
 typedef Matrix<RGB>* ptr_RGBMatrix;
+// Thanh edit
+typedef Matrix<RGBA>* ptrRGBAMatrix;
 
 #endif /* MATRIX_H_ */
